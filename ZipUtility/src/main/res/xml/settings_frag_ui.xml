@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android">
+	    <CheckBoxPreference
+			android:key="@string/settings_device_orientation_portrait"
+			android:title="@string/settings_device_orientation_portrait_title"
+			android:summary="@string/settings_device_orientation_portrait_summary_ena" />
+  	    <CheckBoxPreference
+			android:key="@string/settings_use_light_theme"
+			android:title="@string/settings_use_light_theme_title"
+			android:summary="@string/settings_use_light_theme_summary_ena" />
+	    	    	    	    	    	    
+</PreferenceScreen>
