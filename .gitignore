@@ -58,3 +58,5 @@ freeline/
 freeline_project_description.json
 
 ZipUtility/release/
+
+.idea/inspectionProfiles/
