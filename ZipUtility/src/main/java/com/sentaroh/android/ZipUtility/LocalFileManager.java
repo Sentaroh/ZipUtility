@@ -2851,7 +2851,7 @@ public class LocalFileManager{
 	};
 	
     private void setContextButtonShareVisibility() {
-    	if (mTreeFilelistAdapter.getCount()>0) {
+    	if (mTreeFilelistAdapter.isDataItemIsSelected()) {
    			mContextButtonShareView.setVisibility(ImageButton.VISIBLE);
     	} else {
     		mContextButtonShareView.setVisibility(ImageButton.INVISIBLE);
