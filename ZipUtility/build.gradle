@@ -8,8 +8,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 22
 
-        versionCode 58
-        versionName "1.41"
+        versionCode 59
+        versionName "1.42"
 
 //        multiDexEnabled true
     }
@@ -32,8 +32,8 @@ android {
                         def date = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())
                         def mod_name = variant.getPackageApplication().projectBaseName
                         def fileExtension= outputFileName.toString().substring(outputFileName.toString().lastIndexOf(".")+1)
-                        def newName = "${mod_name}_${versionName}_${versionNumber}_${date}.${fileExtension}"
-//                        def newName = "${mod_name}_${versionName}_${versionNumber}.${fileExtension}"
+//                        def newName = "${mod_name}_${versionName}_${versionNumber}_${date}.${fileExtension}"
+                        def newName = "${mod_name}_${versionName}_${versionNumber}.${fileExtension}"
                         outputFileName = newName
                     }
                 }
