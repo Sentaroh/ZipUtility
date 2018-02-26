@@ -963,7 +963,7 @@ public class LocalFileManager{
 				else mCommonDlg.showCommonDialog(true, "W", mContext.getString(R.string.msgs_file_select_edit_confirm_create_directory), n_path, ntfy);
 			}
 		});
-		// CANCEL�{�^���̎w��
+
 		btnCancel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				dialog.dismiss();
@@ -1061,9 +1061,15 @@ public class LocalFileManager{
 								boolean rc_create=false;
 								if (!tfli.isDirectory()) {
 									if (current_name.startsWith(mGp.safMgr.getExternalSdcardPath())) {
-										SafFile sf=mGp.safMgr.getSafFileBySdcardPath(mGp.safMgr.getSdcardSafFile(), current_name, false);
-										sf.renameTo(etDir.getText().toString());
-										rc_create=sf.exists();
+									    try {
+                                            SafFile sf=mGp.safMgr.getSafFileBySdcardPath(mGp.safMgr.getSdcardSafFile(), current_name, false);
+                                            sf.renameTo(etDir.getText().toString());
+                                            rc_create=sf.exists();
+                                        } catch(Exception e) {
+                                            mUtil.addLogMsg("E","Saf file error");
+                                            mUtil.addLogMsg("E",mGp.safMgr.getSafDebugMsg());
+                                            CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
+                                        }
 									} else {
 										File n_file=new File(new_name);
 										File c_file=new File(current_name);
@@ -1078,9 +1084,15 @@ public class LocalFileManager{
 									ArrayList<File>fl=new ArrayList<File>();
 									CommonUtilities.getAllFileInDirectory(mGp, mUtil, fl, new File(current_name), true);
 									if (current_name.startsWith(mGp.safMgr.getExternalSdcardPath())) {
-										SafFile sf=mGp.safMgr.getSafFileBySdcardPath(mGp.safMgr.getSdcardSafFile(), current_name, true);
-										sf.renameTo(etDir.getText().toString());
-										rc_create=sf.exists();
+                                        try {
+                                            SafFile sf=mGp.safMgr.getSafFileBySdcardPath(mGp.safMgr.getSdcardSafFile(), current_name, true);
+                                            sf.renameTo(etDir.getText().toString());
+                                            rc_create=sf.exists();
+                                        } catch(Exception e) {
+                                            mUtil.addLogMsg("E","Saf directory error");
+                                            mUtil.addLogMsg("E",mGp.safMgr.getSafDebugMsg());
+                                            CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
+                                        }
 									} else {
 										File n_file=new File(new_name);
 										File c_file=new File(current_name);
