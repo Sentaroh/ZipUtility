@@ -8,8 +8,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 22
 
-        versionCode 59
-        versionName "1.42"
+        versionCode 60
+        versionName "1.43"
 
 //        multiDexEnabled true
     }
@@ -20,6 +20,27 @@ android {
     }
 
     buildTypes {
+        debug {
+            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+
+            applicationVariants.all { variant ->
+                if (variant.buildType.name.equals("debug")) {
+                    variant.outputs.all {
+                        def versionName = variant.versionName
+                        def versionNumber = variant.versionCode.toString()
+                        def date = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date())
+                        def mod_name = variant.getPackageApplication().projectBaseName
+                        def fileExtension= outputFileName.toString().substring(outputFileName.toString().lastIndexOf(".")+1)
+//                        def newName = "${mod_name}_${versionName}_${versionNumber}_${date}.${fileExtension}"
+                        def newName = "${mod_name}_${versionName}_${versionNumber}_debug.${fileExtension}"
+                        outputFileName = "../../../../../release/"+newName
+                    }
+                }
+            }
+
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
@@ -33,7 +54,7 @@ android {
                         def mod_name = variant.getPackageApplication().projectBaseName
                         def fileExtension= outputFileName.toString().substring(outputFileName.toString().lastIndexOf(".")+1)
 //                        def newName = "${mod_name}_${versionName}_${versionNumber}_${date}.${fileExtension}"
-                        def newName = "${mod_name}_${versionName}_${versionNumber}.${fileExtension}"
+                        def newName = "${mod_name}_${versionName}_${versionNumber}_release.${fileExtension}"
                         outputFileName = newName
                     }
                 }
@@ -44,7 +65,8 @@ android {
 
 dependencies {
 //    implementation project(':Utilities')
-    implementation(name:'Utilities-1.0.5', ext:'aar')
+//    implementation(name:'Utilities-1.0.5', ext:'aar')
+    implementation files('libs/Utilities-1.0.6.aar')
     implementation 'com.android.support:appcompat-v7:22.2.1'
     implementation files('libs/commons-compress-1.12.jar')
 }

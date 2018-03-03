@@ -1845,6 +1845,7 @@ public class LocalFileManager{
 	private boolean isExtractEnded(final ThreadCtrl tc, final String dest_path, final ZipFile zf,  
 			final ArrayList<FileHeader> selected_fh_list, final ArrayList<FileHeader>extracted_fh_list, 
 			final String conf_list, final boolean move_mode) {
+	    boolean error=false;
 		if ((selected_fh_list.size()==0)) {
 			mUtil.addDebugMsg(2, "I", CommonUtilities.getExecutedMethodName()+" Extract ended");
 			mUiHandler.post(new Runnable(){
@@ -1875,8 +1876,14 @@ public class LocalFileManager{
 						if (tc.isEnabled()) bzf.close();
 					} catch (ZipException e) {
 						e.printStackTrace();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        String e_msg="Exception occured";
+                        mUtil.addLogMsg("E", e_msg+", "+e.getMessage());
+                        mCommonDlg.showCommonDialog(false, "E",e_msg, e.getMessage(), null);
+                        error=true;
 					}
-					if (tc.isEnabled()) mCommonDlg.showCommonDialog(false, "I", 
+					if (!error && tc.isEnabled()) mCommonDlg.showCommonDialog(false, "I",
 							mContext.getString(R.string.msgs_zip_move_file_completed), conf_list, null);
 				}
 			}
@@ -3661,6 +3668,13 @@ public class LocalFileManager{
 					mCommonDlg.showCommonDialog(false, "E",msg, e.getMessage(), null);
 					copy_back_required=false;
 					process_aborted=true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    String msg=String.format(mContext.getString(R.string.msgs_local_file_add_file_failed),processed_file.getPath());
+                    mUtil.addLogMsg("E", msg);
+                    mCommonDlg.showCommonDialog(false, "E",msg, e.getMessage(), null);
+                    copy_back_required=false;
+                    process_aborted=true;
 				}
 
 				mUtil.addDebugMsg(1, "I", "zipSelectedItem elapsed time="+(System.currentTimeMillis()-b_time));

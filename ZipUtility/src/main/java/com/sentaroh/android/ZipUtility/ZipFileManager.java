@@ -1905,6 +1905,12 @@ public class ZipFileManager {
 						mCommonDlg.showCommonDialog(false, "E", mContext.getString(R.string.msgs_zip_add_file_close_failed), 
 								tc.getThreadMessage(), null);
 						aborted=true;
+                    } catch (Exception e) {
+                        tc.setThreadMessage(e.getMessage());
+                        mUtil.addLogMsg("I",mContext.getString(R.string.msgs_zip_add_file_close_failed));
+                        mCommonDlg.showCommonDialog(false, "E", mContext.getString(R.string.msgs_zip_add_file_close_failed),
+                                tc.getThreadMessage(), null);
+                        aborted=true;
 					}
 					if (p_ntfy!=null) p_ntfy.notifyToListener(true, new Object[]{add_item});
 					if (copy_back_required) {
@@ -2801,6 +2807,11 @@ public class ZipFileManager {
 						error_msg=e.getMessage();
 						CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
 						abort=true;
+                    } catch (Exception e) {
+                        mUtil.addLogMsg("I", e.getMessage());
+                        error_msg=e.getMessage();
+                        CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
+                        abort=true;
 					}
 				}
 				

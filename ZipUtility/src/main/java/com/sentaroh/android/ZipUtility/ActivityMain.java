@@ -785,7 +785,8 @@ public class ActivityMain extends AppCompatActivity {
 		refreshOptionMenu();
 		
 		try {
-			mSvcClient.aidlUpdateNotificationMessage(mContext.getString(R.string.msgs_main_notification_end_message));
+		    if (mSvcClient!=null)
+			    mSvcClient.aidlUpdateNotificationMessage(mContext.getString(R.string.msgs_main_notification_end_message));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
