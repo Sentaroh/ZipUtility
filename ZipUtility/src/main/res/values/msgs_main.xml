@@ -192,6 +192,7 @@ External Library:\n
 	<string name="msgs_zip_extract_file_confirm_extract">Do you want to expand the following items to the %s?</string>
 	<string name="msgs_zip_extract_file_started">Extraction has been started.</string>
 	<string name="msgs_zip_extract_file_completed">Extraction has been completed.</string>
+    <string name="msgs_zip_extract_file_end_with_error">Extraction end with error.</string>
 
 	<string name="msgs_zip_file_was_changed">ZIP file has been changed, please try again in a reload of the file list.</string>
 	

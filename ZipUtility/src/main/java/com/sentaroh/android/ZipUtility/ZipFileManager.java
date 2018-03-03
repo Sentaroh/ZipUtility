@@ -2216,32 +2216,43 @@ public class ZipFileManager {
 
 				final ZipFile zf=createZipFile(zip_file_path, zip_file_encoding);
 				ArrayList<FileHeader> zf_fhl=null;
+				StackTraceElement[] ste=null;
 				try {
 					zf_fhl=(ArrayList<FileHeader>) zf.getFileHeaders();
 				} catch (ZipException e) {
 					e.printStackTrace();
+                    ste=e.getStackTrace();
 				}
-				ArrayList<FileHeader> sel_fhl=new ArrayList<FileHeader>();
-				for(FileHeader fh_item:zf_fhl) {
-					for(TreeFilelistItem sel_tfli:tfa.getDataList()) {
-						if (sel_tfli.isChecked() || !tfa.isDataItemIsSelected()) {
-							if (sel_tfli.isDirectory()) {
-								if (fh_item.getFileName().startsWith(sel_tfli.getZipFileName()+"/")) {
-									sel_fhl.add(fh_item);
-									break;
-								}
-							} else {
-								if (sel_tfli.getZipFileName().equals(fh_item.getFileName())) {
-									sel_fhl.add(fh_item);
-									break;
-								}
-							}
-						}
-					}
-				}
-				ArrayList<FileHeader> ext_fhl=new ArrayList<FileHeader>();
-				extractMultipleItem(tc, dest_path, zf, zip_curr_dir, sel_fhl, ext_fhl, conf_list, p_ntfy, comp_msg_required, scan_media);
-				mUtil.addDebugMsg(1, "I", "Extract exited");
+
+				if (zf_fhl!=null) {
+                    ArrayList<FileHeader> sel_fhl=new ArrayList<FileHeader>();
+                    for(FileHeader fh_item:zf_fhl) {
+                        for(TreeFilelistItem sel_tfli:tfa.getDataList()) {
+                            if (sel_tfli.isChecked() || !tfa.isDataItemIsSelected()) {
+                                if (sel_tfli.isDirectory()) {
+                                    if (fh_item.getFileName().startsWith(sel_tfli.getZipFileName()+"/")) {
+                                        sel_fhl.add(fh_item);
+                                        break;
+                                    }
+                                } else {
+                                    if (sel_tfli.getZipFileName().equals(fh_item.getFileName())) {
+                                        sel_fhl.add(fh_item);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    ArrayList<FileHeader> ext_fhl=new ArrayList<FileHeader>();
+                    extractMultipleItem(tc, dest_path, zf, zip_curr_dir, sel_fhl, ext_fhl, conf_list, p_ntfy, comp_msg_required, scan_media);
+                    mUtil.addDebugMsg(1, "I", "Extract exited");
+                } else {
+				    String ste_info="";
+				    for(StackTraceElement element:ste) ste_info+=element.toString()+"\n";
+                    mCommonDlg.showCommonDialog(false, "E",
+                            mContext.getString(R.string.msgs_zip_extract_file_end_with_error)+"\n"+ste_info, conf_list, null);
+                    mUtil.addDebugMsg(1, "I", "Extract exited with error"+"\n"+ste_info);
+                }
 			}
 		};
 		th.setName("extract");
