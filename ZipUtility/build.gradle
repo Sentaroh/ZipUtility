@@ -33,7 +33,7 @@ android {
                         def mod_name = variant.getPackageApplication().projectBaseName
                         def fileExtension= outputFileName.toString().substring(outputFileName.toString().lastIndexOf(".")+1)
 //                        def newName = "${mod_name}_${versionName}_${versionNumber}_${date}.${fileExtension}"
-                        def newName = "${mod_name}_${versionName}_${versionNumber}_debug.${fileExtension}"
+                        def newName = "${mod_name}_debug.${fileExtension}"
                         outputFileName = "../../../../../release/"+newName
                     }
                 }
@@ -66,7 +66,7 @@ android {
 dependencies {
 //    implementation project(':Utilities')
 //    implementation(name:'Utilities-1.0.5', ext:'aar')
-    implementation files('libs/Utilities-1.0.6.aar')
+    implementation files('libs/Utilities-1.0.7.aar')
     implementation 'com.android.support:appcompat-v7:22.2.1'
     implementation files('libs/commons-compress-1.12.jar')
 }
