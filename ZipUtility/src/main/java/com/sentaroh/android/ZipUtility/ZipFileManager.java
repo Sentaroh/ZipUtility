@@ -121,7 +121,7 @@ public class ZipFileManager {
 
 	private ArrayList<ZipFileListItem> mZipFileList=null;
 	private ListView mTreeFilelistView=null;
-	private TreeFilelistAdapter mTreeFilelistAdapter=null;
+	private CustomTreeFilelistAdapter mTreeFilelistAdapter=null;
 	
 	private Handler mUiHandler=null;
 	private String mCurrentFilePath="";
@@ -195,7 +195,7 @@ public class ZipFileManager {
         mMainView=mv;
         initViewWidget();
 
-		mTreeFilelistAdapter=new TreeFilelistAdapter(mActivity, false, true);
+		mTreeFilelistAdapter=new CustomTreeFilelistAdapter(mActivity, false, true);
 		mTreeFilelistView.setAdapter(mTreeFilelistAdapter);
 
 		NotifyEvent ntfy=new NotifyEvent(mContext);
@@ -653,7 +653,7 @@ public class ZipFileManager {
 		ib_sort.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				final TreeFilelistAdapter tfa=new TreeFilelistAdapter(mActivity,false,false);
+				final CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity,false,false);
 				NotifyEvent ntfy_sort=new NotifyEvent(mContext);
 				ntfy_sort.setListener(new NotifyEventListener(){
 					@Override
@@ -684,7 +684,7 @@ public class ZipFileManager {
 		lv_search_result.setOnItemLongClickListener(new OnItemLongClickListener(){
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view,int position, long id) {
-				final TreeFilelistAdapter n_tfa=new TreeFilelistAdapter(mActivity, false, false, false);
+				final CustomTreeFilelistAdapter n_tfa=new CustomTreeFilelistAdapter(mActivity, false, false, false);
 				ArrayList<TreeFilelistItem> n_tfl=new ArrayList<TreeFilelistItem>();
 				final TreeFilelistItem n_tfli=mAdapterSearchFileList.getItem(position).clone();
 				n_tfli.setChecked(true);
@@ -949,7 +949,7 @@ public class ZipFileManager {
 		else return false;
 	};
 
-	private void setContextCopyCutPasteButton(TreeFilelistAdapter tfa) {
+	private void setContextCopyCutPasteButton(CustomTreeFilelistAdapter tfa) {
 		if (!mCurrentFilePath.equals("")) {
 			if (mGp.copyCutList.size()>0) {
 				if (tfa.isDataItemIsSelected()) {
@@ -1349,7 +1349,7 @@ public class ZipFileManager {
         ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonUnselectAll,mContext.getString(R.string.msgs_zip_cont_label_unselect_all));
 	};
 
-	private void copyItem(TreeFilelistAdapter tfa) {
+	private void copyItem(CustomTreeFilelistAdapter tfa) {
 		if (tfa.isDataItemIsSelected()) {
 			mGp.copyCutModeIsCut=false;
 			mGp.copyCutFilePath=mCurrentFilePath;
@@ -1374,7 +1374,7 @@ public class ZipFileManager {
 		}
 	};
 	
-	private void cutItem(TreeFilelistAdapter tfa) {
+	private void cutItem(CustomTreeFilelistAdapter tfa) {
 		if (tfa.isDataItemIsSelected()) {
 			mGp.copyCutModeIsCut=true;
 			mGp.copyCutFilePath=mCurrentFilePath;
@@ -1512,7 +1512,7 @@ public class ZipFileManager {
 						mUiHandler.post(new Runnable(){
 							@Override
 							public void run() {
-								TreeFilelistAdapter tfa=new TreeFilelistAdapter(mActivity, true, false);
+								CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity, true, false);
 								tfa.setDataList(mGp.copyCutList);
 								NotifyEvent ntfy_move_comp=new NotifyEvent(mContext);
 								ntfy_move_comp.setListener(new NotifyEventListener(){
@@ -1709,7 +1709,7 @@ public class ZipFileManager {
 		ntfy_confirm.setListener(new NotifyEventListener(){
 			@Override
 			public void positiveResponse(Context c, final Object[] o) {
-				TreeFilelistAdapter tfa=new TreeFilelistAdapter(mActivity, true, false);
+				CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity, true, false);
 				tfa.setDataList(mGp.copyCutList);
 				deleteCopyPasteWorkFile();
 				
@@ -2147,7 +2147,7 @@ public class ZipFileManager {
 		spinner.setSelection(2);
 	};
 	
-	private void extractDlg(final TreeFilelistAdapter tfa) {
+	private void extractDlg(final CustomTreeFilelistAdapter tfa) {
 		NotifyEvent ntfy=new NotifyEvent(mContext);
 		ntfy.setListener(new NotifyEventListener(){
 			@Override
@@ -2196,10 +2196,10 @@ public class ZipFileManager {
 		fsdf.showDialog(mFragmentManager, fsdf, ntfy);
 	};
 	
-	private void prepareExtractMultipleItem(final String zip_file_path, final String zip_file_encoding, 
-			final TreeFilelistAdapter tfa, final String zip_curr_dir, 
-			final String dest_path, final String conf_list, final NotifyEvent p_ntfy, 
-			final boolean comp_msg_required, final boolean scan_media) {
+	private void prepareExtractMultipleItem(final String zip_file_path, final String zip_file_encoding,
+                                            final CustomTreeFilelistAdapter tfa, final String zip_curr_dir,
+                                            final String dest_path, final String conf_list, final NotifyEvent p_ntfy,
+                                            final boolean comp_msg_required, final boolean scan_media) {
 		mConfirmResponse=0;
 
 		setUiDisabled();
@@ -2681,7 +2681,7 @@ public class ZipFileManager {
 	};
 
 	@SuppressWarnings("unchecked")
-	private ArrayList<FileHeader> buildSelectedFileHeaderList(ZipFile zf, TreeFilelistAdapter tfa) {
+	private ArrayList<FileHeader> buildSelectedFileHeaderList(ZipFile zf, CustomTreeFilelistAdapter tfa) {
 		ArrayList<FileHeader> sel_fh=new ArrayList<FileHeader>();
 		ArrayList<FileHeader> zf_list=null;
 		try {
@@ -2720,7 +2720,7 @@ public class ZipFileManager {
 		return sel_fh;
 	};
 	
-	private void confirmDelete(final TreeFilelistAdapter tfa) {
+	private void confirmDelete(final CustomTreeFilelistAdapter tfa) {
 		String w_conf_list="";
 		String sep="";
 		for (TreeFilelistItem tfli:tfa.getDataList()) {
@@ -2745,7 +2745,7 @@ public class ZipFileManager {
 	};
 
 	private void deleteZipFileItem(final String zip_file_path, final String zip_encoding,
-			final TreeFilelistAdapter tfa, final String conf_list, final NotifyEvent p_ntfy, final boolean com_msg_required) {
+                                   final CustomTreeFilelistAdapter tfa, final String conf_list, final NotifyEvent p_ntfy, final boolean com_msg_required) {
 		setUiDisabled();
 		showDialogProgress();
 		final ThreadCtrl tc=new ThreadCtrl();
@@ -3295,7 +3295,7 @@ public class ZipFileManager {
 	private void processContextMenu(final TreeFilelistItem tfi) {
         final CustomContextMenu mCcMenu = new CustomContextMenu(mContext.getResources(), mFragmentManager);
 		String sel_list="",sep="";
-		final TreeFilelistAdapter tfa=new TreeFilelistAdapter(mActivity, false, false, false);
+		final CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity, false, false, false);
 		final ArrayList<TreeFilelistItem> n_tfl=new ArrayList<TreeFilelistItem>();
 		int sel_count=0;
 		if (mTreeFilelistAdapter.isDataItemIsSelected()) {

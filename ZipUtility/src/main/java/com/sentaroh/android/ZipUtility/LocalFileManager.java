@@ -74,7 +74,7 @@ public class LocalFileManager{
 	private ActivityMain mActivity=null; 
 
 	private ListView mTreeFilelistView=null;
-	private TreeFilelistAdapter mTreeFilelistAdapter=null;
+	private CustomTreeFilelistAdapter mTreeFilelistAdapter=null;
 	
 	private View mMainView=null;
 	private Handler mUiHandler=null;
@@ -103,7 +103,7 @@ public class LocalFileManager{
 
         mMainView=mv;
         initViewWidget();
-        mTreeFilelistAdapter=new TreeFilelistAdapter(mActivity, false, true);
+        mTreeFilelistAdapter=new CustomTreeFilelistAdapter(mActivity, false, true);
         
 		NotifyEvent ntfy=new NotifyEvent(mContext);
 		ntfy.setListener(new NotifyEventListener(){
@@ -160,7 +160,7 @@ public class LocalFileManager{
 					        mFileEmpty.setVisibility(TextView.GONE);
 //				    		mTreeFilelistView.setSelectionFromTop(pos_x, pos_y);
 					        if (prev_selected) {
-							    TreeFilelistAdapter adapter=new TreeFilelistAdapter(mContext, false, false);
+							    CustomTreeFilelistAdapter adapter=new CustomTreeFilelistAdapter(mContext, false, false);
 							    adapter.setDataList(tfl);
 					    		for(TreeFilelistItem prev_item:prev_tfl) {
 					    			int idx=Collections.binarySearch(tfl, prev_item, new Comparator<TreeFilelistItem>(){
@@ -537,7 +537,7 @@ public class LocalFileManager{
 		} 
 	};
 
-	private void shareItem(TreeFilelistAdapter tfa) {
+	private void shareItem(CustomTreeFilelistAdapter tfa) {
 		ArrayList<TreeFilelistItem> tfl=tfa.getDataList();
 		ArrayList<String>fpl=new ArrayList<String>();
 		for(int i=0;i<tfl.size();i++) {
@@ -644,7 +644,7 @@ public class LocalFileManager{
 		ib_sort.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				final TreeFilelistAdapter tfa=new TreeFilelistAdapter(mActivity,false,false);
+				final CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity,false,false);
 				NotifyEvent ntfy_sort=new NotifyEvent(mContext);
 				ntfy_sort.setListener(new NotifyEventListener(){
 					@Override
@@ -706,7 +706,7 @@ public class LocalFileManager{
 		lv_search_result.setOnItemLongClickListener(new OnItemLongClickListener(){
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view,int position, long id) {
-				final TreeFilelistAdapter n_tfa=new TreeFilelistAdapter(mActivity, false, false, false);
+				final CustomTreeFilelistAdapter n_tfa=new CustomTreeFilelistAdapter(mActivity, false, false, false);
 				ArrayList<TreeFilelistItem> n_tfl=new ArrayList<TreeFilelistItem>();
 				final TreeFilelistItem n_tfli=mAdapterSearchFileList.getItem(position).clone();
 				n_tfli.setChecked(true);
@@ -867,7 +867,7 @@ public class LocalFileManager{
 		}
 	};
 
-	private void createItem(TreeFilelistAdapter tfa, final String c_dir) {
+	private void createItem(CustomTreeFilelistAdapter tfa, final String c_dir) {
 		final Dialog dialog = new Dialog(mActivity);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.single_item_input_dlg);
@@ -974,7 +974,7 @@ public class LocalFileManager{
 
 	};
 
-	private void renameItem(TreeFilelistAdapter tfa) {
+	private void renameItem(CustomTreeFilelistAdapter tfa) {
 		final Dialog dialog = new Dialog(mActivity);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.single_item_input_dlg);
@@ -1158,7 +1158,7 @@ public class LocalFileManager{
 
 	};
 
-	private void copyItem(TreeFilelistAdapter tfa) {
+	private void copyItem(CustomTreeFilelistAdapter tfa) {
 		if (tfa.isDataItemIsSelected()) {
 			mGp.copyCutModeIsCut=false;
 			mGp.copyCutList.clear();
@@ -1184,7 +1184,7 @@ public class LocalFileManager{
 		}
 	};
 	
-	private void cutItem(TreeFilelistAdapter tfa) {
+	private void cutItem(CustomTreeFilelistAdapter tfa) {
 		if (tfa.isDataItemIsSelected()) {
 			mGp.copyCutModeIsCut=true;
 			mGp.copyCutList.clear();
@@ -2557,7 +2557,7 @@ public class LocalFileManager{
 		return result;
 	};
 	
-	private void confirmScan(final TreeFilelistAdapter tfa) {
+	private void confirmScan(final CustomTreeFilelistAdapter tfa) {
 		NotifyEvent ntfy=new NotifyEvent(mContext);
 		ntfy.setListener(new NotifyEventListener(){
 			@Override
@@ -2614,7 +2614,7 @@ public class LocalFileManager{
 				"", ntfy);
 	};
 	
-	private void confirmDelete(final TreeFilelistAdapter tfa) {
+	private void confirmDelete(final CustomTreeFilelistAdapter tfa) {
 //		String conf_list="";
 //		String sep="";
 //		StringBuilder sb=new StringBuilder(1024*1024);
@@ -3258,7 +3258,7 @@ public class LocalFileManager{
 	private void processContextMenu(final TreeFilelistItem tfi) {
         final CustomContextMenu mCcMenu = new CustomContextMenu(mContext.getResources(), mFragmentManager);
 		String sel_list="",sep="";
-		final TreeFilelistAdapter tfa=new TreeFilelistAdapter(mActivity, false, false, false);
+		final CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity, false, false, false);
 		ArrayList<TreeFilelistItem> n_tfl=new ArrayList<TreeFilelistItem>();
 		int sel_count=0;
 		if (mTreeFilelistAdapter.isDataItemIsSelected()) {
@@ -3501,7 +3501,7 @@ public class LocalFileManager{
 		return result;
 	};
 
-	private void prepareZipSelectedItem(final TreeFilelistAdapter tfa) {
+	private void prepareZipSelectedItem(final CustomTreeFilelistAdapter tfa) {
 		String conf_list="", sep="", w_out_fn="", w_out_dir="";
 		for(TreeFilelistItem tfi:tfa.getDataList()) {
 			if (tfi.isChecked()) {
@@ -3741,7 +3741,7 @@ public class LocalFileManager{
 			}
 
 			ArrayList<TreeFilelistItem> tfl=createTreeFileList(fp);
-			if (mTreeFilelistAdapter==null) mTreeFilelistAdapter=new TreeFilelistAdapter(mActivity, false, true);
+			if (mTreeFilelistAdapter==null) mTreeFilelistAdapter=new CustomTreeFilelistAdapter(mActivity, false, true);
 			mTreeFilelistAdapter.setDataList(tfl);
 			mTreeFilelistAdapter.setCheckBoxEnabled(isUiEnabled());
 			mTreeFilelistAdapter.notifyDataSetChanged();

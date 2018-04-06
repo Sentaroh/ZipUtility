@@ -85,7 +85,6 @@ import com.sentaroh.android.Utilities.Dialog.ProgressSpinDialogFragment;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 import com.sentaroh.android.Utilities.Widget.CustomTextView;
-import com.sentaroh.android.ZipUtility.ZipFileManager.SavedViewData;
 
 @SuppressWarnings("unused")
 @SuppressLint("ClickableViewAccessibility")
@@ -102,7 +101,7 @@ public class TarFileManager {
 
 	private ArrayList<ZipFileListItem> mZipFileList=null;
 	private ListView mTreeFilelistView=null;
-	private TreeFilelistAdapter mTreeFilelistAdapter=null;
+	private CustomTreeFilelistAdapter mTreeFilelistAdapter=null;
 	
 	private Handler mUiHandler=null;
 	private String mMainFilePath="";
@@ -621,7 +620,7 @@ public class TarFileManager {
 //			Log.v("","size="+mZipFileList.size());
 			if (mZipFileList!=null && mZipFileList.size()>0) {
 				ArrayList<TreeFilelistItem> tfl=createTreeFileList(mZipFileList, base);
-				mTreeFilelistAdapter=new TreeFilelistAdapter(mActivity, false, true);
+				mTreeFilelistAdapter=new CustomTreeFilelistAdapter(mActivity, false, true);
 //				Log.v("","size="+tfl.size());
 				mTreeFilelistAdapter.setDataList(tfl);
 				mTreeFilelistView.setAdapter(mTreeFilelistAdapter);
@@ -1311,7 +1310,7 @@ public class TarFileManager {
 		spinner.setSelection(2);
 	};
 	
-	private void extractDlg(final TreeFilelistAdapter tfa) {
+	private void extractDlg(final CustomTreeFilelistAdapter tfa) {
 		NotifyEvent ntfy=new NotifyEvent(mContext);
 		ntfy.setListener(new NotifyEventListener(){
 			@Override
@@ -1443,7 +1442,7 @@ public class TarFileManager {
 		}
 	};
 	
-	private ArrayList<TreeFilelistItem> buildSelectedFileist(TreeFilelistAdapter tfa) {
+	private ArrayList<TreeFilelistItem> buildSelectedFileist(CustomTreeFilelistAdapter tfa) {
 		ArrayList<TreeFilelistItem> sel_file_list=new ArrayList<TreeFilelistItem>();
 		if (tfa.isDataItemIsSelected()) {
 			for (TreeFilelistItem tfli:tfa.getDataList()) {
@@ -1789,7 +1788,7 @@ public class TarFileManager {
 		return result;
 	};
 
-	private void confirmDelete(final TreeFilelistAdapter tfa) {
+	private void confirmDelete(final CustomTreeFilelistAdapter tfa) {
 		String conf_list="";
 		String sep="";
 		final ArrayList<TreeFilelistItem> sel_file_list=buildSelectedFileist(tfa);
@@ -2214,7 +2213,7 @@ public class TarFileManager {
 	private void processContextMenu(final TreeFilelistItem tfi) {
         final CustomContextMenu mCcMenu = new CustomContextMenu(mContext.getResources(), mFragmentManager);
 		String sel_list="",sep="";
-		final TreeFilelistAdapter tfa=new TreeFilelistAdapter(mActivity, false, false, false);
+		final CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity, false, false, false);
 		final ArrayList<TreeFilelistItem> n_tfl=new ArrayList<TreeFilelistItem>();
 		int sel_count=0;
 		if (mTreeFilelistAdapter.isDataItemIsSelected()) {

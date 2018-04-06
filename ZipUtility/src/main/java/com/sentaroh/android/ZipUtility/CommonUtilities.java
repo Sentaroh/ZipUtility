@@ -354,8 +354,8 @@ public final class CommonUtilities {
 		}
 	};
 
-	static public void sortFileList(final ActivityMain mActivity, final GlobalParameters mGp, 
-			final TreeFilelistAdapter tfa, final NotifyEvent p_ntfy) {
+	static public void sortFileList(final ActivityMain mActivity, final GlobalParameters mGp,
+                                    final CustomTreeFilelistAdapter tfa, final NotifyEvent p_ntfy) {
 		if (tfa==null) return;
 		final Dialog dialog = new Dialog(mActivity);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -430,7 +430,7 @@ public final class CommonUtilities {
 		dialog.show();
 	};
 	
-	static private void performSortFileList(ActivityMain mActivity, Dialog dialog, TreeFilelistAdapter tfa) {
+	static private void performSortFileList(ActivityMain mActivity, Dialog dialog, CustomTreeFilelistAdapter tfa) {
 //		final RadioGroup rg_sort_order=(RadioGroup)dialog.findViewById(R.id.select_sort_dlg_rg_sort_order);
 		final RadioButton rb_sort_order_asc=(RadioButton)dialog.findViewById(R.id.select_sort_dlg_rb_sort_order_asc);
 //		final RadioButton rb_sort_order_dsc=(RadioButton)dialog.findViewById(R.id.select_sort_dlg_rb_sort_order_dsc);

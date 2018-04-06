@@ -50,7 +50,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-public class TreeFilelistAdapter extends BaseAdapter {
+public class CustomTreeFilelistAdapter extends BaseAdapter {
 	private Context mContext;
 	private ArrayList<Integer>mShowItems=new ArrayList<Integer>();
 	private ArrayList<TreeFilelistItem>mDataItems=null;
@@ -72,15 +72,15 @@ public class TreeFilelistAdapter extends BaseAdapter {
 	public void setCheckBoxEnabled(boolean p) {mCheckBoxEnabled=p;}
 	public boolean isCheckBoxEnabled() {return mCheckBoxEnabled;}
 	
-	public TreeFilelistAdapter(Context c) {
+	public CustomTreeFilelistAdapter(Context c) {
 		mContext = c;
 		mDataItems=new ArrayList<TreeFilelistItem>();
 		initTextColor();
 		
 	};
 
-	public TreeFilelistAdapter(Context c,
-			boolean singleSelectMode, boolean showLastModified) {
+	public CustomTreeFilelistAdapter(Context c,
+                                     boolean singleSelectMode, boolean showLastModified) {
 		mContext = c;
 		this.mSingleSelectMode=singleSelectMode;
 		this.mShowLastModified=showLastModified;
@@ -88,8 +88,8 @@ public class TreeFilelistAdapter extends BaseAdapter {
 		initTextColor();
 	};
 
-	public TreeFilelistAdapter(Context c,
-			boolean singleSelectMode, boolean showLastModified, boolean set_color) {
+	public CustomTreeFilelistAdapter(Context c,
+                                     boolean singleSelectMode, boolean showLastModified, boolean set_color) {
 		mContext = c;
 		this.mSingleSelectMode=singleSelectMode;
 		this.mShowLastModified=showLastModified;
@@ -279,7 +279,7 @@ public class TreeFilelistAdapter extends BaseAdapter {
 		createShowList();
 	};
 
-	public void addChildItem(TreeFilelistItem pfi, TreeFilelistAdapter afa, int cp) {
+	public void addChildItem(TreeFilelistItem pfi, CustomTreeFilelistAdapter afa, int cp) {
 		//from adapter
 		if (afa.getCount()!=0) {
 			for (int i=0;i<afa.getDataItemCount();i++) {
@@ -597,7 +597,7 @@ public class TreeFilelistAdapter extends BaseAdapter {
             View v = convertView;
             if (v == null) {
                 LayoutInflater vi = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                v = vi.inflate(R.layout.tree_file_list_item, null);
+                v = vi.inflate(R.layout.custom_tree_file_list_item, null);
                 holder=new ViewHolder();
 
             	holder.cb_cb1=(CheckBox)v.findViewById(R.id.tree_file_list_checkbox);
