@@ -8,8 +8,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 22
 
-        versionCode 63
-        versionName "1.46"
+        versionCode 64
+        versionName "1.47"
 
 //        multiDexEnabled true
     }
