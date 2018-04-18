@@ -2590,7 +2590,7 @@ public class ZipFileManager {
 			}
 			@Override
 			public void afterTextChanged(Editable s) {
-				verifyZipPassword(zf, fh, s.toString(), dlg_ok, dlg_msg);
+			    if (s.toString()!=null) verifyZipPassword(zf, fh, s.toString(), dlg_ok, dlg_msg);
 			}
     	});
     	
@@ -2662,6 +2662,7 @@ public class ZipFileManager {
 	public static boolean isCorrectZipFilePassword(final ZipFile zf, final FileHeader fh, String pswd) {
 		if (zf==null || fh==null) return true;
 		boolean result=false;
+		if (pswd==null) return result;
 		try {
 			if (fh.isEncrypted()) {
 				zf.setPassword(pswd);
