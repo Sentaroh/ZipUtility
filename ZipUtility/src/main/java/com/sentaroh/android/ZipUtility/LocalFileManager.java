@@ -2076,7 +2076,9 @@ public class LocalFileManager{
 				InputStream is=zf.getInputStream(fh);
 				File lf=new File(dest_path);
 				lf.mkdirs();
-				FileOutputStream os=new FileOutputStream(to);
+                String temp_path=mGp.internalRootDirectory+"/"+APP_SPECIFIC_DIRECTORY+"/files/temp_file.tmp";
+                File temp_to_file=new File(temp_path);
+				FileOutputStream os=new FileOutputStream(temp_to_file);
 				long fsz=fh.getUncompressedSize();
 				long frc=0;
 				byte[] buff=new byte[IO_AREA_SIZE];
@@ -2093,7 +2095,9 @@ public class LocalFileManager{
 				os.flush();
 				os.close();
 				is.close();
-				to.setLastModified(ZipUtil.dosToJavaTme(fh.getLastModFileTime()));
+                temp_to_file.setLastModified(ZipUtil.dosToJavaTme(fh.getLastModFileTime()));
+                if (to.exists()) to.delete();
+                temp_to_file.renameTo(to);
 				if (!tc.isEnabled()) to.delete();
 				else {
 					CommonUtilities.scanMediaFile(mGp,mUtil,to.getAbsolutePath());
@@ -2370,7 +2374,8 @@ public class LocalFileManager{
 		} else {
 			try {
 				if (confirmReplace(tc,to_path)) {
-					FileOutputStream fos=new FileOutputStream(to_path);
+				    String temp_path=mGp.internalRootDirectory+"/"+APP_SPECIFIC_DIRECTORY+"/files/temp_file.tmp";
+					FileOutputStream fos=new FileOutputStream(temp_path);
 //					BufferedOutputStream bos=new BufferedOutputStream(fos, 1024*1024*8);
 					byte[] buff=new byte[IO_AREA_SIZE];
 					FileInputStream fis=new FileInputStream(from_file);
@@ -2391,7 +2396,9 @@ public class LocalFileManager{
 					fos.flush();
 					fos.close();
 					fis.close();
-					(new File(to_path)).setLastModified(from_file.lastModified());
+					(new File(temp_path)).setLastModified(from_file.lastModified());
+					if ((new File(to_path)).exists()) (new File(to_path)).delete();
+                    (new File(temp_path)).renameTo((new File(to_path)));
 				} else {
 					//Reject replace request
 					if (tc.isEnabled()) {
