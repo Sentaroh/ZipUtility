@@ -1148,7 +1148,6 @@ public class LocalFileManager{
 				dialog.dismiss();
 			}
 		});
-		// CANCEL�{�^���̎w��
 		btnCancel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				dialog.dismiss();
@@ -1164,7 +1163,7 @@ public class LocalFileManager{
 			mGp.copyCutList.clear();
 			mGp.copyCutType=GlobalParameters.COPY_CUT_FROM_LOCAL;
 			mGp.copyCutFilePath=mMainFilePath;
-			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().substring(1);
+			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":(mCurrentDirectory.getText().length()==0?"":mCurrentDirectory.getText().substring(1));
 			String c_list="", sep="";
 			for(TreeFilelistItem tfl:tfa.getDataList()) {
 				if(tfl.isChecked()) {
@@ -1190,7 +1189,8 @@ public class LocalFileManager{
 			mGp.copyCutList.clear();
 			mGp.copyCutType=GlobalParameters.COPY_CUT_FROM_LOCAL;
 			mGp.copyCutFilePath=mMainFilePath;
-			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().substring(1);
+//			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().substring(1);
+            mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":(mCurrentDirectory.getText().length()==0?"":mCurrentDirectory.getText().substring(1));
 			String c_list="", sep="";
 			for(TreeFilelistItem tfl:tfa.getDataList()) {
 				if(tfl.isChecked()) {
@@ -2840,7 +2840,7 @@ public class LocalFileManager{
 		ArrayList<TreeFilelistItem> tfl=createTreeFileList(dir_name);
 		mTreeFilelistAdapter.setDataList(tfl);
 		if (tfl.size()>0) mTreeFilelistView.setSelection(0);
-		mCurrentDirectory.setText(dir_name.replace(mLocalStorage.getSelectedItem().toString(), ""));
+        setCurrentDirectoryText(dir_name.replace(mLocalStorage.getSelectedItem().toString(), ""));
 		setTopUpButtonEnabled(true);
 		
 		if (mTreeFilelistAdapter.getCount()==0) {
@@ -3099,7 +3099,7 @@ public class LocalFileManager{
 						mTreeFilelistView.setSelection(0);
 					}
 					setContextButtonSelectUnselectVisibility();
-					mCurrentDirectory.setText(dir.replace(mLocalStorage.getSelectedItem().toString(), ""));
+                    setCurrentDirectoryText(dir.replace(mLocalStorage.getSelectedItem().toString(), ""));
 					setTopUpButtonEnabled(true);
 					
 					if (mTreeFilelistAdapter.getCount()==0) {
@@ -3186,7 +3186,7 @@ public class LocalFileManager{
 						if (!mMainFilePath.equals(n_dir)) {
 							ArrayList<TreeFilelistItem> tfl=createTreeFileList(n_dir);
 							mTreeFilelistAdapter.setDataList(tfl);
-							mCurrentDirectory.setText(n_dir.replace(mLocalStorage.getSelectedItem().toString(), ""));
+                            setCurrentDirectoryText(n_dir.replace(mLocalStorage.getSelectedItem().toString(), ""));
 							if (tfl.size()>0) {
 //								mTreeFilelistView.setSelection(0);
 								if (p_dli!=null) mTreeFilelistView.setSelectionFromTop(p_dli.pos_x, p_dli.pos_y);
@@ -3349,7 +3349,7 @@ public class LocalFileManager{
 					ArrayList<TreeFilelistItem> tfl=createTreeFileList(dir);
 					mTreeFilelistAdapter.setDataList(tfl);
 					if (tfl.size()>0) mTreeFilelistView.setSelection(0);
-					mCurrentDirectory.setText(dir.replace(mLocalStorage.getSelectedItem().toString(), ""));
+                    setCurrentDirectoryText(dir.replace(mLocalStorage.getSelectedItem().toString(), ""));
 					mContextButtonArchiveView.setVisibility(ImageButton.INVISIBLE);
 					mContextButtonDeleteView.setVisibility(ImageButton.INVISIBLE);
 					setTopUpButtonEnabled(true);
@@ -3754,7 +3754,7 @@ public class LocalFileManager{
 			mTreeFilelistAdapter.notifyDataSetChanged();
 			mTreeFilelistView.setAdapter(mTreeFilelistAdapter);
 			if (fp.equals(mLocalStorage.getSelectedItem().toString())) mCurrentDirectory.setText("/");
-			else mCurrentDirectory.setText(fp.replace(mLocalStorage.getSelectedItem().toString(), ""));
+			else setCurrentDirectoryText(fp.replace(mLocalStorage.getSelectedItem().toString(), ""));
 			mCurrentDirectory.setVisibility(TextView.VISIBLE);
 			mTreeFilelistView.setSelectionFromTop(0, 0);
 			setTreeFileListener();
@@ -3779,6 +3779,11 @@ public class LocalFileManager{
 //					getString(R.string.msgs_text_browser_file_file_name_not_specified)});
 		}
 	};
+
+	private void setCurrentDirectoryText(String cd) {
+
+	    mCurrentDirectory.setText(cd.equals("")?"/":cd);
+    }
 
 	static private ArrayList<TreeFilelistItem> createTreeFileList(String target_dir) {
 		ArrayList<TreeFilelistItem> tfl=new ArrayList<TreeFilelistItem>();
