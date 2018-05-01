@@ -75,7 +75,6 @@ import com.sentaroh.android.Utilities.SafFile;
 import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.Utilities.ZipFileListItem;
-import com.sentaroh.android.Utilities.ZipUtil;
 import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomContextMenuOnClickListener;
@@ -85,6 +84,7 @@ import com.sentaroh.android.Utilities.Dialog.ProgressSpinDialogFragment;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 import com.sentaroh.android.Utilities.Widget.CustomTextView;
+import com.sentaroh.android.Utilities.ZipUtil;
 
 @SuppressWarnings("unused")
 @SuppressLint("ClickableViewAccessibility")
@@ -2269,7 +2269,7 @@ public class TarFileManager {
 //							if (fh.getAesExtraDataRecord()!=null)
 //								Log.v("","aes="+fh.getAesExtraDataRecord().getAesStrength());
 							long uncomp_size=fh.getUncompressedSize();
-							long last_mod=ZipUtil.dosToJavaTme(fh.getLastModFileTime());
+							long last_mod= ZipUtil.dosToJavaTme(fh.getLastModFileTime());
 							String prop=String.format(mContext.getString(R.string.msgs_zip_zip_item_property_file), 
 									 StringUtil.convDateTimeTo_YearMonthDayHourMinSec(last_mod), 
 									 comp_method, comp_size,uncomp_size, fh.isEncrypted());

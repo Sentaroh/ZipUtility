@@ -53,6 +53,7 @@ import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
+import com.sentaroh.android.Utilities.BufferedZipFile;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
@@ -60,17 +61,16 @@ import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomCo
 import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.Dialog.FileSelectDialogFragment;
 import com.sentaroh.android.Utilities.Dialog.ProgressSpinDialogFragment;
-import com.sentaroh.android.Utilities.BufferedZipFile;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.LocalMountPoint;
 import com.sentaroh.android.Utilities.MiscUtil;
 import com.sentaroh.android.Utilities.SafFile;
 import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.ThreadCtrl;
-import com.sentaroh.android.Utilities.ZipFileListItem;
-import com.sentaroh.android.Utilities.ZipUtil;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 import com.sentaroh.android.Utilities.Widget.CustomTextView;
+import com.sentaroh.android.Utilities.ZipFileListItem;
+import com.sentaroh.android.Utilities.ZipUtil;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -1093,7 +1093,7 @@ public class ZipFileManager {
 
 					String detect_encoding="";
 					if (mEncodingDesired.equals(mContext.getString(R.string.msgs_zip_parm_zip_encoding_auto))) {
-						detect_encoding=ZipUtil.detectFileNameEncoding(fp);
+						detect_encoding= ZipUtil.detectFileNameEncoding(fp);
 						if (detect_encoding==null) {
 							mEncodingSelected=mGp.settingZipDefaultEncoding;
 						} else mEncodingSelected=detect_encoding;
@@ -2580,7 +2580,8 @@ public class ZipFileManager {
     	CommonDialog.setDlgBoxSizeLimit(dialog, true);
     	
     	dlg_pswd.setText(mMainPassword);
-    	verifyZipPassword(zf, fh, mMainPassword, dlg_ok, dlg_msg);
+        dlg_pswd.setEnabled(true);
+//    	verifyZipPassword(zf, fh, mMainPassword, dlg_ok, dlg_msg);
     	dlg_pswd.addTextChangedListener(new TextWatcher(){
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -2590,7 +2591,9 @@ public class ZipFileManager {
 			}
 			@Override
 			public void afterTextChanged(Editable s) {
-			    if (s.toString()!=null) verifyZipPassword(zf, fh, s.toString(), dlg_ok, dlg_msg);
+			    if (s.toString().length()>0) {
+			        verifyZipPassword(zf, fh, s.toString(), dlg_ok, dlg_msg);
+                }
 			}
     	});
     	
