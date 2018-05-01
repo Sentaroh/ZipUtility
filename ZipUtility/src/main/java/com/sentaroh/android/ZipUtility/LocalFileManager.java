@@ -571,15 +571,23 @@ public class LocalFileManager{
 				    Uri uri = Uri.fromFile(file);
 				    files.add(uri);
 				}
-				intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
-				mContext.startActivity(intent);
+                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
+				try {
+                    mContext.startActivity(intent);
+                } catch(Exception e) {
+                    mCommonDlg.showCommonDialog(false, "E", "startActivity() failed at shareItem() for multiple item. message="+e.getMessage(), "", null);
+                }
 			} else if (fpl.size()==1) {
 				Intent intent = new Intent(android.content.Intent.ACTION_SEND);
 				File lf=new File(fpl.get(0));
 				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(lf)); 
 				intent.setType("image/*");
-				mContext.startActivity(intent);
+                try {
+                    mContext.startActivity(intent);
+                } catch(Exception e) {
+                    mCommonDlg.showCommonDialog(false, "E", "startActivity() failed at shareItem() for songle item. message="+e.getMessage(), "", null);
+                }
 			} else {
 				mCommonDlg.showCommonDialog(false, "E", 
 						mContext.getString(R.string.msgs_local_file_share_file_no_file_selected), "", null);

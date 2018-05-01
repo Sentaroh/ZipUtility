@@ -329,7 +329,7 @@ public final class CommonUtilities {
 				ctv.toggle();
 			}
 		});
-	};
+	}
 
 	static public FileManagerDirectoryListItem getDirectoryItem(ArrayList<FileManagerDirectoryListItem> mDirectoryList, 
 			String fp) {
@@ -352,7 +352,7 @@ public final class CommonUtilities {
 		for(FileManagerDirectoryListItem item:dl) {
 			mDirectoryList.remove(item);
 		}
-	};
+	}
 
 	static public void sortFileList(final ActivityMain mActivity, final GlobalParameters mGp,
                                     final CustomTreeFilelistAdapter tfa, final NotifyEvent p_ntfy) {
@@ -428,7 +428,7 @@ public final class CommonUtilities {
 		});
 
 		dialog.show();
-	};
+	}
 	
 	static private void performSortFileList(ActivityMain mActivity, Dialog dialog, CustomTreeFilelistAdapter tfa) {
 //		final RadioGroup rg_sort_order=(RadioGroup)dialog.findViewById(R.id.select_sort_dlg_rg_sort_order);
@@ -449,14 +449,6 @@ public final class CommonUtilities {
 		tfa.sort();
 		tfa.notifyDataSetChanged();
 		mActivity.refreshOptionMenu();
-	};
+	}
 
 }
-
-class FileManagerDirectoryListItem implements Serializable{
-	private static final long serialVersionUID = 1L;
-	public String file_path="";
-	public int pos_x=0, pos_y=0;
-	public ArrayList<TreeFilelistItem> file_list=null;
-};
-
