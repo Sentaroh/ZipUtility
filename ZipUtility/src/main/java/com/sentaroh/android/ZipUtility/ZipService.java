@@ -38,7 +38,7 @@ public class ZipService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		mGp=(GlobalParameters) getApplication();
+		mGp=(GlobalParameters) getApplicationContext();
 		mContext=getApplicationContext();
 		mUtil=new CommonUtilities(getApplicationContext(), "Service", mGp);
 		
