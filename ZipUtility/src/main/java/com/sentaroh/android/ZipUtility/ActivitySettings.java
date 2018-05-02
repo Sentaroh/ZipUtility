@@ -61,7 +61,7 @@ public class ActivitySettings extends PreferenceActivity{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		mContext=this;
-		mGp=(GlobalParameters)getApplication();
+		mGp=(GlobalParameters)getApplicationContext();
 		setTheme(mGp.applicationTheme);
 		super.onCreate(savedInstanceState);
 		mPrefActivity=this;

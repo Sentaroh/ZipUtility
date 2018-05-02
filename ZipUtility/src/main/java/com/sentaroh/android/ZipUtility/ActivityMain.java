@@ -203,7 +203,7 @@ public class ActivityMain extends AppCompatActivity {
         mActivity=this;
         mFragmentManager=getSupportFragmentManager();
         mRestartStatus=0;
-       	mGp=(GlobalParameters)getApplication();
+       	mGp=(GlobalParameters)getApplicationContext();
         setTheme(mGp.applicationTheme);
         mGp.themeColorList=ThemeUtil.getThemeColorList(mActivity);
         super.onCreate(savedInstanceState);
