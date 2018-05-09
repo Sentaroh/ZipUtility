@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "com.sentaroh.android.ZipUtility"
         minSdkVersion 21
-        targetSdkVersion 22
+        targetSdkVersion 26
 
         versionCode 68
         versionName "1.51"
