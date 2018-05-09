@@ -108,28 +108,47 @@ public class GlobalParameters extends CommonGlobalParms {
 //		Log.v("","constructed");
 	};
 	
-	@SuppressLint("Wakelock")
-	@Override
-	public void onCreate() {
+//	@SuppressLint("Wakelock")
+//	@Override
+//	public void onCreate() {
+////		Log.v("","onCreate dir="+getFilesDir().toString());
+//		appContext=this.getApplicationContext();
+//		uiHandler=new Handler();
+//		debuggable=isDebuggable();
+//
+//		internalRootDirectory=Environment.getExternalStorageDirectory().toString();
+//
+//		applicationRootDirectory=getFilesDir().toString();
+//		applicationCacheDirectory=getCacheDir().toString();
+//
+//		initSettingsParms(this);
+//		loadSettingsParms(this);
+//		setLogParms(this);
+//
+//		initStorageStatus(this);
+//
+//	};
+
+    public void initGlobalParameter(Context c) {
 //		Log.v("","onCreate dir="+getFilesDir().toString());
-		appContext=this.getApplicationContext();
-		uiHandler=new Handler();
-		debuggable=isDebuggable();
+        appContext=c;
+        uiHandler=new Handler();
+        debuggable=isDebuggable();
 
-		internalRootDirectory=Environment.getExternalStorageDirectory().toString();
-		
-		applicationRootDirectory=getFilesDir().toString();
-		applicationCacheDirectory=getCacheDir().toString();
+        internalRootDirectory=Environment.getExternalStorageDirectory().toString();
 
-		initSettingsParms(this);
-		loadSettingsParms(this);
-		setLogParms(this);
+        applicationRootDirectory=c.getFilesDir().toString();
+        applicationCacheDirectory=c.getCacheDir().toString();
 
-		initStorageStatus(this);
+        initSettingsParms(c);
+        loadSettingsParms(c);
+        setLogParms(this);
 
-	};
-	
-	public void clearParms() {
+        initStorageStatus(c);
+
+    };
+
+    public void clearParms() {
 	};
 	
 	@SuppressLint("NewApi")
@@ -151,7 +170,7 @@ public class GlobalParameters extends CommonGlobalParms {
 	};
 	
 	public void refreshMediaDir(Context c) {
-		File[] fl=ContextCompat.getExternalFilesDirs(this, null);
+		File[] fl=ContextCompat.getExternalFilesDirs(c, null);
 		if (fl!=null) {
 			for(File item:fl) {
 				if (item!=null && !item.getPath().startsWith(internalRootDirectory)) {
@@ -254,10 +273,10 @@ public class GlobalParameters extends CommonGlobalParms {
 	
 	private boolean isDebuggable() {
 		boolean result=false;
-        PackageManager manager = getPackageManager();
+        PackageManager manager = appContext.getPackageManager();
         ApplicationInfo appInfo = null;
         try {
-            appInfo = manager.getApplicationInfo(getPackageName(), 0);
+            appInfo = manager.getApplicationInfo(appContext.getPackageName(), 0);
         } catch (NameNotFoundException e) {
         	result=false;
         }

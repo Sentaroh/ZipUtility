@@ -61,7 +61,7 @@ public class ActivitySettings extends PreferenceActivity{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		mContext=this;
-		mGp=(GlobalParameters)getApplicationContext();
+		mGp=GlobalWorkArea.getGlobalParameters(mContext);
 		setTheme(mGp.applicationTheme);
 		super.onCreate(savedInstanceState);
 		mPrefActivity=this;
@@ -93,7 +93,7 @@ public class ActivitySettings extends PreferenceActivity{
 	@Override
 	public boolean onIsMultiPane () {
 		mContext=this;
-		mGp=(GlobalParameters)getApplication();
+		mGp=GlobalWorkArea.getGlobalParameters(mContext);
 //    	mPrefActivity=this;
 		mUtil=new CommonUtilities(this, "SettingsActivity", mGp);
 		if (mGp.settingDebugLevel>0) mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
