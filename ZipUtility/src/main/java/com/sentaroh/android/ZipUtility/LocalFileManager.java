@@ -25,8 +25,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -63,6 +65,7 @@ import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 import com.sentaroh.android.Utilities.Widget.CustomTextView;
 import com.sentaroh.android.Utilities.ZipUtil;
+import com.sentaroh.android.ZipUtility.Log.LogUtil;
 
 public class LocalFileManager{
 	private GlobalParameters mGp=null;
@@ -561,15 +564,19 @@ public class LocalFileManager{
 		} else {
 			if (fpl.size()>1) {
 				Intent intent = new Intent();
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 				intent.setType("image/*"); /* This example is sharing jpeg images. */
 
 				ArrayList<Uri> files = new ArrayList<Uri>();
 
 				for(String path : fpl) {
 				    File file = new File(path);
-				    Uri uri = Uri.fromFile(file);
-				    files.add(uri);
+				    Uri uri =null;
+                    if (Build.VERSION.SDK_INT>=24)  uri=FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(path));
+                    else Uri.fromFile(file);
+                    files.add(uri);
 				}
                 intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
 				try {
@@ -580,8 +587,12 @@ public class LocalFileManager{
 			} else if (fpl.size()==1) {
 				Intent intent = new Intent(android.content.Intent.ACTION_SEND);
 				File lf=new File(fpl.get(0));
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(lf)); 
+                Uri uri =null;
+                if (Build.VERSION.SDK_INT>=26)  uri=FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", lf);
+                else uri=Uri.parse("file://"+fpl.get(0));
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				intent.putExtra(Intent.EXTRA_STREAM, uri);
 				intent.setType("image/*");
                 try {
                     mContext.startActivity(intent);
@@ -3728,8 +3739,14 @@ public class LocalFileManager{
 		if (mt != null) {
 			try {
 				Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
-				intent.setDataAndType(Uri.parse("file://"+p_dir+"/"+f_name), mt);
-				mActivity.startActivity(intent);
+                if (Build.VERSION.SDK_INT>=24) {
+                    Uri uri=FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(p_dir+"/"+f_name));
+                    intent.setDataAndType(uri, mt);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                } else {
+                    intent.setDataAndType(Uri.parse("file://"+p_dir+"/"+f_name), mt);
+                }
+                mActivity.startActivity(intent);
 				result=true;
 			} catch(ActivityNotFoundException e) {
 				mCommonDlg.showCommonDialog(false,"E", 

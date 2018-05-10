@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.Notification.Builder;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -38,8 +39,8 @@ public class ZipService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		mGp=(GlobalParameters) getApplicationContext();
-		mContext=getApplicationContext();
+        mContext=getApplicationContext();
+		mGp=GlobalWorkArea.getGlobalParameters(mContext);
 		mUtil=new CommonUtilities(getApplicationContext(), "Service", mGp);
 		
 		mUtil.addDebugMsg(1,"I","onCreate entered");
@@ -54,19 +55,8 @@ public class ZipService extends Service {
     			.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
         				| PowerManager.ACQUIRE_CAUSES_WAKEUP
         				, "ZipUtility-Partial");
-
-		mNotificationBuilder=new Builder(mContext);
-		mNotificationBuilder.setWhen(System.currentTimeMillis())
-			.setContentTitle(mContext.getString(R.string.msgs_main_notification_title))
-		    .setContentText(mContext.getString(R.string.msgs_main_notification_message))
-		    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.zip_utility))
-		    .setSmallIcon(R.drawable.ic_32_file_zip);
-		Intent activity_intent = new Intent(mContext, ActivityMain.class);
-		PendingIntent activity_pi=PendingIntent.getActivity(mContext, 0, activity_intent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
-		mNotificationBuilder.setContentIntent(activity_pi);
-
-	};
+        initNotification();
+	}
 
 	@SuppressLint("NewApi")
 	private void setHeartBeat() {
@@ -74,21 +64,21 @@ public class ZipService extends Service {
 //			Thread.dumpStack();
 			long time=System.currentTimeMillis()+1000*5;
 //			Intent in = new Intent(mContext, SyncService.class);
-			Intent in = new Intent();
+			Intent in = new Intent(mContext, ZipService.class);
 			in.setAction(SERVICE_HEART_BEAT);
-			PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, in, PendingIntent.FLAG_UPDATE_CURRENT);
+			PendingIntent pi = PendingIntent.getService(mContext, 0, in, PendingIntent.FLAG_UPDATE_CURRENT);
 //			PendingIntent pi = PendingIntent.getService(mContext, 0, in, PendingIntent.FLAG_UPDATE_CURRENT);
 		    AlarmManager am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
 		    if (Build.VERSION.SDK_INT>=23) am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time, pi);
 		    else am.set(AlarmManager.RTC_WAKEUP, time, pi);
 		}
-	};
+	}
 	
 	private void cancelHeartBeat() {
 //		Intent in = new Intent(mContext, SyncService.class);
-		Intent in = new Intent();
+        Intent in = new Intent(mContext, ZipService.class);
 		in.setAction(SERVICE_HEART_BEAT);
-		PendingIntent pi = PendingIntent.getBroadcast(mContext, 0, in, PendingIntent.FLAG_CANCEL_CURRENT);
+		PendingIntent pi = PendingIntent.getService(mContext, 0, in, PendingIntent.FLAG_CANCEL_CURRENT);
 //		PendingIntent pi = PendingIntent.getService(mContext, 0, in, PendingIntent.FLAG_CANCEL_CURRENT);
 	    AlarmManager am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
 	    am.cancel(pi);
@@ -105,7 +95,7 @@ public class ZipService extends Service {
 		String action="";
 		if (intent!=null) if (intent.getAction()!=null) action=intent.getAction();
 		if (action.equals(SERVICE_HEART_BEAT)) {
-//			mUtil.addDebugMsg(1,"I","onStartCommand entered, action="+action);
+//            mUtil.addDebugMsg(1,"I","onStartCommand entered, action="+action);
 			setHeartBeat();
 		} else {
 			mUtil.addDebugMsg(2,"I","onStartCommand entered, action="+action);
@@ -196,20 +186,57 @@ public class ZipService extends Service {
 		@Override
 		public void aidlUpdateNotificationMessage(String msg_text) throws RemoteException {
 			mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
-			if (mNotificationBuilder!=null) {
-				mNotificationBuilder
-					.setWhen(System.currentTimeMillis())
-					.setContentText(msg_text);
-				if (mNotification!=null) {
-					mNotification=mNotificationBuilder.build();
-					NotificationManager nm=(NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-					nm.notify(R.string.app_name, mNotification);
-				}
-			}
+			showNotification(msg_text);
 		}
 
     };
-    
+
+    private void initNotification() {
+        NotificationManager nm=(NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT>=26) {
+            NotificationChannel channel = new NotificationChannel(
+                    "ZipUtility",
+                    "ZipUtility",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.enableLights(false);
+            channel.setSound(null,null);
+//            channel.setLightColor(Color.GREEN);
+            channel.enableVibration(false);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            nm.deleteNotificationChannel("ZipUtility");
+            nm.createNotificationChannel(channel);
+        }
+
+        mNotificationBuilder=new Builder(mContext);
+        mNotificationBuilder.setWhen(System.currentTimeMillis())
+                .setContentTitle(mContext.getString(R.string.msgs_main_notification_title))
+                .setContentText(mContext.getString(R.string.msgs_main_notification_message))
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.zip_utility))
+                .setSmallIcon(R.drawable.ic_32_file_zip);
+        Intent activity_intent = new Intent(mContext, ActivityMain.class);
+        PendingIntent activity_pi=PendingIntent.getActivity(mContext, 0, activity_intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        mNotificationBuilder.setContentIntent(activity_pi);
+        if (Build.VERSION.SDK_INT>=26) {
+            mNotificationBuilder.setChannelId("ZipUtility");
+        }
+
+    }
+
+    private void showNotification(String msg_text) {
+        if (mNotificationBuilder!=null) {
+            mNotificationBuilder
+                    .setWhen(System.currentTimeMillis())
+                    .setContentText(msg_text);
+            if (mNotification!=null) {
+                mNotification=mNotificationBuilder.build();
+                NotificationManager nm=(NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+                nm.notify(R.string.app_name, mNotification);
+            }
+        }
+    }
+
     private void setActivityForeground() {
 		mGp.activityIsBackground=false;
 		cancelHeartBeat();

@@ -26,6 +26,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 import static com.sentaroh.android.ZipUtility.Constants.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -59,6 +61,7 @@ import android.os.RemoteException;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -89,6 +92,7 @@ import com.sentaroh.android.Utilities.Widget.CustomViewPagerAdapter;
 import com.sentaroh.android.Utilities.ThemeUtil;
 import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.ZipUtility.Log.LogFileListDialogFragment;
+import com.sentaroh.android.ZipUtility.Log.LogUtil;
 
 @SuppressLint("NewApi")
 public class ActivityMain extends AppCompatActivity {
@@ -173,6 +177,7 @@ public class ActivityMain extends AppCompatActivity {
 //                Log.v("","name="+path);
 //            }
 //            cursor.close();
+
             String file_path=ContentProviderUtil.getFilePath(mContext, cd, intent.getData());
     		if (file_path!=null){// && file_path.endsWith(".zip")) {
                 mLocalFileMgr.showLocalFileView(false);
@@ -553,9 +558,16 @@ public class ActivityMain extends AppCompatActivity {
 		if (mGp.settingLogOption) {
 			Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			intent.setDataAndType(Uri.parse("file://"+mUtil.getLogFilePath()), "text/plain");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			try {
-				startActivity(intent);
+			    if (Build.VERSION.SDK_INT>=26) {
+                    Uri uri= FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(mUtil.getLogFilePath()));
+                    intent.setDataAndType(uri, "text/plain");
+//                    startActivity(Intent.createChooser(intent, mUtil.getLogFilePath()));
+                } else {
+                    intent.setDataAndType(Uri.parse("file://"+mUtil.getLogFilePath()), "text/plain");
+                }
+                startActivity(intent);
 			} catch (ActivityNotFoundException e) {
 				mCommonDlg.showCommonDialog(false, "E", 
 						mContext.getString(R.string.msgs_log_file_browse_app_can_not_found), e.getMessage(), null);
@@ -576,6 +588,7 @@ public class ActivityMain extends AppCompatActivity {
 			@Override
 			public void positiveResponse(Context c, Object[] o) {
 				mGp.setSettingOptionLogEnabled(mContext, (Boolean)o[0]);
+                if (!(Boolean)o[0]) mUtil.rotateLogFile();
 //				loadSettingParms();
 			}
 			@Override

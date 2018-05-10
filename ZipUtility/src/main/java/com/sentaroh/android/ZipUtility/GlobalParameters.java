@@ -243,8 +243,10 @@ public class GlobalParameters extends CommonGlobalParms {
 
 	public void setSettingOptionLogEnabled(Context c, boolean enabled) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-		prefs.edit().putBoolean(c.getString(R.string.settings_log_option), enabled).commit(); 
-	};
+		prefs.edit().putBoolean(c.getString(R.string.settings_log_option), enabled).commit();
+        this.settingLogOption=enabled;
+        setLogParms(this);
+    };
 	
 	public void loadSettingsParms(Context c) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);

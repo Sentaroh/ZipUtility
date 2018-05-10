@@ -79,9 +79,11 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -3641,10 +3643,18 @@ public class ZipFileManager {
 											setUiEnabled();
 											if (rc) {
 												try {
-													Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
-													intent.setDataAndType(Uri.parse("file://"+work_dir+"/"+f_name), mt);
-													mActivity.startActivity(intent);
-												} catch(ActivityNotFoundException e) {
+                                                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
+                                                    if (Build.VERSION.SDK_INT>=26) {
+                                                        Uri uri= FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(work_dir+"/"+f_name));
+                                                        intent.setDataAndType(uri, mt);
+                                                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//                                                        mActivity.startActivity(Intent.createChooser(intent, work_dir+"/"+f_name));
+                                                    } else {
+                                                        intent.setDataAndType(Uri.parse("file://"+work_dir+"/"+f_name), mt);
+                                                    }
+                                                    mActivity.startActivity(intent);
+
+                                                } catch(ActivityNotFoundException e) {
 													mCommonDlg.showCommonDialog(false,"E", 
 															String.format(mContext.getString(R.string.msgs_zip_specific_extract_file_viewer_not_found),f_name,mt),"",null);
 													new File(work_dir+"/"+f_name).delete();
