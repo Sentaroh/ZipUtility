@@ -239,11 +239,12 @@ ZIPファイルの作成・編集・抽出のためのアプリケーション�
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api21">SMBSync_SD_CARD_5.0_JA.png</string>
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api23">SMBSync_SD_CARD_6.0_JA.png</string>
 	<string name="msgs_main_external_sdcard_select_required_cancel_msg">外部SDCARDが選択されるまで編集できません。</string>
+    <string name="msgs_main_external_sdcard_select_required_can_not_write">SDCARDへの書き込みが許可さていません。</string>
 	
-	<string name="msgs_main_permission_external_storage_title">許可</string>
-	<string name="msgs_main_permission_external_storage_request_msg">内部ストレージに同期するデータや管理用データの読み書きを行うために、内部ストレージにアクセスする許可を与えてください。</string>
-	<string name="msgs_main_permission_external_storage_denied_msg">内部ストレージにアクセスする許可が与えられていないため編集ができません。アプリケーションを終了します。</string>
-	
+	<string name="msgs_main_permission_external_storage_title">内部ストレージ許可許可</string>
+	<string name="msgs_main_permission_external_storage_request_msg">内部ストレージにデータや管理用データの読み書きを行うために内部ストレージにアクセスする許可を与えてください。</string>
+	<string name="msgs_main_permission_external_storage_denied_msg">内部ストレージにアクセスする許可が与えられていないためアプリケーションを続行できません、アプリケーションを終了します。</string>
+
 	<string name="msgs_local_file_scan_confirm_scan">メディアファイルをスキャンしてよろしいでしょうか？</string>
 	<string name="msgs_local_file_scan_scan_please_wait">スキャン中です、お待ちください。</string>
 	<string name="msgs_local_file_scan_scan_was_cancelled">メディアファイルのスキャンが中止されました。</string>

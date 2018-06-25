@@ -58,6 +58,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.os.StrictMode;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
@@ -204,6 +205,9 @@ public class ActivityMain extends AppCompatActivity {
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
+
         mContext=this;
         mActivity=this;
         mFragmentManager=getSupportFragmentManager();
@@ -492,7 +496,10 @@ public class ActivityMain extends AppCompatActivity {
 			case R.id.menu_top_quit:
 				mGp.settingExitClean=true;
 				confirmExit();
-				return true;			
+				return true;
+            case R.id.menu_top_show_sdcard_selector:
+                startSdcardPicker();
+                return true;
 			case R.id.menu_top_kill:
 				confirmKill();
 				return true;			
@@ -561,8 +568,9 @@ public class ActivityMain extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 			try {
 			    if (Build.VERSION.SDK_INT>=26) {
-                    Uri uri= FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(mUtil.getLogFilePath()));
-                    intent.setDataAndType(uri, "text/plain");
+//                    Uri uri= FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(mUtil.getLogFilePath()));
+//                    intent.setDataAndType(uri, "text/plain");
+                    intent.setDataAndType(Uri.parse("file://"+mUtil.getLogFilePath()), "text/plain");
 //                    startActivity(Intent.createChooser(intent, mUtil.getLogFilePath()));
                 } else {
                     intent.setDataAndType(Uri.parse("file://"+mUtil.getLogFilePath()), "text/plain");
@@ -651,9 +659,33 @@ public class ActivityMain extends AppCompatActivity {
 		} catch (NameNotFoundException e) {
 			return "";
 		}
-	};
+	}
 
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (REQUEST_PERMISSIONS_WRITE_EXTERNAL_STORAGE == requestCode) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            } else {
+                NotifyEvent ntfy_term = new NotifyEvent(mContext);
+                ntfy_term.setListener(new NotifyEvent.NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context c, Object[] o) {
+//                        isTaskTermination = true;
+                        finish();
+                    }
+
+                    @Override
+                    public void negativeResponse(Context c, Object[] o) {
+                    }
+                });
+                mCommonDlg.showCommonDialog(false, "W",
+                        mContext.getString(R.string.msgs_main_permission_external_storage_title),
+                        mContext.getString(R.string.msgs_main_permission_external_storage_denied_msg), ntfy_term);
+            }
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		mUtil.addDebugMsg(1, "I", "Return from settings");
 		if (requestCode==0) applySettingParms();
 		else if (requestCode == ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS) {
@@ -661,8 +693,9 @@ public class ActivityMain extends AppCompatActivity {
 	        if (resultCode == Activity.RESULT_OK) {
 	        	mUtil.addDebugMsg(1,"I","Intent="+data.getData().toString());
         		if (mGp.safMgr.isRootTreeUri(data.getData())) {
-	        		mGp.safMgr.addSafFileFromUri(data.getData());
+	        		mGp.safMgr.addSdcardUuid(data.getData());
 //	        		if (mSafSelectActivityNotify!=null) mSafSelectActivityNotify.notifyToListener(true, null);
+                    mLocalFileMgr.setSdcardGrantMsg();
 	        	} else {
 	        		NotifyEvent ntfy_retry=new NotifyEvent(mContext);
 	        		ntfy_retry.setListener(new NotifyEventListener(){
@@ -692,7 +725,7 @@ public class ActivityMain extends AppCompatActivity {
 	        				mContext.getString(R.string.msgs_main_external_sdcard_select_retry_select_msg), "", ntfy_retry);
 	        	}
 	        } else {
-	        	if (mGp.safMgr.getSdcardSafFile()==null) {
+	        	if (mGp.safMgr.getSdcardRootSafFile()==null) {
 					mCommonDlg.showCommonDialog(false, "W", 
 							mContext.getString(R.string.msgs_main_external_sdcard_select_required_title),
 							mContext.getString(R.string.msgs_main_external_sdcard_select_required_cancel_msg),
@@ -976,8 +1009,8 @@ public class ActivityMain extends AppCompatActivity {
 	    }  
 	};  
 	
-	private static ISvcClient mSvcClient=null;
-	private static ServiceConnection mSvcConnection=null;
+	private ISvcClient mSvcClient=null;
+	private ServiceConnection mSvcConnection=null;
 
 	private void openService(final NotifyEvent p_ntfy) {
  		mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");

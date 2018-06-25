@@ -40,6 +40,10 @@
           android:icon="@android:drawable/ic_menu_info_details"
           appv7:showAsAction="ifRoom"/>
 
+    <item android:id="@+id/menu_top_show_sdcard_selector"
+        android:title="@string/msgs_menu_show_sdcard_selector"
+        />
+
     <item android:id="@+id/menu_top_kill"
           android:title="@string/msgs_menu_kill"
           />

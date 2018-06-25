@@ -62,22 +62,22 @@ public class FileSelectSpinnerAdapter extends ArrayAdapter<String> {
         
         return view;
 	}
-	@SuppressWarnings("deprecation")
-	@Override
-	public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        final TextView text=(TextView)super.getDropDownView(position, convertView, parent);
-        if (Build.VERSION.SDK_INT>=11) {
-    		text.setCompoundDrawablesWithIntrinsicBounds(null,null,
-              		mContext.getResources().getDrawable(android.R.drawable.btn_radio), 
-              		null );
-    		text.post(new Runnable(){
-				@Override
-				public void run() {
-					text.setSingleLine(false);
-				}
-    		});
-        }
-        return text;
-	}
+//	@SuppressWarnings("deprecation")
+//	@Override
+//	public View getDropDownView(int position, View convertView, ViewGroup parent) {
+//        final TextView text=(TextView)super.getDropDownView(position, convertView, parent);
+//        if (Build.VERSION.SDK_INT>=11) {
+//    		text.setCompoundDrawablesWithIntrinsicBounds(null,null,
+//              		mContext.getResources().getDrawable(android.R.drawable.btn_radio),
+//              		null );
+//    		text.post(new Runnable(){
+//				@Override
+//				public void run() {
+//					text.setSingleLine(false);
+//				}
+//    		});
+//        }
+//        return text;
+//	}
 	
 }

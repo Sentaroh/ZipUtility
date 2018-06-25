@@ -29,7 +29,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import com.sentaroh.android.Utilities.CommonGlobalParms;
-import com.sentaroh.android.Utilities.SafFileManager;
+import com.sentaroh.android.Utilities.SafManager;
 import com.sentaroh.android.Utilities.ThemeColorList;
 
 import android.Manifest;
@@ -72,7 +72,7 @@ public class GlobalParameters extends CommonGlobalParms {
 	public String applicationRootDirectory="/";
 	public String applicationCacheDirectory="/";
 	
-	public SafFileManager safMgr=null;
+	public SafManager safMgr=null;
 
 	public ArrayList<TreeFilelistItem> copyCutList=new ArrayList<TreeFilelistItem>();
 	public String copyCutFilePath="";
@@ -180,9 +180,9 @@ public class GlobalParameters extends CommonGlobalParms {
 			}
 		}
 		if (safMgr==null) {
-			safMgr=new SafFileManager(c, settingDebugLevel>0);
+			safMgr=new SafManager(c, settingDebugLevel>0);
 		} else {
-			safMgr.loadSafFileList();
+			safMgr.loadSafFile();
 		}
 	};
 	
@@ -195,13 +195,6 @@ public class GlobalParameters extends CommonGlobalParms {
 		setLogDirName(gp.settingLogMsgDir);
 		setLogFileName(gp.settingLogMsgFilename);
 		setApplicationTag(APPLICATION_TAG);
-		setLogIntent(BROADCAST_LOG_RESET,
-				BROADCAST_LOG_DELETE,
-				BROADCAST_LOG_FLUSH,
-				BROADCAST_LOG_ROTATE,
-				BROADCAST_LOG_SEND,
-				BROADCAST_LOG_CLOSE);
-
 	}
 	
 //	private int mTextColorForeground=0;

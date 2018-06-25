@@ -195,16 +195,16 @@ public class TarFileManager {
 //		zipFileSpinner=(Spinner)mMainView.findViewById(R.id.zip_file_zip_file_spinner);
 //		CommonUtilities.setSpinnerBackground(mActivity, mGp.zipFileSpinner, mGp.themeIsLight);
 //		final CustomSpinnerAdapter adapter=
-//				new CustomSpinnerAdapter(mActivity, R.layout.custom_simple_spinner_item);
-//		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//				new CustomSpinnerAdapter(mActivity, android.R.layout.simple_spinner_item);
+//		adapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
 ////		mZipFileSpinner.setPrompt(mContext.getString(R.string.msgs_main_sync_profile_dlg_sync_folder_type_prompt));
 //		mGp.zipFileSpinner.setAdapter(adapter);
 		
 		mEncodingSpinner=(Spinner)mMainView.findViewById(R.id.zip_file_encoding);
 		CommonUtilities.setSpinnerBackground(mActivity, mEncodingSpinner, mGp.themeIsLight);
 		final CustomSpinnerAdapter enc_adapter=
-				new CustomSpinnerAdapter(mActivity, R.layout.custom_simple_spinner_item);
-		enc_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+				new CustomSpinnerAdapter(mActivity, android.R.layout.simple_spinner_item);
+		enc_adapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
 		enc_adapter.add(mContext.getString(R.string.msgs_zip_parm_zip_encoding_auto));
 		for(String item:ENCODING_NAME_LIST) enc_adapter.add(item);
 		mEncodingSpinner.setAdapter(enc_adapter);
@@ -511,9 +511,9 @@ public class TarFileManager {
 	
 	public void refreshFileList() {
 		final String cdir=mZipFileCurrentDirectory.getText().toString();
-		if (mMainFilePath.startsWith(mGp.externalRootDirectory)) {
-			if (mGp.safMgr.getSdcardSafFile()==null) mActivity.startSdcardPicker();
-		}
+//		if (mMainFilePath.startsWith(mGp.externalRootDirectory)) {
+//			if (mGp.safMgr.getSdcardRootSafFile()==null) mActivity.startSdcardPicker();
+//		}
 		ArrayList<TreeFilelistItem> p_tfl=null;
 		if (mTreeFilelistAdapter!=null) p_tfl=mTreeFilelistAdapter.getDataList();
 		if (cdir.length()>0) createFileList(mMainFilePath,null,cdir.substring(1));
@@ -1297,13 +1297,13 @@ public class TarFileManager {
 	private static void setZipCompLevelSpinner(GlobalParameters mGp, Activity mActivity, Spinner spinner) {
 		CommonUtilities.setSpinnerBackground(mActivity, spinner, mGp.themeIsLight);
 		final CustomSpinnerAdapter adapter=
-				new CustomSpinnerAdapter(mActivity, R.layout.custom_simple_spinner_item);
+				new CustomSpinnerAdapter(mActivity, android.R.layout.simple_spinner_item);
 		adapter.add(mGp.appContext.getString(R.string.msgs_zip_parm_zip_comp_level_fastest));
 		adapter.add(mGp.appContext.getString(R.string.msgs_zip_parm_zip_comp_level_fast));
 		adapter.add(mGp.appContext.getString(R.string.msgs_zip_parm_zip_comp_level_normal));
 		adapter.add(mGp.appContext.getString(R.string.msgs_zip_parm_zip_comp_level_maximum));
 		adapter.add(mGp.appContext.getString(R.string.msgs_zip_parm_zip_comp_level_ultra));
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		adapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
 		spinner.setPrompt(mGp.appContext.getString(R.string.msgs_zip_parm_zip_comp_level_promopt));
 		spinner.setAdapter(adapter);
 		
@@ -1546,8 +1546,7 @@ public class TarFileManager {
 						} else {
 //							extract_fh.getFileName(), dest_path+"/"+dir, fn
 							if (dest_path.startsWith(mGp.externalRootDirectory)) {
-								SafFile sf=mGp.safMgr.getSafFileBySdcardPath(mGp.safMgr.getSdcardSafFile(),
-										dest_path+"/"+extract_tfli.getZipFileName(), true);
+								SafFile sf=mGp.safMgr.createSdcardItem(dest_path+"/"+extract_tfli.getZipFileName(), true);
 								sf.exists();
 							} else {
 								File lf=new File(dest_path+"/"+extract_tfli.getZipFileName());
@@ -1900,9 +1899,8 @@ public class TarFileManager {
 		putProgressMessage(msg);
 
 		boolean result=false;
-		SafFile sf=mGp.safMgr.getSdcardSafFile();
-		SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(sf, sdcard_path, false);
-		SafFile temp_sf=mGp.safMgr.getSafFileBySdcardPath(sf, sdcard_path+".tmp", false);
+		SafFile out_sf=mGp.safMgr.createSdcardItem(sdcard_path, false);
+		SafFile temp_sf=mGp.safMgr.createSdcardItem(sdcard_path+".tmp", false);
 		File from=new File(app_path);
 		try {
 			OutputStream fos=mContext.getContentResolver().openOutputStream(temp_sf.getUri());
@@ -2401,9 +2399,8 @@ public class TarFileManager {
 				InputStream is=zf.getInputStream(fh);
 				
 				String w_path=dest_path.endsWith("/")?dest_path+dest_file_name:dest_path+"/"+dest_file_name;
-				SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-				SafFile out_dir_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, dest_path, true);
-				SafFile out_file_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, w_path, false);
+				SafFile out_dir_sf=mGp.safMgr.createSdcardItem(dest_path, true);
+				SafFile out_file_sf=mGp.safMgr.createSdcardItem(w_path, false);
 				OutputStream os=mContext.getContentResolver().openOutputStream(out_file_sf.getUri());
 				
 				long fsz=fh.getUncompressedSize();

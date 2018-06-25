@@ -241,12 +241,13 @@ External Library:\n
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api21">SMBSync_SD_CARD_5.0_EN.png</string>
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api23">SMBSync_SD_CARD_6.0_EN.png</string>
 	<string name="msgs_main_external_sdcard_select_required_cancel_msg">You can not perform edit until external SD card is selected.</string>
+    <string name="msgs_main_external_sdcard_select_required_can_not_write">Write to SDCARD is not allowed.</string>
 	
 	<string name="msgs_main_external_sdcard_mp_changed_title">External SDCARD</string>
-	
-	<string name="msgs_main_permission_external_storage_title">許可</string>
-	<string name="msgs_main_permission_external_storage_request_msg">内部ストレージに同期するデータや管理用データの読み書きを行うために、内部ストレージにアクセスする許可を与えてください。</string>
-	<string name="msgs_main_permission_external_storage_denied_msg">内部ストレージにアクセスする許可が与えられていないため編集ができません。アプリケーションを終了します。</string>
+
+    <string name="msgs_main_permission_external_storage_title">Internal Storage Permission</string>
+    <string name="msgs_main_permission_external_storage_request_msg">Please give permission to access internal storage in order to read and write data and management data to internal storage.</string>
+    <string name="msgs_main_permission_external_storage_denied_msg">The application can not continue because the permission to access the internal storage is not given, the application is terminated.</string>
 	
 	<string name="msgs_local_file_scan_confirm_scan">Do you want to scan media file?</string>
 	<string name="msgs_local_file_scan_scan_please_wait">During the scanning, please wait.</string>

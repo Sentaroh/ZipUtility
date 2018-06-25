@@ -53,7 +53,6 @@ import com.sentaroh.android.Utilities.BufferedZipFile;
 import com.sentaroh.android.Utilities.MiscUtil;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.SafFile;
-import com.sentaroh.android.Utilities.SafFileManager;
 import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
@@ -78,6 +77,7 @@ public class LocalFileManager{
 
 	private ListView mTreeFilelistView=null;
 	private CustomTreeFilelistAdapter mTreeFilelistAdapter=null;
+    private TextView mLocalViewMsg=null;
 	
 	private View mMainView=null;
 	private Handler mUiHandler=null;
@@ -112,9 +112,9 @@ public class LocalFileManager{
 		ntfy.setListener(new NotifyEventListener(){
 			@Override
 			public void positiveResponse(final Context c, final Object[] o) {
-				if (!mGp.externalRootDirectory.equals(GlobalParameters.STORAGE_STATUS_UNMOUNT)) {
-					if (mGp.safMgr.getSdcardSafFile()==null) mActivity.startSdcardPicker();
-				}
+//				if (!mGp.externalRootDirectory.equals(GlobalParameters.STORAGE_STATUS_UNMOUNT)) {
+//					if (mGp.safMgr.getSdcardRootSafFile()==null) mActivity.startSdcardPicker();
+//				}
 			}
 			@Override
 			public void negativeResponse(Context c, final Object[] o) {
@@ -186,10 +186,9 @@ public class LocalFileManager{
 				        setContextButtonSelectUnselectVisibility();
 			    		if (mGp.copyCutList.size()>0) {
 			    			mGp.copyCutItemInfo.setVisibility(TextView.VISIBLE);
-			    			if (isCopyCutDestValid(curr_dir)) 
-			    				mContextButtonPasteView.setVisibility(ImageButton.VISIBLE);
+    	    				setContextButtonViewVisibility(mContextButtonPasteView);
 			    		}
-			    		setUiEnabled();
+                        setUiEnabled();
 				        mUtil.addDebugMsg(1, "I", "refreshFileList completed, size="+tfl.size());
 					}
 				});
@@ -277,17 +276,19 @@ public class LocalFileManager{
         mFileEmpty=(TextView)mMainView.findViewById(R.id.local_file_empty);
         mFileEmpty.setVisibility(TextView.GONE);
         mTreeFilelistView.setVisibility(ListView.VISIBLE);
-        
+
+        mLocalViewMsg=(TextView)mMainView.findViewById(R.id.local_file_msg);
+
         mLocalStorage=(Spinner)mMainView.findViewById(R.id.local_file_storage_spinner);
 		CommonUtilities.setSpinnerBackground(mActivity, mLocalStorage, mGp.themeIsLight);
 		final CustomSpinnerAdapter stg_adapter=
-				new CustomSpinnerAdapter(mActivity, R.layout.custom_simple_spinner_item);
-		stg_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+				new CustomSpinnerAdapter(mActivity, android.R.layout.simple_spinner_item);
+		stg_adapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
 		stg_adapter.add(mGp.internalRootDirectory);
 		if (!mGp.externalRootDirectory.equals(GlobalParameters.STORAGE_STATUS_UNMOUNT)) 
 			stg_adapter.add(mGp.externalRootDirectory);
-		if (!mGp.safMgr.getUsbFileSystemDirectory().equals(SafFileManager.UNKNOWN_USB_FS_DIRECTORY)) 
-			stg_adapter.add(mGp.safMgr.getUsbFileSystemDirectory());
+//		if (!mGp.safMgr.getUsbFileSystemDirectory().equals(SafFileManager.UNKNOWN_USB_FS_DIRECTORY)) 
+//			stg_adapter.add(mGp.safMgr.getUsbFileSystemDirectory());
 		mLocalStorage.setAdapter(stg_adapter);
 		mLocalStorage.setSelection(0,false);
 		if (stg_adapter.getCount()>1) mLocalStorage.setEnabled(true);
@@ -945,8 +946,8 @@ public class LocalFileManager{
 						File lf= new File(n_path);
 						boolean rc_create=false;
 						if (create_type.isChecked()) {
-							if (t_dir.startsWith(mGp.safMgr.getExternalSdcardPath())) {
-								SafFile sf=mGp.safMgr.getSafFileBySdcardPath(mGp.safMgr.getSdcardSafFile(), n_path, false);
+							if (t_dir.startsWith(mGp.safMgr.getSdcardRootPath())) {
+								SafFile sf=mGp.safMgr.createSdcardItem(n_path, false);
 								rc_create=sf.exists();
 							} else {
 								try {
@@ -956,8 +957,8 @@ public class LocalFileManager{
 								}
 							}
 						} else {
-							if (t_dir.startsWith(mGp.safMgr.getExternalSdcardPath())) {
-								SafFile sf=mGp.safMgr.getSafFileBySdcardPath(mGp.safMgr.getSdcardSafFile(), n_path, true);
+							if (t_dir.startsWith(mGp.safMgr.getSdcardRootPath())) {
+								SafFile sf=mGp.safMgr.createSdcardItem(n_path, true);
 								rc_create=sf.exists();
 							} else {
 								rc_create=lf.mkdirs();
@@ -1079,14 +1080,14 @@ public class LocalFileManager{
 								mUtil.addDebugMsg(1, "I", "Rename started");
 								boolean rc_create=false;
 								if (!tfli.isDirectory()) {
-									if (current_name.startsWith(mGp.safMgr.getExternalSdcardPath())) {
+									if (current_name.startsWith(mGp.safMgr.getSdcardRootPath())) {
 									    try {
-                                            SafFile sf=mGp.safMgr.getSafFileBySdcardPath(mGp.safMgr.getSdcardSafFile(), current_name, false);
+                                            SafFile sf=mGp.safMgr.createSdcardItem(current_name, false);
                                             sf.renameTo(etDir.getText().toString());
                                             rc_create=sf.exists();
                                         } catch(Exception e) {
                                             mUtil.addLogMsg("E","Saf file error");
-                                            mUtil.addLogMsg("E",mGp.safMgr.getSafDebugMsg());
+                                            mUtil.addLogMsg("E",mGp.safMgr.getMessages());
                                             CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
                                         }
 									} else {
@@ -1102,14 +1103,14 @@ public class LocalFileManager{
 								} else {
 									ArrayList<File>fl=new ArrayList<File>();
 									CommonUtilities.getAllFileInDirectory(mGp, mUtil, fl, new File(current_name), true);
-									if (current_name.startsWith(mGp.safMgr.getExternalSdcardPath())) {
+									if (current_name.startsWith(mGp.safMgr.getSdcardRootPath())) {
                                         try {
-                                            SafFile sf=mGp.safMgr.getSafFileBySdcardPath(mGp.safMgr.getSdcardSafFile(), current_name, true);
+                                            SafFile sf=mGp.safMgr.createSdcardItem(current_name, true);
                                             sf.renameTo(etDir.getText().toString());
                                             rc_create=sf.exists();
                                         } catch(Exception e) {
                                             mUtil.addLogMsg("E","Saf directory error");
-                                            mUtil.addLogMsg("E",mGp.safMgr.getSafDebugMsg());
+                                            mUtil.addLogMsg("E",mGp.safMgr.getMessages());
                                             CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
                                         }
 									} else {
@@ -1492,14 +1493,11 @@ public class LocalFileManager{
 				from_file.delete();
 				result=true;
 			}
-			SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-			@SuppressWarnings("unused")
-			SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, to_path, true);
+			SafFile out_sf=mGp.safMgr.createSdcardItem(to_path, true);
 		} else {
 			try {
 				if (confirmReplace(tc,to_path)) {
-					SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-					SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, to_path, false);
+					SafFile out_sf=mGp.safMgr.createSdcardItem(to_path, false);
 					OutputStream fos=mContext.getContentResolver().openOutputStream(out_sf.getUri());
 //					BufferedOutputStream bos=new BufferedOutputStream(fos, 1024*1024*8);
 					byte[] buff=new byte[IO_AREA_SIZE];
@@ -1582,13 +1580,11 @@ public class LocalFileManager{
 					result=true;
 				}
 				if (result) {
-					SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-					SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, from_file.getPath(), true);
+					SafFile out_sf=mGp.safMgr.createSdcardItem(from_file.getPath(), true);
 					out_sf.delete();
 				}
 			} else {
-				SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-				SafFile in_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, from_file.getPath(), true);
+				SafFile in_sf=mGp.safMgr.createSdcardItem(from_file.getPath(), true);
 				in_sf.delete();
 				result=true;
 			}
@@ -1637,8 +1633,7 @@ public class LocalFileManager{
 						fos.flush();
 						fos.close();
 						fis.close();
-						SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-						SafFile del_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, from_file.getPath(), false);
+						SafFile del_sf=mGp.safMgr.createSdcardItem(from_file.getPath(), false);
 						del_sf.delete();
 						out_file.setLastModified(in_last_mod);
 						String msg=String.format(mContext.getString(R.string.msgs_zip_local_file_move_moved),to_path);
@@ -1689,24 +1684,19 @@ public class LocalFileManager{
 					result=true;
 				}
 				if (result) {
-					SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-					SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, from_file.getPath(), true);
+					SafFile out_sf=mGp.safMgr.createSdcardItem(from_file.getPath(), true);
 					out_sf.delete();
 				}
 			} else {
-				SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-				SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, from_file.getPath(), true);
+				SafFile out_sf=mGp.safMgr.createSdcardItem(from_file.getPath(), true);
 				out_sf.delete();
 				result=true;
 			}
-			SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-			@SuppressWarnings("unused")
-			SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, to_path, true);
+			SafFile out_sf=mGp.safMgr.createSdcardItem(to_path, true);
 		} else {
 			try {
 				if (confirmReplace(tc,to_path)) {
-					SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-					SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, to_path, false);
+					SafFile out_sf=mGp.safMgr.createSdcardItem(to_path, false);
 					OutputStream fos=mContext.getContentResolver().openOutputStream(out_sf.getUri());
 //					BufferedOutputStream bos=new BufferedOutputStream(fos, 1024*1024*8);
 					byte[] buff=new byte[IO_AREA_SIZE];
@@ -1740,7 +1730,7 @@ public class LocalFileManager{
 						fos.flush();
 						fos.close();
 						fis.close();
-						SafFile in_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, from_file.getPath(), false);
+						SafFile in_sf=mGp.safMgr.createSdcardItem(from_file.getPath(), false);
 						in_sf.delete();
 						String msg=String.format(mContext.getString(R.string.msgs_zip_local_file_move_moved),to_path);
 						mUtil.addLogMsg("I", msg);
@@ -1932,8 +1922,7 @@ public class LocalFileManager{
 				extracted_fh_list.add(fh_item);
 				if (fh_item.isDirectory()) {
 					if (dest_path.startsWith(mGp.externalRootDirectory)) {
-						SafFile sf=mGp.safMgr.getSafFileBySdcardPath(mGp.safMgr.getSdcardSafFile(),
-								dest_path+"/"+fh_item.getFileName().replace(mGp.copyCutCurrentDirectory,""), true);
+						SafFile sf=mGp.safMgr.createSdcardItem(dest_path+"/"+fh_item.getFileName().replace(mGp.copyCutCurrentDirectory,""), true);
 						sf.exists();
 					} else {
 						File lf=new File(dest_path+"/"+fh_item.getFileName().replace(mGp.copyCutCurrentDirectory,""));
@@ -2148,10 +2137,9 @@ public class LocalFileManager{
 				InputStream is=zf.getInputStream(fh);
 				
 				String w_path=dest_path.endsWith("/")?dest_path+dest_file_name:dest_path+"/"+dest_file_name;
-				SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-				SafFile out_dir_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, dest_path, true);
+				SafFile out_dir_sf=mGp.safMgr.createSdcardItem(dest_path, true);
 				out_dir_sf.exists();
-				SafFile out_file_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, w_path, false);
+				SafFile out_file_sf=mGp.safMgr.createSdcardItem(w_path, false);
 				OutputStream os=mContext.getContentResolver().openOutputStream(out_file_sf.getUri());
 				
 				long fsz=fh.getUncompressedSize();
@@ -2458,14 +2446,11 @@ public class LocalFileManager{
 			} else {
 				result=true;
 			}
-			SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-			@SuppressWarnings("unused")
-			SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, to_path, true);
+			SafFile out_sf=mGp.safMgr.createSdcardItem(to_path, true);
 		} else {
 			try {
 				if (confirmReplace(tc,to_path)) {
-					SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-					SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, to_path, false);
+					SafFile out_sf=mGp.safMgr.createSdcardItem(to_path, false);
 					OutputStream fos=mContext.getContentResolver().openOutputStream(out_sf.getUri());
 //					BufferedOutputStream bos=new BufferedOutputStream(fos, 1024*1024*8);
 					byte[] buff=new byte[IO_AREA_SIZE];
@@ -2524,8 +2509,7 @@ public class LocalFileManager{
 						if (item.isDirectory()) deleteLocalItem(tc, item.getPath());
 						else {
 							if (item.getPath().startsWith(mGp.externalRootDirectory)) {
-								SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-								SafFile del_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, item.getPath(), true);
+								SafFile del_sf=mGp.safMgr.createSdcardItem(item.getPath(), true);
 								result=del_sf.delete();
 							} else {
 								result=item.delete();
@@ -2545,8 +2529,7 @@ public class LocalFileManager{
 				}
 				if (result) {
 					if (fp.startsWith(mGp.externalRootDirectory)) {
-						SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-						SafFile del_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, fp, true);
+						SafFile del_sf=mGp.safMgr.createSdcardItem(fp, true);
 						result=del_sf.delete();
 					} else {
 						result=lf.delete();
@@ -2562,8 +2545,7 @@ public class LocalFileManager{
 				}
 			} else {
 				if (fp.startsWith(mGp.externalRootDirectory)) {
-					SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-					SafFile del_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, fp, false);
+					SafFile del_sf=mGp.safMgr.createSdcardItem(fp, false);
 					result=del_sf.delete();
 				} else {
 					result=lf.delete();
@@ -2705,6 +2687,7 @@ public class LocalFileManager{
 								mGp.copyCutItemInfo.setVisibility(TextView.GONE);
 								mGp.copyCutItemClear.setVisibility(Button.GONE);
 								mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
+                                mTreeFilelistAdapter.setAllItemUnchecked();
 								refreshFileList();
 								setUiEnabled();
 							}
@@ -2806,9 +2789,11 @@ public class LocalFileManager{
 		refreshOptionMenu();
 //		Thread.dumpStack();
 	};
-	
+
+
+
 	public void setContextButtonPasteEnabled(boolean enabled) {
-		if (enabled) mContextButtonPasteView.setVisibility(LinearLayout.VISIBLE);
+		if (enabled) setContextButtonViewVisibility(mContextButtonPasteView);
 		else mContextButtonPasteView.setVisibility(LinearLayout.INVISIBLE);
 	};
 	
@@ -2887,7 +2872,7 @@ public class LocalFileManager{
 
         }
 		if (isCopyCutDestValid(dir_name)) {
-			mContextButtonPasteView.setVisibility(ImageButton.VISIBLE);
+            setContextButtonViewVisibility(mContextButtonPasteView);
 		} else {
 			mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
 		}
@@ -2928,7 +2913,7 @@ public class LocalFileManager{
 					mExternalViewContent.sort_key_name=mTreeFilelistAdapter.isSortKeyName();
 					mExternalViewContent.sort_key_size=mTreeFilelistAdapter.isSortKeySize();
 					mExternalViewContent.sort_key_time=mTreeFilelistAdapter.isSortKeyTime();
-				}
+                }
 				mMainFilePath=n_fp;
 				ArrayList<TreeFilelistItem> prev_tfl=null;
 				String w_curr_dir="";
@@ -2958,8 +2943,10 @@ public class LocalFileManager{
 						sort_time=mExternalViewContent.sort_key_time;
 					}
 				}
-				
-			    String curr_dir="";
+
+                setSdcardGrantMsg();
+
+                String curr_dir="";
 			    if (w_curr_dir.equals("/")) {
 			    	curr_dir=mMainFilePath;
 			    } else {
@@ -2985,12 +2972,13 @@ public class LocalFileManager{
 				}
 				if (mTreeFilelistAdapter.isDataItemIsSelected()) {
 					mContextButtonCopyView.setVisibility(ImageButton.VISIBLE);
-					mContextButtonCutView.setVisibility(ImageButton.VISIBLE);
+                    setContextButtonViewVisibility(mContextButtonCutView);
 				}
 				if (mGp.copyCutList.size()>0) {
 					mGp.copyCutItemInfo.setVisibility(TextView.VISIBLE);
 					mGp.copyCutItemClear.setVisibility(Button.VISIBLE);
-					if (isCopyCutDestValid(curr_dir)) mContextButtonPasteView.setVisibility(ImageButton.VISIBLE);
+					if (isCopyCutDestValid(curr_dir))
+                        setContextButtonViewVisibility(mContextButtonPasteView);
 				}
 				mActivity.refreshOptionMenu();
 			}
@@ -3035,7 +3023,7 @@ public class LocalFileManager{
 //        });
 //        mTreeFilelistAdapter.setExpandCloseListener(ntfy_expand_close);
         
-		mContextButtonCreateView.setVisibility(ImageButton.VISIBLE);
+		if (mGp.safMgr.isSdcardMounted()) mContextButtonCreateView.setVisibility(ImageButton.VISIBLE);
 		mContextButtonShareView.setVisibility(ImageButton.INVISIBLE);
 		mContextButtonRenameView.setVisibility(ImageButton.INVISIBLE);
 		mContextButtonCopyView.setVisibility(ImageButton.INVISIBLE);
@@ -3049,38 +3037,38 @@ public class LocalFileManager{
 			public void positiveResponse(Context c, Object[] o) {
 				setContextButtonShareVisibility();
 				mContextButtonCreateView.setVisibility(ImageButton.INVISIBLE);
-				if (mTreeFilelistAdapter.getDataItemSelectCount()==1) mContextButtonRenameView.setVisibility(ImageButton.VISIBLE);
+				if (mTreeFilelistAdapter.getDataItemSelectCount()==1) setContextButtonViewVisibility(mContextButtonRenameView);
 				else mContextButtonRenameView.setVisibility(ImageButton.INVISIBLE);
-				mContextButtonDeleteView.setVisibility(ImageButton.VISIBLE);
+                setContextButtonViewVisibility(mContextButtonDeleteView);
 				mContextButtonArchiveView.setVisibility(ImageButton.VISIBLE);
 				mContextButtonCopyView.setVisibility(ImageButton.VISIBLE);
-				mContextButtonCutView.setVisibility(ImageButton.VISIBLE);
+                setContextButtonViewVisibility(mContextButtonCutView);
 				mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
 				setContextButtonSelectUnselectVisibility();
 			}
 			@Override
 			public void negativeResponse(Context c, Object[] o) {
 				if (mTreeFilelistAdapter.isDataItemIsSelected()) {
-					mContextButtonCreateView.setVisibility(ImageButton.INVISIBLE);
+                    setContextButtonViewVisibility(mContextButtonCreateView);
 					setContextButtonShareVisibility();
 					if (mTreeFilelistAdapter.getDataItemSelectCount()==1) {
-						mContextButtonRenameView.setVisibility(ImageButton.VISIBLE);
+                        setContextButtonViewVisibility(mContextButtonRenameView);
 					} else {
 						mContextButtonRenameView.setVisibility(ImageButton.INVISIBLE);
 					}
 					mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
-					mContextButtonDeleteView.setVisibility(ImageButton.VISIBLE);
+                    setContextButtonViewVisibility(mContextButtonDeleteView);
 					mContextButtonArchiveView.setVisibility(ImageButton.VISIBLE);
 					mContextButtonCopyView.setVisibility(ImageButton.VISIBLE);
-					mContextButtonCutView.setVisibility(ImageButton.VISIBLE);
+                    setContextButtonViewVisibility(mContextButtonCutView);
 				} else {
 					String dir=mLocalStorage.getSelectedItem().toString()+mCurrentDirectory.getText();
 					if (isCopyCutDestValid(dir)) {
-						mContextButtonPasteView.setVisibility(ImageButton.VISIBLE);
+                        setContextButtonViewVisibility(mContextButtonPasteView);
 					} else {
 						mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
 					}
-					mContextButtonCreateView.setVisibility(ImageButton.VISIBLE);
+                    setContextButtonViewVisibility(mContextButtonCreateView);
 					setContextButtonShareVisibility();
 					mContextButtonRenameView.setVisibility(ImageButton.INVISIBLE);
 					mContextButtonDeleteView.setVisibility(ImageButton.INVISIBLE);
@@ -3130,7 +3118,7 @@ public class LocalFileManager{
 				        mTreeFilelistView.setVisibility(ListView.VISIBLE);
 			        }
 					if (isCopyCutDestValid(dir)) {
-						mContextButtonPasteView.setVisibility(ImageButton.VISIBLE);
+                        setContextButtonViewVisibility(mContextButtonPasteView);
 					} else {
 						mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
 					}
@@ -3146,7 +3134,7 @@ public class LocalFileManager{
 				}
 			}
         });
-        
+
         mTreeFilelistView.setOnItemLongClickListener(new OnItemLongClickListener(){
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -3180,7 +3168,7 @@ public class LocalFileManager{
 			        mTreeFilelistView.setSelectionFromTop(p_dli.pos_x, p_dli.pos_y);
 		        }
 				if (isCopyCutDestValid(mMainFilePath)) {
-					mContextButtonPasteView.setVisibility(ImageButton.VISIBLE);
+                    setContextButtonViewVisibility(mContextButtonPasteView);
 				} else {
 					mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
 				}
@@ -3229,7 +3217,7 @@ public class LocalFileManager{
 					        mTreeFilelistView.setVisibility(ListView.VISIBLE);
 				        }
 						if (isCopyCutDestValid(n_dir)) {
-							mContextButtonPasteView.setVisibility(ImageButton.VISIBLE);
+                            setContextButtonViewVisibility(mContextButtonPasteView);
 						} else {
 							mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
 						}
@@ -3239,17 +3227,39 @@ public class LocalFileManager{
 				}
 			}
         });
-	};
+	}
 	
 	public boolean isUpButtonEnabled() {
 		return mFileListUp.isEnabled(); 
-	};
+	}
 
-	public void performClickUpButton() {
+	public void setSdcardGrantMsg() {
+        if (mMainFilePath.startsWith(mGp.internalRootDirectory)) {
+            mLocalViewMsg.setVisibility(TextView.GONE);
+        } else {
+            if (!mGp.safMgr.isSdcardMounted()) {
+                mLocalViewMsg.setVisibility(TextView.VISIBLE);
+                mLocalViewMsg.setText(mContext.getString(R.string.msgs_main_external_sdcard_select_required_can_not_write));
+            } else {
+                mLocalViewMsg.setVisibility(TextView.GONE);
+            }
+        }
+    }
+
+    private void setContextButtonViewVisibility(LinearLayout cbv) {
+        if (mMainFilePath.startsWith(mGp.internalRootDirectory)) {
+            cbv.setVisibility(LinearLayout.VISIBLE);
+        } else {
+            if (mGp.safMgr.isSdcardMounted()) cbv.setVisibility(LinearLayout.VISIBLE);
+            else cbv.setVisibility(LinearLayout.INVISIBLE);
+        }
+    }
+
+    public void performClickUpButton() {
 		mFileListUp.setSoundEffectsEnabled(false);
 		mFileListUp.performClick(); 
 		mFileListUp.setSoundEffectsEnabled(true);
-	};
+	}
 
 	private void setTopUpButtonEnabled(boolean p) {
 		mFileListUp.setEnabled(p);
@@ -3382,7 +3392,7 @@ public class LocalFileManager{
 				        mTreeFilelistView.setVisibility(ListView.VISIBLE);
 			        }
 					if (isCopyCutDestValid(dir)) {
-						mContextButtonPasteView.setVisibility(ImageButton.VISIBLE);
+                        setContextButtonViewVisibility(mContextButtonPasteView);
 					} else {
 						mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
 					}
@@ -3473,9 +3483,8 @@ public class LocalFileManager{
 		putProgressMessage(msg);
 
 		boolean result=false;
-		SafFile sf=mGp.safMgr.getSdcardSafFile();
-		SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(sf, sdcard_path, false);
-		SafFile temp_sf=mGp.safMgr.getSafFileBySdcardPath(sf, sdcard_path+".tmp", false);
+		SafFile out_sf=mGp.safMgr.createSdcardItem(sdcard_path, false);
+		SafFile temp_sf=mGp.safMgr.createSdcardItem(sdcard_path+".tmp", false);
 		File from=new File(app_path);
 		try {
 			OutputStream fos=mContext.getContentResolver().openOutputStream(temp_sf.getUri());
@@ -3588,8 +3597,7 @@ public class LocalFileManager{
 									
 								});
 								if (out_fl.getPath().startsWith(mGp.externalRootDirectory)) {
-									SafFile root_sf=mGp.safMgr.getSdcardSafFile();
-									SafFile out_sf=mGp.safMgr.getSafFileBySdcardPath(root_sf, out_fl.getPath(), true);
+									SafFile out_sf=mGp.safMgr.createSdcardItem(out_fl.getPath(), true);
 									out_sf.delete();
 								} else {
 									if (out_fl.isFile()) out_fl.delete();
@@ -3740,12 +3748,14 @@ public class LocalFileManager{
 			try {
 				Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
                 if (Build.VERSION.SDK_INT>=24) {
-                    Uri uri=FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(p_dir+"/"+f_name));
-                    intent.setDataAndType(uri, mt);
-                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.setDataAndType(Uri.parse("file://"+p_dir+"/"+f_name), mt);
+//                    Uri uri=FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(p_dir+"/"+f_name));
+//                    intent.setDataAndType(uri, mt);
+//                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 } else {
                     intent.setDataAndType(Uri.parse("file://"+p_dir+"/"+f_name), mt);
                 }
+                intent.setDataAndType(Uri.parse("file://"+p_dir+"/"+f_name), mt);
                 mActivity.startActivity(intent);
 				result=true;
 			} catch(ActivityNotFoundException e) {
@@ -3793,7 +3803,8 @@ public class LocalFileManager{
 	        } else {
 		        mContextButtonSelectAllView.setVisibility(LinearLayout.VISIBLE);
 		        mContextButtonUnselectAllView.setVisibility(LinearLayout.INVISIBLE);
-		        mFileEmpty.setVisibility(TextView.GONE);
+                setContextButtonViewVisibility(mContextButtonCreateView);
+                mFileEmpty.setVisibility(TextView.GONE);
 		        mTreeFilelistView.setVisibility(ListView.VISIBLE);
 	        }
 	        

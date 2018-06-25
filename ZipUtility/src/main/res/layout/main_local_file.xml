@@ -80,7 +80,17 @@
             android:fastScrollEnabled="true" />
 
    		<include layout="@layout/context_view_local"/>
-        
+
+        <TextView
+            android:id="@+id/local_file_msg"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:visibility="gone"
+            android:text="SDCARD access was not granted"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
     </LinearLayout>
     
 
