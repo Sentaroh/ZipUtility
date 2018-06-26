@@ -732,14 +732,14 @@ public class TarFileManager {
 		TreeFilelistItem tfi=null;
 		if (zfli.isDirectory()) {
 			tfi=new TreeFilelistItem(zfli.getFileName(),
-					sdf.format(zfli.getLastModifiedTime())+", ", true, 0, zfli.getLastModifiedTime(),
+					true, 0, zfli.getLastModifiedTime(),
 					false, true, true,
 					false, zfli.getParentDirectory(),0);
 			tfi.setZipEncrypted(false);
 			tfi.setZipFileName(zfli.getPath());
 		} else {
 			tfi=new TreeFilelistItem(zfli.getFileName(),
-					sdf.format(zfli.getLastModifiedTime())+","+tfs, false, zfli.getFileLength(), zfli.getLastModifiedTime(),
+					false, zfli.getFileLength(), zfli.getLastModifiedTime(),
 					false, true, true,
 					false, zfli.getParentDirectory(),0);
 			tfi.setZipEncrypted(zfli.isEncrypted());

@@ -1192,7 +1192,7 @@ public class ZipFileManager {
 		TreeFilelistItem tfi=null;
 		if (zfli.isDirectory()) {
 			tfi=new TreeFilelistItem(zfli.getFileName(),
-					sdf.format(zfli.getLastModifiedTime())+", ", true, 0, zfli.getLastModifiedTime(),
+					true, -1, zfli.getLastModifiedTime(),
 					false, true, true,
 					false, zfli.getParentDirectory(),0);
 			tfi.setZipEncrypted(false);
@@ -1201,7 +1201,7 @@ public class ZipFileManager {
 			tfi.setZipFileCompressedSize(zfli.getCompressedFileLength());
 		} else {
 			tfi=new TreeFilelistItem(zfli.getFileName(),
-					sdf.format(zfli.getLastModifiedTime())+","+tfs, false, zfli.getFileLength(), zfli.getLastModifiedTime(),
+					false, zfli.getFileLength(), zfli.getLastModifiedTime(),
 					false, true, true,
 					false, zfli.getParentDirectory(),0);
 			tfi.setZipEncrypted(zfli.isEncrypted());

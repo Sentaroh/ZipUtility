@@ -36,6 +36,9 @@ import android.annotation.SuppressLint;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import com.sentaroh.android.Utilities.MiscUtil;
+import com.sentaroh.android.Utilities.StringUtil;
+
 
 public class TreeFilelistItem 
 		implements Cloneable, Serializable, Comparable<TreeFilelistItem>{
@@ -45,9 +48,9 @@ public class TreeFilelistItem
 	private static final long serialVersionUID = 1L;
 	
 	private String fileName;
-	private String fileCap;
 	private String mimeType="";
 	private String fileExt="";
+    private String fileSize="0", fileLastModDate="", fileLastModTime="";
 	private boolean isDirectory=false;
 	private boolean isEncrypted=false;
 	private long fileLength;
@@ -76,9 +79,9 @@ public class TreeFilelistItem
 
 	public void dump(String id) {
 		String did=(id+"            ").substring(0,12);
-		Log.v("TreeFileListItem",did+"FileName="+fileName+", Caption="+fileCap+", filePath="+filePath);
+		Log.v("TreeFileListItem",did+"FileName="+fileName+", filePath="+filePath);
 		Log.v("TreeFileListItem",did+"isDir="+isDirectory+", Length="+fileLength+
-				", lastModdate="+lastModdate+", isChecked="+isChecked+
+				", lastModdate="+fileLastModDate+" "+fileLastModTime+", isChecked="+isChecked+
 				", canRead="+canRead+",canWrite="+canWrite+", isHidden="+isHidden);
 		Log.v("TreeFileListItem",did+"childListExpanded="+childListExpanded+
 				", listLevel=="+listLevel+", hideListItem="+hideListItem+
@@ -127,13 +130,12 @@ public class TreeFilelistItem
 	};
 
 	@SuppressLint("DefaultLocale")
-	public TreeFilelistItem(String fn,String cp,
+	public TreeFilelistItem(String fn,
 			boolean d, long fl,long lm, boolean ic, 
 			boolean cr,boolean cw,boolean hd, String fp, int lvl)
 	{
 		fileName = fn;
 		fileLength = fl;
-		fileCap = cp;
 		isDirectory=d;
 		lastModdate=lm;
 		isChecked =ic;
@@ -142,7 +144,11 @@ public class TreeFilelistItem
 		isHidden=hd;
 		filePath=fp;
 		listLevel=lvl;
-		if (isDirectory) {
+        fileSize= MiscUtil.convertFileSize(fileLength);
+        String[] dt= StringUtil.convDateTimeTo_YearMonthDayHourMinSec(lastModdate).split(" ");
+        fileLastModDate=dt[0];
+        fileLastModTime=dt[1];
+        if (isDirectory) {
 			createSortKey("D");
 		} else {
 			fileExt=fileName.lastIndexOf(".")>0?fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase():"";
@@ -169,7 +175,11 @@ public class TreeFilelistItem
 	
 	public String getName(){return fileName;}
 	public long getLength(){return fileLength;}
-	public String getCap(){return fileCap;}
+
+    public String getFileSize() {return fileSize;}
+    public String getFileLastModDate() {return fileLastModDate;}
+    public String getFileLastModTime() {return fileLastModTime;}
+
 	public boolean isDirectory(){return isDirectory;}
 	public long getLastModified(){return lastModdate;}
 //	public void setLastModified(long p){lastModdate=p;}

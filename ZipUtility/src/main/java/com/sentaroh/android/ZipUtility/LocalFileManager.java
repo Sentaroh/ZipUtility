@@ -3842,23 +3842,81 @@ public class LocalFileManager{
 //		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss",Locale.getDefault());
 		TreeFilelistItem tfi=null;
 		if (item.isDirectory()) {
+		    long dir_size=getDirectoryFileSize(item);
 			tfi=new TreeFilelistItem(item.getName(),
-//					sdf.format(item.lastModified())+
-					StringUtil.convDateTimeTo_YearMonthDayHourMinSec(item.lastModified())
-					.concat(", "), true, 0, item.lastModified(),
+					true, dir_size, item.lastModified(),
 					false, item.canRead(), item.canWrite(),
 					item.isHidden(), item.getParent(),0);
 		} else {
 			String tfs=MiscUtil.convertFileSize(item.length());
 			tfi=new TreeFilelistItem(item.getName(),
-//					sdf.format(item.lastModified())+
-					StringUtil.convDateTimeTo_YearMonthDayHourMinSec(item.lastModified())
-					.concat(",").concat(tfs), false, item.length(), item.lastModified(),
+					false, item.length(), item.lastModified(),
 					false, item.canRead(), item.canWrite(),
 					item.isHidden(), item.getParent(),0);
 		}
 		return tfi;
 	};
-	
+
+    private static long getDirectoryFileSize(File lf) {
+        ArrayList<File>fl=new ArrayList<File>();
+        getAllFileInDirectory(lf, fl, true);
+        long size=0;
+        for(File item:fl) {
+            size+=item.length();
+        }
+        return size;
+    }
+
+    final static public void getAllFileInDirectory(File sd, ArrayList<File>fl, boolean process_sub_directories) {
+//		Log.v("","path="+lf.getAbsolutePath());
+        if (sd.exists()) {
+            if (sd.isDirectory()) {
+                File[] cfl=sd.listFiles();
+                if (cfl!=null && cfl.length>0) {
+                    for(File cf:cfl) {
+                        if (cf.isDirectory()) {
+                            if (process_sub_directories)
+                                getAllFileInDirectory(cf, fl, process_sub_directories);
+                        } else {
+                            fl.add(cf);
+                        }
+                    }
+                }
+            } else {
+                fl.add(sd);
+            }
+        }
+    };
+
+    private static long getDirectoryFileSize(SafFile lf) {
+        ArrayList<SafFile>fl=new ArrayList<SafFile>();
+        getAllFileInDirectory(lf, fl, true);
+        long size=0;
+        for(SafFile item:fl) {
+            size+=item.length();
+        }
+        return size;
+    }
+
+    final static public void getAllFileInDirectory(SafFile sd, ArrayList<SafFile>fl, boolean process_sub_directories) {
+//		Log.v("","path="+lf.getAbsolutePath());
+        if (sd.exists()) {
+            if (sd.isDirectory()) {
+                SafFile[] cfl=sd.listFiles();
+                if (cfl!=null && cfl.length>0) {
+                    for(SafFile cf:cfl) {
+                        if (cf.isDirectory()) {
+                            if (process_sub_directories)
+                                getAllFileInDirectory(cf, fl, process_sub_directories);
+                        } else {
+                            fl.add(cf);
+                        }
+                    }
+                }
+            } else {
+                fl.add(sd);
+            }
+        }
+    };
 
 }

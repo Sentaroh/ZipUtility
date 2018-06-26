@@ -31,6 +31,7 @@ import java.util.List;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.ThemeColorList;
 import com.sentaroh.android.Utilities.ThemeUtil;
+import com.sentaroh.android.Utilities.Widget.CustomTextView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -413,7 +414,6 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 			Log.v("TreeFilelist"," pos="+i+
 					", path="+mDataItems.get(i).getPath()+
 					", name="+mDataItems.get(i).getName()+
-					", cap="+mDataItems.get(i).getCap()+
 					", level="+mDataItems.get(i).getListLevel()+
 					", hide="+mDataItems.get(i).isHideListItem()+
 					", expand="+mDataItems.get(i).isChildListExpanded()+
@@ -607,8 +607,9 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
             	holder.iv_expand=(ImageView)v.findViewById(R.id.tree_file_list_expand);
             	holder.ll_expand_view.setVisibility(LinearLayout.GONE);
             	holder.iv_image1=(ImageView)v.findViewById(R.id.tree_file_list_icon);
-            	holder.tv_name=(TextView)v.findViewById(R.id.tree_file_list_name);
+            	holder.tv_name=(CustomTextView)v.findViewById(R.id.tree_file_list_name);
             	holder.tv_size=(TextView)v.findViewById(R.id.tree_file_list_size);
+                holder.tv_count=(TextView)v.findViewById(R.id.tree_file_list_count);
             	holder.tv_moddate=(TextView)v.findViewById(R.id.tree_file_list_date);
             	holder.tv_modtime=(TextView)v.findViewById(R.id.tree_file_list_time);
         		holder.ll_view=(LinearLayout)v.findViewById(R.id.tree_file_list_view);
@@ -669,7 +670,6 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
         			holder.rb_rb1.setVisibility(RadioButton.GONE);
         		}
             	if (o.getName().startsWith("---")) {
-            		//空処?��?
             		holder.cb_cb1.setVisibility(CheckBox.GONE);
             		holder.rb_rb1.setVisibility(CheckBox.GONE);
             		holder.iv_expand.setVisibility(ImageView.GONE);
@@ -678,20 +678,17 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
             	} else {
                 	holder.tv_spacer.setWidth(o.getListLevel()*30);
                 	holder.tv_name.setText(o.getName());
+                	if (o.getLength()!=-1) {
+                	    holder.tv_size.setText(o.getFileSize());
+                        holder.tv_count.setVisibility(TextView.VISIBLE);
+                    } else {
+                	    holder.tv_size.setText(String.format("%3d Item",o.getSubDirItemCount()));
+                        holder.tv_count.setVisibility(TextView.GONE);
+                    }
                 	if (mShowLastModified) {
-//                		Log.v("","name="+o.getName()+", cap="+o.getCap());
-    		            if (!o.getCap().equals("") && !o.getCap().equals(" ")) {
-    		            	String[] cap1 = new String[3];
-    		            	cap1=o.getCap().split(",");
-    		            	holder.tv_size.setText(cap1[1]);
-    		            	holder.tv_moddate.setText(cap1[0].substring(0,10));
-    		            	holder.tv_modtime.setText(cap1[0].substring(11));
-    		            	if (o.isDirectory()) holder.tv_size.setText(""+o.getSubDirItemCount()+" Item");
-    		            } else {
-    		            	holder.tv_size.setText("");
-    		            	holder.tv_moddate.setText("");
-    		            	holder.tv_modtime.setText("");
-    		            }
+                        holder.tv_moddate.setText(o.getFileLastModDate());
+                        holder.tv_modtime.setText(o.getFileLastModTime());
+                        if (o.isDirectory()) holder.tv_count.setText(String.format("%3d Item",o.getSubDirItemCount()));
 //    		       		int wsz_w=mActivity.getWindow()
 //    	    					.getWindowManager().getDefaultDisplay().getWidth();
 //    		       		int wsz_h=activity.getWindow()
@@ -703,7 +700,6 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 //    		            if (!o.isDir()) holder.tv_size.setVisibility(TextView.VISIBLE);
 //    		            else holder.tv_size.setVisibility(TextView.GONE);
                 	} else {
-    	            	holder.tv_size.setVisibility(TextView.GONE);
     	            	holder.tv_moddate.setVisibility(TextView.GONE);
     	            	holder.tv_modtime.setVisibility(TextView.GONE);
                 	}
@@ -733,6 +729,7 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 		            	holder.tv_modtime.setTextColor(mThemeColorList.text_color_disabled);//Color.GRAY);
                    	}
                    	if(o.isDirectory()) {
+                        if (o.getLength()!=-1) holder.tv_count.setVisibility(TextView.VISIBLE);
                    		if (o.getSubDirItemCount()>0) {
                    			if (o.isEnableItem()) {
 	                   			if (o.isChildListExpanded()) 
@@ -744,6 +741,7 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
                    		}
                    		holder.iv_image1.setImageResource(mIconImage[2]); //folder
                    	} else {
+                        holder.tv_count.setVisibility(TextView.GONE);
                			if (o.getMimeType().startsWith("image")) {
                				holder.iv_image1.setImageResource(R.drawable.ic_32_file_image);
                			} else if (o.getMimeType().startsWith("audio")) {
@@ -906,7 +904,8 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 	};
 
 	static class ViewHolder {
-		 TextView tv_name, tv_moddate, tv_modtime, tv_size, tv_spacer;
+		 CustomTextView tv_name;
+         TextView tv_moddate, tv_modtime, tv_size, tv_spacer, tv_count;
 		 ImageView iv_image1;
 		 ImageView iv_expand;
 		 LinearLayout ll_view, ll_date_time_view, ll_expand_view, ll_select_view;

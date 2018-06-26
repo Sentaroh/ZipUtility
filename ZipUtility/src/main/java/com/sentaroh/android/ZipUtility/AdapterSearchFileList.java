@@ -154,8 +154,6 @@ public class AdapterSearchFileList extends BaseAdapter {
         	holder.file_name.setText(o.getName());
         	holder.directory_name.setText(o.getPath());
         	String[] cap1 = new String[3];
-        	cap1=o.getCap().split(",");
-//        	holder.file_size.setText(cap1[1]+", ");
         	holder.file_size.setText(String.format("%1$,3d", o.getLength())+ "Byte, ");
         	String comp_method="";
 			if (o.getZipFileCompressionMethod()==Zip4jConstants.COMP_DEFLATE) comp_method="DEFLATE, "; 
@@ -164,8 +162,8 @@ public class AdapterSearchFileList extends BaseAdapter {
 			else comp_method+=o.getZipFileCompressionMethod()+", ";
 			holder.comp_method.setText(comp_method);
 
-        	holder.file_date.setText(cap1[0].substring(0,10));
-        	holder.file_time.setText(cap1[0].substring(11));
+        	holder.file_date.setText(o.getFileLastModDate());
+        	holder.file_time.setText(o.getFileLastModTime());
 
         }
         return v;
