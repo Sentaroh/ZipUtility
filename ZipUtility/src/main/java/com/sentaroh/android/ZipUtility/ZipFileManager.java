@@ -212,7 +212,21 @@ public class ZipFileManager {
 		createFileList(mCurrentFilePath,ntfy, "");
 	};
 
-	public boolean isFileListSortAscendant() {
+    public void reInitView() {
+        ArrayList<TreeFilelistItem>fl=mTreeFilelistAdapter.getDataList();
+        int v_pos_fv=0, v_pos_top=0;
+        v_pos_fv=mTreeFilelistView.getFirstVisiblePosition();
+        if (mTreeFilelistView.getChildAt(0)!=null) v_pos_top=mTreeFilelistView.getChildAt(0).getTop();
+
+        mTreeFilelistAdapter=new CustomTreeFilelistAdapter(mActivity, false, true);
+
+        mTreeFilelistAdapter.setDataList(fl);
+        mTreeFilelistView.setAdapter(mTreeFilelistAdapter);
+        mTreeFilelistView.setSelectionFromTop(v_pos_fv, v_pos_top);
+        mTreeFilelistAdapter.notifyDataSetChanged();
+    }
+
+    public boolean isFileListSortAscendant() {
 		if (mTreeFilelistAdapter!=null) return mTreeFilelistAdapter.isSortAscendant();
 		else return true;
 	};

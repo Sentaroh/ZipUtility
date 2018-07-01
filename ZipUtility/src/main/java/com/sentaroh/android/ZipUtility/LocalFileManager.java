@@ -53,7 +53,6 @@ import com.sentaroh.android.Utilities.BufferedZipFile;
 import com.sentaroh.android.Utilities.MiscUtil;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.SafFile;
-import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
@@ -64,7 +63,6 @@ import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 import com.sentaroh.android.Utilities.Widget.CustomTextView;
 import com.sentaroh.android.Utilities.ZipUtil;
-import com.sentaroh.android.ZipUtility.Log.LogUtil;
 
 public class LocalFileManager{
 	private GlobalParameters mGp=null;
@@ -122,12 +120,26 @@ public class LocalFileManager{
 		});
 		createFileList(mMainFilePath, ntfy);
 		
-	};
+	}
+
+	public void reInitView() {
+        ArrayList<TreeFilelistItem>fl=mTreeFilelistAdapter.getDataList();
+        int v_pos_fv=0, v_pos_top=0;
+        v_pos_fv=mTreeFilelistView.getFirstVisiblePosition();
+        if (mTreeFilelistView.getChildAt(0)!=null) v_pos_top=mTreeFilelistView.getChildAt(0).getTop();
+
+        mTreeFilelistAdapter=new CustomTreeFilelistAdapter(mActivity, false, true);
+
+        mTreeFilelistAdapter.setDataList(fl);
+        mTreeFilelistView.setAdapter(mTreeFilelistAdapter);
+        mTreeFilelistView.setSelectionFromTop(v_pos_fv, v_pos_top);
+        mTreeFilelistAdapter.notifyDataSetChanged();
+    }
 
 	public boolean isFileListSortAscendant() {
 		if (mTreeFilelistAdapter!=null) return mTreeFilelistAdapter.isSortAscendant();
 		else return true;
-	};
+	}
 	
 	public void refreshFileList() {
 		mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
@@ -3142,7 +3154,7 @@ public class LocalFileManager{
 	    		final int pos=mTreeFilelistAdapter.getItem(position);
 	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getDataItem(pos);
 				if (tfi.getName().startsWith("---")) return true;
-				processContextMenu(tfi);
+				showContextMenu(tfi);
 				return true;
 			}
         });
@@ -3291,7 +3303,7 @@ public class LocalFileManager{
 		}
 	};
 
-	private void processContextMenu(final TreeFilelistItem tfi) {
+	private void showContextMenu(final TreeFilelistItem tfi) {
         final CustomContextMenu mCcMenu = new CustomContextMenu(mContext.getResources(), mFragmentManager);
 		String sel_list="",sep="";
 		final CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity, false, false, false);
@@ -3842,13 +3854,12 @@ public class LocalFileManager{
 //		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss",Locale.getDefault());
 		TreeFilelistItem tfi=null;
 		if (item.isDirectory()) {
-		    long dir_size=getDirectoryFileSize(item);
+		    long dir_size=getAllFileSizeInDirectory(item,true);
 			tfi=new TreeFilelistItem(item.getName(),
 					true, dir_size, item.lastModified(),
 					false, item.canRead(), item.canWrite(),
 					item.isHidden(), item.getParent(),0);
 		} else {
-			String tfs=MiscUtil.convertFileSize(item.length());
 			tfi=new TreeFilelistItem(item.getName(),
 					false, item.length(), item.lastModified(),
 					false, item.canRead(), item.canWrite(),
@@ -3857,18 +3868,8 @@ public class LocalFileManager{
 		return tfi;
 	};
 
-    private static long getDirectoryFileSize(File lf) {
-        ArrayList<File>fl=new ArrayList<File>();
-        getAllFileInDirectory(lf, fl, true);
-        long size=0;
-        for(File item:fl) {
-            size+=item.length();
-        }
-        return size;
-    }
-
-    final static public void getAllFileInDirectory(File sd, ArrayList<File>fl, boolean process_sub_directories) {
-//		Log.v("","path="+lf.getAbsolutePath());
+    final static public long getAllFileSizeInDirectory(File sd, boolean process_sub_directories) {
+        long dir_size=0;
         if (sd.exists()) {
             if (sd.isDirectory()) {
                 File[] cfl=sd.listFiles();
@@ -3876,47 +3877,17 @@ public class LocalFileManager{
                     for(File cf:cfl) {
                         if (cf.isDirectory()) {
                             if (process_sub_directories)
-                                getAllFileInDirectory(cf, fl, process_sub_directories);
+                                dir_size+=getAllFileSizeInDirectory(cf, process_sub_directories);
                         } else {
-                            fl.add(cf);
+                            dir_size+=cf.length();
                         }
                     }
                 }
             } else {
-                fl.add(sd);
+                dir_size+=sd.length();
             }
         }
-    };
-
-    private static long getDirectoryFileSize(SafFile lf) {
-        ArrayList<SafFile>fl=new ArrayList<SafFile>();
-        getAllFileInDirectory(lf, fl, true);
-        long size=0;
-        for(SafFile item:fl) {
-            size+=item.length();
-        }
-        return size;
-    }
-
-    final static public void getAllFileInDirectory(SafFile sd, ArrayList<SafFile>fl, boolean process_sub_directories) {
-//		Log.v("","path="+lf.getAbsolutePath());
-        if (sd.exists()) {
-            if (sd.isDirectory()) {
-                SafFile[] cfl=sd.listFiles();
-                if (cfl!=null && cfl.length>0) {
-                    for(SafFile cf:cfl) {
-                        if (cf.isDirectory()) {
-                            if (process_sub_directories)
-                                getAllFileInDirectory(cf, fl, process_sub_directories);
-                        } else {
-                            fl.add(cf);
-                        }
-                    }
-                }
-            } else {
-                fl.add(sd);
-            }
-        }
+        return dir_size;
     };
 
 }

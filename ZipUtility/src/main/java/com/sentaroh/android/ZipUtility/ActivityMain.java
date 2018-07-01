@@ -128,6 +128,8 @@ public class ActivityMain extends AppCompatActivity {
 	    			", New language=",newConfig.locale.getLanguage());
 //	    	if (mLocalFileMgr!=null) mLocalFileMgr.refreshFileList();
 	    }
+	    if (mLocalFileMgr!=null) mLocalFileMgr.reInitView();
+        if (mZipFileMgr!=null) mZipFileMgr.reInitView();
 	};
 
 	@Override  

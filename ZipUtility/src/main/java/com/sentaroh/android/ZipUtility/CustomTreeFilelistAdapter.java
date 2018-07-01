@@ -693,7 +693,7 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 //    	    					.getWindowManager().getDefaultDisplay().getWidth();
 //    		       		int wsz_h=activity.getWindow()
 //    	    					.getWindowManager().getDefaultDisplay().getHeight();
-    	    		
+
 //    		       		if (wsz_w>=700) holder.tv_size.setVisibility(TextView.VISIBLE);
 //                       	else holder.tv_size.setVisibility(TextView.GONE);
 
