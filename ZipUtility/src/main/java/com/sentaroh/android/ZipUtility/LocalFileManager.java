@@ -1,23 +1,5 @@
 package com.sentaroh.android.ZipUtility;
 
-import static com.sentaroh.android.ZipUtility.Constants.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.regex.Pattern;
-
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.FileHeader;
-import net.lingala.zip4j.model.ZipParameters;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -32,11 +14,13 @@ import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.view.WindowManager.LayoutParams;
 import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckedTextView;
@@ -46,23 +30,44 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 
 import com.sentaroh.android.Utilities.BufferedZipFile;
-import com.sentaroh.android.Utilities.MiscUtil;
-import com.sentaroh.android.Utilities.NotifyEvent;
-import com.sentaroh.android.Utilities.SafFile;
-import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomContextMenuOnClickListener;
 import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.Dialog.ProgressSpinDialogFragment;
+import com.sentaroh.android.Utilities.MiscUtil;
+import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
+import com.sentaroh.android.Utilities.SafFile;
+import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 import com.sentaroh.android.Utilities.Widget.CustomTextView;
 import com.sentaroh.android.Utilities.ZipUtil;
+
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.ZipParameters;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+
+import static com.sentaroh.android.ZipUtility.Constants.APPLICATION_TAG;
+import static com.sentaroh.android.ZipUtility.Constants.APP_SPECIFIC_DIRECTORY;
+import static com.sentaroh.android.ZipUtility.Constants.ENCODING_NAME_UTF8;
+import static com.sentaroh.android.ZipUtility.Constants.IO_AREA_SIZE;
+import static com.sentaroh.android.ZipUtility.Constants.MIME_TYPE_TEXT;
+import static com.sentaroh.android.ZipUtility.Constants.MIME_TYPE_ZIP;
+import static com.sentaroh.android.ZipUtility.Constants.WORK_DIRECTORY;
 
 public class LocalFileManager{
 	private GlobalParameters mGp=null;
@@ -151,72 +156,31 @@ public class LocalFileManager{
 	    	w_curr_dir=mLocalStorage.getSelectedItem().toString()+mCurrentDirectory.getText().toString();
 	    }
 	    final String curr_dir=w_curr_dir;
-	    
-	    setUiDisabled();
-	    final NotifyEvent ntfy=new NotifyEvent(mContext);
-	    ntfy.setListener(new NotifyEventListener(){
-			@Override
-			public void positiveResponse(Context c, Object[] o) {
-				@SuppressWarnings("unchecked")
-				final ArrayList<TreeFilelistItem> tfl=(ArrayList<TreeFilelistItem>)o[0];
-				mUiHandler.post(new Runnable(){
-					@Override
-					public void run() {
-//					    int pos_x=mTreeFilelistView.getFirstVisiblePosition();
-//					    int pos_y=mTreeFilelistView.getChildAt(0)==null?0:mTreeFilelistView.getChildAt(0).getTop();
-					    ArrayList<TreeFilelistItem> prev_tfl=mTreeFilelistAdapter.getDataList();
-					    boolean prev_selected=mTreeFilelistAdapter.isDataItemIsSelected();
-				        if (tfl.size()==0) {
-				        	mTreeFilelistView.setVisibility(ListView.GONE);
-					        mFileEmpty.setVisibility(TextView.VISIBLE);
-					        mFileEmpty.setText(R.string.msgs_zip_local_folder_empty);
-				        } else {
-				        	mTreeFilelistView.setVisibility(ListView.VISIBLE);
-					        mFileEmpty.setVisibility(TextView.GONE);
-//				    		mTreeFilelistView.setSelectionFromTop(pos_x, pos_y);
-					        if (prev_selected) {
-							    CustomTreeFilelistAdapter adapter=new CustomTreeFilelistAdapter(mContext, false, false);
-							    adapter.setDataList(tfl);
-					    		for(TreeFilelistItem prev_item:prev_tfl) {
-					    			int idx=Collections.binarySearch(tfl, prev_item, new Comparator<TreeFilelistItem>(){
-										@Override
-										public int compare(TreeFilelistItem lhs, TreeFilelistItem prev_item) {
-											return lhs.getName().compareToIgnoreCase(prev_item.getName());
-										}
-					    			});
-					    			if (idx>=0) tfl.get(idx).setChecked(prev_item.isChecked());
-					    		}
-					    		if (mTreeFilelistAdapter.isDataItemIsSelected()) {
-					    			mContextButtonCopyView.setVisibility(ImageButton.VISIBLE);
-					    			mContextButtonCutView.setVisibility(ImageButton.VISIBLE);
-					    		}
-					        }
-				        }
-						mTreeFilelistAdapter.setDataList(tfl);
-						mTreeFilelistAdapter.setCheckBoxEnabled(isUiEnabled());
-						mTreeFilelistAdapter.notifyDataSetChanged();
-				        setContextButtonSelectUnselectVisibility();
-			    		if (mGp.copyCutList.size()>0) {
-			    			mGp.copyCutItemInfo.setVisibility(TextView.VISIBLE);
-    	    				setContextButtonViewVisibility(mContextButtonPasteView);
-			    		}
-                        setUiEnabled();
-				        mUtil.addDebugMsg(1, "I", "refreshFileList completed, size="+tfl.size());
-					}
-				});
-			}
-			@Override
-			public void negativeResponse(Context c, Object[] o) {}
-	    });
-	    Thread th=new Thread(){
-	    	@Override
-	    	public void run(){
-	    		ArrayList<TreeFilelistItem> tfl=createTreeFileList(curr_dir);
-	    		mUtil.addDebugMsg(1, "I", "refreshFileList file list created");
-	    		ntfy.notifyToListener(true, new Object[]{tfl});
-	    	}
-	    };
-		th.start();
+
+	    int pos_x=mTreeFilelistView.getFirstVisiblePosition();
+		int pos_y=mTreeFilelistView.getChildAt(0)==null?0:mTreeFilelistView.getChildAt(0).getTop();
+        ArrayList<TreeFilelistItem>prev_fl=mTreeFilelistAdapter.getDataList();
+        boolean prev_selected=mTreeFilelistAdapter.isDataItemIsSelected();
+
+        createFileList(curr_dir, null);
+
+        if (prev_selected) {
+            ArrayList<TreeFilelistItem>new_fl=mTreeFilelistAdapter.getDataList();
+            for (TreeFilelistItem prev_item:prev_fl) {
+                if (prev_item.isChecked()) {
+                    for(TreeFilelistItem new_item:new_fl) {
+                        if (prev_item.getName().equals(new_item.getName())) {
+                            new_item.setChecked(true);
+                            break;
+                        }
+                    }
+                }
+            }
+            mTreeFilelistAdapter.notifyDataSetChanged();
+        }
+
+        mTreeFilelistView.setSelectionFromTop(pos_x,pos_y);
+
 	};
 	
 	private Spinner mLocalStorage;
@@ -3833,7 +3797,7 @@ public class LocalFileManager{
 	    mCurrentDirectory.setText(cd.equals("")?"/":cd);
     }
 
-	static private ArrayList<TreeFilelistItem> createTreeFileList(String target_dir) {
+	private ArrayList<TreeFilelistItem> createTreeFileList(String target_dir) {
 		ArrayList<TreeFilelistItem> tfl=new ArrayList<TreeFilelistItem>();
 		File[] fl=(new File(target_dir)).listFiles();
 		if (fl!=null) {
@@ -3850,22 +3814,40 @@ public class LocalFileManager{
 	};
 	
 	@SuppressLint("DefaultLocale")
-	static private TreeFilelistItem createNewFileListItem(File item) {
+	private TreeFilelistItem createNewFileListItem(final File item) {
 //		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss",Locale.getDefault());
-		TreeFilelistItem tfi=null;
 		if (item.isDirectory()) {
-		    long dir_size=getAllFileSizeInDirectory(item,true);
-			tfi=new TreeFilelistItem(item.getName(),
-					true, dir_size, item.lastModified(),
+
+            final TreeFilelistItem tfi=new TreeFilelistItem(item.getName(),
+					true, -1, item.lastModified(),
 					false, item.canRead(), item.canWrite(),
 					item.isHidden(), item.getParent(),0);
+            final Handler hndl=new Handler();
+            Thread th=new Thread(){
+                @Override
+                public void run() {
+                    long dir_size=getAllFileSizeInDirectory(item,true);
+                    tfi.setLength(dir_size);
+                    hndl.post(new Runnable(){
+                        @Override
+                        public void run(){
+                            if (item.getName().equals(".PGMS")) {
+                                mUtil.addLogMsg("I", ".PGMS size="+tfi.getLength());
+                            }
+                            mTreeFilelistAdapter.notifyDataSetChanged();
+                        }
+                    }) ;
+                }
+            };
+            th.start();
+            return tfi;
 		} else {
-			tfi=new TreeFilelistItem(item.getName(),
+            TreeFilelistItem tfi=new TreeFilelistItem(item.getName(),
 					false, item.length(), item.lastModified(),
 					false, item.canRead(), item.canWrite(),
 					item.isHidden(), item.getParent(),0);
+            return tfi;
 		}
-		return tfi;
 	};
 
     final static public long getAllFileSizeInDirectory(File sd, boolean process_sub_directories) {

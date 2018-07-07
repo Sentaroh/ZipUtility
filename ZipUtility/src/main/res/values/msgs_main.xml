@@ -89,7 +89,7 @@ External Library:\n
 	<string name="msgs_zip_local_file_move_failed">Move file was failed</string>
 	<string name="msgs_zip_local_file_move_cancelled">Move file was cancelled</string>
 	<string name="msgs_zip_local_file_move_moving" formatted="false">While moving file %s, %s%% complete</string>
-	<string name="msgs_zip_local_file_move_completed">移動が完了しました。</string>
+	<string name="msgs_zip_local_file_move_completed">Moe was completed.</string>
 	
 	<string name="msgs_zip_local_file_copy_confirm_title">Do you want to copy the following items</string>
 	<string name="msgs_zip_local_file_copy_copied">File was copied, name=%s</string>
@@ -253,5 +253,7 @@ External Library:\n
 	<string name="msgs_local_file_scan_scan_please_wait">During the scanning, please wait.</string>
 	<string name="msgs_local_file_scan_scan_was_cancelled">Scan was cancelled.</string>
 	<string name="msgs_local_file_scan_scan_was_completed">Scan was completed.</string>
+
+    <string name="msgs_file_list_size_calculating">Calculating</string>
 		
 </resources>

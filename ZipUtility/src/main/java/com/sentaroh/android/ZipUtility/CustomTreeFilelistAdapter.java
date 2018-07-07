@@ -682,7 +682,8 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
                 	    holder.tv_size.setText(o.getFileSize());
                         holder.tv_count.setVisibility(TextView.VISIBLE);
                     } else {
-                	    holder.tv_size.setText(String.format("%3d Item",o.getSubDirItemCount()));
+//                	    holder.tv_size.setText(String.format("%3d Item",o.getSubDirItemCount()));
+                        holder.tv_size.setText(mContext.getString(R.string.msgs_file_list_size_calculating));
                         holder.tv_count.setVisibility(TextView.GONE);
                     }
                 	if (mShowLastModified) {

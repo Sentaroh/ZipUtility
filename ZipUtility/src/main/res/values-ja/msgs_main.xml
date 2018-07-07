@@ -249,6 +249,6 @@ ZIPファイルの作成・編集・抽出のためのアプリケーション�
 	<string name="msgs_local_file_scan_scan_please_wait">スキャン中です、お待ちください。</string>
 	<string name="msgs_local_file_scan_scan_was_cancelled">メディアファイルのスキャンが中止されました。</string>
 	<string name="msgs_local_file_scan_scan_was_completed">メディアファイルのスキャンが終了しました。</string>
-	
-		
+
+    <string name="msgs_file_list_size_calculating">計算中</string>
 </resources>

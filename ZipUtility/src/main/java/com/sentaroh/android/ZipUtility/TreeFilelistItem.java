@@ -159,7 +159,17 @@ public class TreeFilelistItem
 			createSortKey("F");
 		}
 	};
-	
+
+	public void setLength(long fl) {
+	    fileLength=fl;
+        fileSize= MiscUtil.convertFileSize(fileLength);
+        if (isDirectory) {
+            createSortKey("D");
+        } else {
+            createSortKey("F");
+        }
+    }
+
 	private void createSortKey(String type) {
 		StringBuilder sb=new StringBuilder(256);
 		sortKeyName=sb.append(type).append(fileName).toString();
