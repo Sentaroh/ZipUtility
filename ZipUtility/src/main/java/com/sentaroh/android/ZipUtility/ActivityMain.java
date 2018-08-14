@@ -21,16 +21,7 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-*/ 
-
-import static com.sentaroh.android.ZipUtility.Constants.*;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
+*/
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -38,7 +29,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -48,52 +38,52 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.StrictMode;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.FileProvider;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
 import android.widget.TextView;
-import android.widget.TabHost.OnTabChangeListener;
 
 import com.sentaroh.android.Utilities.ContentProviderUtil;
+import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
+import com.sentaroh.android.Utilities.SystemInfo;
+import com.sentaroh.android.Utilities.ThemeUtil;
 import com.sentaroh.android.Utilities.Widget.CustomTabContentView;
 import com.sentaroh.android.Utilities.Widget.CustomViewPager;
 import com.sentaroh.android.Utilities.Widget.CustomViewPagerAdapter;
-import com.sentaroh.android.Utilities.ThemeUtil;
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.ZipUtility.Log.LogFileListDialogFragment;
-import com.sentaroh.android.ZipUtility.Log.LogUtil;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+
+import static com.sentaroh.android.ZipUtility.Constants.ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS;
 
 @SuppressLint("NewApi")
 public class ActivityMain extends AppCompatActivity {
@@ -227,6 +217,8 @@ public class ActivityMain extends AppCompatActivity {
         
         mUtil.addDebugMsg(1, "I", "onCreate entered");
 
+        putSystemInfo();
+
         mCommonDlg=new CommonDialog(mActivity, mFragmentManager);
         
         if (mGp.settingFixDeviceOrientationToPortrait) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -244,7 +236,12 @@ public class ActivityMain extends AppCompatActivity {
 
         checkRequiredPermissions();
 	};
-    
+
+	private void putSystemInfo() {
+        ArrayList<String> sil=SystemInfo.listSystemInfo(mContext, mGp.safMgr);
+        for(String item:sil) mUtil.addDebugMsg(1,"I",item);
+    }
+
 	@Override
 	public void onStart() {
 		super.onStart();

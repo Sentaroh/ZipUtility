@@ -2114,8 +2114,21 @@ public class LocalFileManager{
 				
 				String w_path=dest_path.endsWith("/")?dest_path+dest_file_name:dest_path+"/"+dest_file_name;
 				SafFile out_dir_sf=mGp.safMgr.createSdcardItem(dest_path, true);
-				out_dir_sf.exists();
+                if (out_dir_sf==null) {
+                    String e_msg=mGp.safMgr.getMessages();
+                    mUtil.addLogMsg("E","SafFile create error:dir="+out_dir_sf+e_msg);
+                    mCommonDlg.showCommonDialog(false,"E","SafFile creation :dir="+out_dir_sf,e_msg,null);
+                    return false;
+                }
+
+                out_dir_sf.exists();
 				SafFile out_file_sf=mGp.safMgr.createSdcardItem(w_path, false);
+                if (out_file_sf==null) {
+                    String e_msg=mGp.safMgr.getMessages();
+                    mUtil.addLogMsg("E","SafFile create error:fp="+out_file_sf+e_msg);
+                    mCommonDlg.showCommonDialog(false,"E","SafFile creation :fp="+out_file_sf,e_msg,null);
+                    return false;
+                }
 				OutputStream os=mContext.getContentResolver().openOutputStream(out_file_sf.getUri());
 				
 				long fsz=fh.getUncompressedSize();
@@ -3460,7 +3473,19 @@ public class LocalFileManager{
 
 		boolean result=false;
 		SafFile out_sf=mGp.safMgr.createSdcardItem(sdcard_path, false);
+		if (out_sf==null) {
+            String e_msg=mGp.safMgr.getMessages();
+            mUtil.addLogMsg("E","SafFile create error:fp="+sdcard_path+"\n"+e_msg);
+            mCommonDlg.showCommonDialog(false,"E","SafFile creation :fp="+sdcard_path,e_msg,null);
+            return false;
+        }
 		SafFile temp_sf=mGp.safMgr.createSdcardItem(sdcard_path+".tmp", false);
+        if (temp_sf==null) {
+            String e_msg=mGp.safMgr.getMessages();
+            mUtil.addLogMsg("E","SafFile create error:fp="+sdcard_path+".tmp\n"+e_msg);
+            mCommonDlg.showCommonDialog(false,"E","SafFile creation :fp="+sdcard_path+".tmp",e_msg,null);
+            return false;
+        }
 		File from=new File(app_path);
 		try {
 			OutputStream fos=mContext.getContentResolver().openOutputStream(temp_sf.getUri());
@@ -3574,7 +3599,13 @@ public class LocalFileManager{
 								});
 								if (out_fl.getPath().startsWith(mGp.externalRootDirectory)) {
 									SafFile out_sf=mGp.safMgr.createSdcardItem(out_fl.getPath(), true);
-									out_sf.delete();
+									if (out_sf!=null) out_sf.delete();
+									else {
+									    String e_msg=mGp.safMgr.getMessages();
+									    mUtil.addLogMsg("E","SafFile create error:\n"+e_msg);
+									    mCommonDlg.showCommonDialog(false,"E","SafFile creation error",e_msg,null);
+									    return;
+                                    }
 								} else {
 									if (out_fl.isFile()) out_fl.delete();
 								}

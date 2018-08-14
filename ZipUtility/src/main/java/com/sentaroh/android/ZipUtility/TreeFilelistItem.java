@@ -21,7 +21,14 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-*/ 
+*/
+
+import android.annotation.SuppressLint;
+import android.util.Log;
+import android.webkit.MimeTypeMap;
+
+import com.sentaroh.android.Utilities.MiscUtil;
+import com.sentaroh.android.Utilities.StringUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,12 +39,6 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
-import android.annotation.SuppressLint;
-import android.util.Log;
-import android.webkit.MimeTypeMap;
-
-import com.sentaroh.android.Utilities.MiscUtil;
-import com.sentaroh.android.Utilities.StringUtil;
 
 
 public class TreeFilelistItem 
@@ -51,6 +52,7 @@ public class TreeFilelistItem
 	private String mimeType="";
 	private String fileExt="";
     private String fileSize="0", fileLastModDate="", fileLastModTime="";
+    private boolean zipFileItem=false;
 	private boolean isDirectory=false;
 	private boolean isEncrypted=false;
 	private long fileLength;
@@ -190,7 +192,10 @@ public class TreeFilelistItem
     public String getFileLastModDate() {return fileLastModDate;}
     public String getFileLastModTime() {return fileLastModTime;}
 
-	public boolean isDirectory(){return isDirectory;}
+    public boolean isZipFileItem(){return zipFileItem;}
+    public void setZipFileItem(boolean zip_file_item){zipFileItem=zip_file_item;}
+
+    public boolean isDirectory(){return isDirectory;}
 	public long getLastModified(){return lastModdate;}
 //	public void setLastModified(long p){lastModdate=p;}
 	public boolean isChecked(){return isChecked;}

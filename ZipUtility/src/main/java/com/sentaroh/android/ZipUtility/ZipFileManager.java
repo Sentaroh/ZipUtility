@@ -23,7 +23,66 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import static com.sentaroh.android.ZipUtility.Constants.*;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager.LayoutParams;
+import android.webkit.MimeTypeMap;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.Button;
+import android.widget.CheckedTextView;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.sentaroh.android.Utilities.BufferedZipFile;
+import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
+import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
+import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomContextMenuOnClickListener;
+import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+import com.sentaroh.android.Utilities.Dialog.FileSelectDialogFragment;
+import com.sentaroh.android.Utilities.Dialog.ProgressSpinDialogFragment;
+import com.sentaroh.android.Utilities.LocalMountPoint;
+import com.sentaroh.android.Utilities.MiscUtil;
+import com.sentaroh.android.Utilities.NotifyEvent;
+import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
+import com.sentaroh.android.Utilities.SafFile;
+import com.sentaroh.android.Utilities.StringUtil;
+import com.sentaroh.android.Utilities.ThreadCtrl;
+import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
+import com.sentaroh.android.Utilities.Widget.CustomTextView;
+import com.sentaroh.android.Utilities.ZipFileListItem;
+import com.sentaroh.android.Utilities.ZipUtil;
+
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -47,66 +106,12 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.FileHeader;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.util.Zip4jConstants;
-
-import com.sentaroh.android.Utilities.BufferedZipFile;
-import com.sentaroh.android.Utilities.NotifyEvent;
-import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
-import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
-import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomContextMenuOnClickListener;
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
-import com.sentaroh.android.Utilities.Dialog.FileSelectDialogFragment;
-import com.sentaroh.android.Utilities.Dialog.ProgressSpinDialogFragment;
-import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
-import com.sentaroh.android.Utilities.LocalMountPoint;
-import com.sentaroh.android.Utilities.MiscUtil;
-import com.sentaroh.android.Utilities.SafFile;
-import com.sentaroh.android.Utilities.StringUtil;
-import com.sentaroh.android.Utilities.ThreadCtrl;
-import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
-import com.sentaroh.android.Utilities.Widget.CustomTextView;
-import com.sentaroh.android.Utilities.ZipFileListItem;
-import com.sentaroh.android.Utilities.ZipUtil;
-
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.content.FileProvider;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.View;
-import android.view.Window;
-import android.view.View.OnClickListener;
-import android.view.WindowManager.LayoutParams;
-import android.webkit.MimeTypeMap;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.Button;
-import android.widget.CheckedTextView;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
-import android.widget.Spinner;
-import android.widget.TextView;
+import static com.sentaroh.android.ZipUtility.Constants.ENCODING_NAME_LIST;
+import static com.sentaroh.android.ZipUtility.Constants.ENCODING_NAME_UTF8;
+import static com.sentaroh.android.ZipUtility.Constants.IO_AREA_SIZE;
+import static com.sentaroh.android.ZipUtility.Constants.MIME_TYPE_TEXT;
+import static com.sentaroh.android.ZipUtility.Constants.MIME_TYPE_ZIP;
+import static com.sentaroh.android.ZipUtility.Constants.WORK_DIRECTORY;
 
 @SuppressLint("ClickableViewAccessibility")
 public class ZipFileManager {
@@ -1213,6 +1218,7 @@ public class ZipFileManager {
 			tfi.setZipFileName(zfli.getPath());
 			tfi.setZipFileCompressionMethod(zfli.getCompressionMethod());
 			tfi.setZipFileCompressedSize(zfli.getCompressedFileLength());
+            tfi.setZipFileItem(true);
 		} else {
 			tfi=new TreeFilelistItem(zfli.getFileName(),
 					false, zfli.getFileLength(), zfli.getLastModifiedTime(),
@@ -1222,6 +1228,7 @@ public class ZipFileManager {
 			tfi.setZipFileName(zfli.getPath());
 			tfi.setZipFileCompressionMethod(zfli.getCompressionMethod());
 			tfi.setZipFileCompressedSize(zfli.getCompressedFileLength());
+            tfi.setZipFileItem(true);
 //			Log.v("","ft="+ft+", mt="+mt);
 		}
 		return tfi;

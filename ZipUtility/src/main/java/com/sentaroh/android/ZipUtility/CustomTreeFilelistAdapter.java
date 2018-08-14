@@ -21,17 +21,7 @@ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
-*/ 
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import com.sentaroh.android.Utilities.NotifyEvent;
-import com.sentaroh.android.Utilities.ThemeColorList;
-import com.sentaroh.android.Utilities.ThemeUtil;
-import com.sentaroh.android.Utilities.Widget.CustomTextView;
+*/
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -50,6 +40,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
+
+import com.sentaroh.android.Utilities.NotifyEvent;
+import com.sentaroh.android.Utilities.ThemeColorList;
+import com.sentaroh.android.Utilities.ThemeUtil;
+import com.sentaroh.android.Utilities.Widget.CustomTextView;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class CustomTreeFilelistAdapter extends BaseAdapter {
 	private Context mContext;
@@ -685,6 +685,10 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 //                	    holder.tv_size.setText(String.format("%3d Item",o.getSubDirItemCount()));
                         holder.tv_size.setText(mContext.getString(R.string.msgs_file_list_size_calculating));
                         holder.tv_count.setVisibility(TextView.GONE);
+                    }
+                    if (o.isDirectory()) {
+                        if (!o.isZipFileItem()) holder.tv_size.setVisibility(TextView.VISIBLE);
+                        else holder.tv_size.setVisibility(TextView.INVISIBLE);
                     }
                 	if (mShowLastModified) {
                         holder.tv_moddate.setText(o.getFileLastModDate());
