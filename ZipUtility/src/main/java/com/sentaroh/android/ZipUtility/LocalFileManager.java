@@ -1172,10 +1172,15 @@ public class LocalFileManager {
                                     }
                                 }
                                 if (!rc_create) {
-                                    mCommonDlg.showCommonDialog(false, "I",
-                                            String.format(mContext.getString(R.string.msgs_zip_local_file_rename_failed), new_name),
-                                            "", null);
-                                    setUiEnabled();
+                                    mUiHandler.post(new Runnable(){
+                                        @Override
+                                        public void run() {
+                                            mCommonDlg.showCommonDialog(false, "I",
+                                                    String.format(mContext.getString(R.string.msgs_zip_local_file_rename_failed), new_name),
+                                                    "", null);
+                                            setUiEnabled();
+                                        }
+                                    });
                                     return;
                                 }
                                 mUtil.addDebugMsg(1, "I", "Rename ended");
