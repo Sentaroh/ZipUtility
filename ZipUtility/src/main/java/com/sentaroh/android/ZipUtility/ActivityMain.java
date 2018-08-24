@@ -170,7 +170,7 @@ public class ActivityMain extends AppCompatActivity {
 //                Log.v("","name="+path);
 //            }
 //            cursor.close();
-
+//          change commit comment
             String file_path=ContentProviderUtil.getFilePath(mContext, cd, intent.getData());
     		if (file_path!=null){// && file_path.endsWith(".zip")) {
                 mLocalFileMgr.showLocalFileView(false);
