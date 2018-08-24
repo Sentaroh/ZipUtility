@@ -255,5 +255,7 @@ External Library:\n
 	<string name="msgs_local_file_scan_scan_was_completed">Scan was completed.</string>
 
     <string name="msgs_file_list_size_calculating">Calculating</string>
+
+    <string name="msgs_main_saf_file_creation_error">SafFile creation error, File path=%s</string>
 		
 </resources>
