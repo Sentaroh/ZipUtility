@@ -973,7 +973,7 @@ public class ZipFileManager {
 	private void setContextCopyCutPasteButton(CustomTreeFilelistAdapter tfa) {
 		if (!mCurrentFilePath.equals("")) {
 			if (mGp.copyCutList.size()>0) {
-				if (tfa.isDataItemIsSelected()) {
+				if (tfa.isItemSelected()) {
 					mContextButtonPasteView.setVisibility(LinearLayout.INVISIBLE);
 				} else {
 					String c_dir=mCurrentDirectory.getText().length()==0?"":mCurrentDirectory.getText().substring(1);
@@ -984,7 +984,7 @@ public class ZipFileManager {
 			} else {
 				mContextButtonPasteView.setVisibility(LinearLayout.INVISIBLE);
 			}
-			if (tfa.isDataItemIsSelected()) {
+			if (tfa.isItemSelected()) {
 				mContextButtonCopyView.setVisibility(LinearLayout.VISIBLE);
 				mContextButtonCutView.setVisibility(LinearLayout.VISIBLE);
 			} else {
@@ -1017,9 +1017,9 @@ public class ZipFileManager {
 			
 	        mContextButtonDeleteView.setVisibility(LinearLayout.INVISIBLE);
 	        mContextButtonExtractView.setVisibility(LinearLayout.VISIBLE);
-			if (mTreeFilelistAdapter.isAllDataItemIsSelected()) mContextButtonSelectAllView.setVisibility(ImageButton.INVISIBLE);
+			if (mTreeFilelistAdapter.isAllItemSelected()) mContextButtonSelectAllView.setVisibility(ImageButton.INVISIBLE);
 			else mContextButtonSelectAllView.setVisibility(ImageButton.VISIBLE);
-			if (mTreeFilelistAdapter.getDataItemSelectCount()==0) mContextButtonUnselectAllView.setVisibility(ImageButton.INVISIBLE);
+			if (mTreeFilelistAdapter.getSelectedItemCount()==0) mContextButtonUnselectAllView.setVisibility(ImageButton.INVISIBLE);
 			else mContextButtonUnselectAllView.setVisibility(ImageButton.VISIBLE);
 			
 			setContextCopyCutPasteButton(mTreeFilelistAdapter);
@@ -1373,7 +1373,7 @@ public class ZipFileManager {
 	};
 
 	private void copyItem(CustomTreeFilelistAdapter tfa) {
-		if (tfa.isDataItemIsSelected()) {
+		if (tfa.isItemSelected()) {
 			mGp.copyCutModeIsCut=false;
 			mGp.copyCutFilePath=mCurrentFilePath;
 			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().substring(1);
@@ -1398,7 +1398,7 @@ public class ZipFileManager {
 	};
 	
 	private void cutItem(CustomTreeFilelistAdapter tfa) {
-		if (tfa.isDataItemIsSelected()) {
+		if (tfa.isItemSelected()) {
 			mGp.copyCutModeIsCut=true;
 			mGp.copyCutFilePath=mCurrentFilePath;
 			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().substring(1);
@@ -2182,7 +2182,7 @@ public class ZipFileManager {
 				String w_conf_list="";
 				String sep="";
 				for (TreeFilelistItem item:tfa.getDataList()) {
-					if (item.isChecked() || !tfa.isDataItemIsSelected()) {
+					if (item.isChecked() || !tfa.isItemSelected()) {
 						 w_conf_list+=sep+item.getZipFileName();
 						sep="\n";
 					}
@@ -2260,7 +2260,7 @@ public class ZipFileManager {
                     ArrayList<FileHeader> sel_fhl=new ArrayList<FileHeader>();
                     for(FileHeader fh_item:zf_fhl) {
                         for(TreeFilelistItem sel_tfli:tfa.getDataList()) {
-                            if (sel_tfli.isChecked() || !tfa.isDataItemIsSelected()) {
+                            if (sel_tfli.isChecked() || !tfa.isItemSelected()) {
                                 if (sel_tfli.isDirectory()) {
                                     if (fh_item.getFileName().startsWith(sel_tfli.getZipFileName()+"/")) {
                                         sel_fhl.add(fh_item);
@@ -2726,7 +2726,7 @@ public class ZipFileManager {
 //		Log.v("","zf_list="+zf_list);
 		if (zf_list!=null) {
 //			for(TreeFilelistItem tfli:tfa.getDataList()) Log.v("","name="+tfli.getName()+", cheked="+tfli.isChecked());
-			if (tfa.isDataItemIsSelected()) {
+			if (tfa.isItemSelected()) {
 //				Log.v("","sel");
 				for(FileHeader fh:zf_list) {
 					for (TreeFilelistItem tfli:tfa.getDataList()) {
@@ -3119,29 +3119,7 @@ public class ZipFileManager {
 			public void onNothingSelected(AdapterView<?> parent) {
 			}
 		});
-        NotifyEvent ntfy_expand_close=new NotifyEvent(mContext);
-        ntfy_expand_close.setListener(new NotifyEventListener(){
-			@Override
-			public void positiveResponse(Context c, Object[] o) {
-				if (!isUiEnabled()) return;
-				int idx=(Integer)o[0];
-	    		final int pos=mTreeFilelistAdapter.getItem(idx);
-	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getDataItem(pos);
-				if (tfi.getName().startsWith("---")) return;
-				if (tfi.isDirectory()){// && tfi.getSubDirItemCount()>0) {
-					String dir=tfi.getPath().equals("")?tfi.getName():tfi.getPath()+"/"+tfi.getName();
-					ArrayList<TreeFilelistItem> tfl=createTreeFileList(mZipFileList, dir);
-					mTreeFilelistAdapter.setDataList(tfl);
-					mCurrentDirectory.setText("/"+dir);
-					setTopUpButtonEnabled(true);
-				}
-			}
-			@Override
-			public void negativeResponse(Context c, Object[] o) {
-			}
-        });
-        mTreeFilelistAdapter.setExpandCloseListener(ntfy_expand_close);
-        
+
 		mContextButtonDeleteView.setVisibility(ImageButton.INVISIBLE);
 		NotifyEvent ntfy_cb=new NotifyEvent(mContext);
 		ntfy_cb.setListener(new NotifyEventListener(){
@@ -3149,9 +3127,9 @@ public class ZipFileManager {
 			public void positiveResponse(Context c, Object[] o) {
 				if (!isUiEnabled()) return;
 				mContextButtonDeleteView.setVisibility(ImageButton.VISIBLE);
-				if (mTreeFilelistAdapter.isAllDataItemIsSelected()) mContextButtonSelectAllView.setVisibility(ImageButton.INVISIBLE);
+				if (mTreeFilelistAdapter.isAllItemSelected()) mContextButtonSelectAllView.setVisibility(ImageButton.INVISIBLE);
 				else mContextButtonSelectAllView.setVisibility(ImageButton.VISIBLE);
-				if (mTreeFilelistAdapter.getDataItemSelectCount()==0) mContextButtonUnselectAllView.setVisibility(ImageButton.INVISIBLE);
+				if (mTreeFilelistAdapter.getSelectedItemCount()==0) mContextButtonUnselectAllView.setVisibility(ImageButton.INVISIBLE);
 				else mContextButtonUnselectAllView.setVisibility(ImageButton.VISIBLE);
 				
 				setContextCopyCutPasteButton(mTreeFilelistAdapter);
@@ -3162,7 +3140,7 @@ public class ZipFileManager {
 			@Override
 			public void negativeResponse(Context c, Object[] o) {
 				if (!isUiEnabled()) return;
-				if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+				if (mTreeFilelistAdapter.isItemSelected()) {
 					mContextButtonDeleteView.setVisibility(ImageButton.VISIBLE);
 					mContextButtonOpenView.setVisibility(ImageButton.INVISIBLE);
 					mContextButtonNewView.setVisibility(ImageButton.INVISIBLE);
@@ -3177,9 +3155,9 @@ public class ZipFileManager {
 
 				}
 				setContextCopyCutPasteButton(mTreeFilelistAdapter);
-				if (mTreeFilelistAdapter.isAllDataItemIsSelected()) mContextButtonSelectAllView.setVisibility(ImageButton.INVISIBLE);
+				if (mTreeFilelistAdapter.isAllItemSelected()) mContextButtonSelectAllView.setVisibility(ImageButton.INVISIBLE);
 				else mContextButtonSelectAllView.setVisibility(ImageButton.VISIBLE);
-				if (mTreeFilelistAdapter.getDataItemSelectCount()==0) mContextButtonUnselectAllView.setVisibility(ImageButton.INVISIBLE);
+				if (mTreeFilelistAdapter.getSelectedItemCount()==0) mContextButtonUnselectAllView.setVisibility(ImageButton.INVISIBLE);
 				else mContextButtonUnselectAllView.setVisibility(ImageButton.VISIBLE);
 			}
 		});
@@ -3187,10 +3165,10 @@ public class ZipFileManager {
         mTreeFilelistView.setOnItemClickListener(new OnItemClickListener(){
         	public void onItemClick(AdapterView<?> items, View view, int idx, long id) {
         		if (!isUiEnabled()) return;
-	    		final int pos=mTreeFilelistAdapter.getItem(idx);
-	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getDataItem(pos);
+//	    		final int pos=mTreeFilelistAdapter.getItem(idx);
+	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getItem(idx);
 				if (tfi.getName().startsWith("---")) return;
-				if (!mTreeFilelistAdapter.isDataItemIsSelected() && tfi.isDirectory()) {
+				if (!mTreeFilelistAdapter.isItemSelected() && tfi.isDirectory()) {
 					String curr_dir=mCurrentDirectory.getText().toString().substring(1);
 					FileManagerDirectoryListItem dli=
 							CommonUtilities.getDirectoryItem(mDirectoryList, mZipFileSpinner.getSelectedItem().toString()+"/"+curr_dir);
@@ -3214,7 +3192,7 @@ public class ZipFileManager {
 					} else mContextButtonSelectAllView.setVisibility(LinearLayout.INVISIBLE);
 					setTopUpButtonEnabled(true);
 				} else {
-					if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+					if (mTreeFilelistAdapter.isItemSelected()) {
 						tfi.setChecked(!tfi.isChecked());
 						mTreeFilelistAdapter.notifyDataSetChanged();
 					} else {
@@ -3229,8 +3207,8 @@ public class ZipFileManager {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         		if (!isUiEnabled()) return true;
-	    		final int pos=mTreeFilelistAdapter.getItem(position);
-	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getDataItem(pos);
+//	    		final int pos=mTreeFilelistAdapter.getItem(position);
+	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getItem(position);
 				if (tfi.getName().startsWith("---")) return true;
 				processContextMenu(tfi);
 				return true;
@@ -3339,7 +3317,7 @@ public class ZipFileManager {
 		final CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity, false, false, false);
 		final ArrayList<TreeFilelistItem> n_tfl=new ArrayList<TreeFilelistItem>();
 		int sel_count=0;
-		if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+		if (mTreeFilelistAdapter.isItemSelected()) {
 			for(TreeFilelistItem s_tfi:mTreeFilelistAdapter.getDataList()) {
 				if (s_tfi.isChecked()) {
 					n_tfl.add(s_tfi.clone());

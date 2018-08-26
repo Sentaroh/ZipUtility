@@ -162,7 +162,7 @@ public class LocalFileManager {
         int pos_x = mTreeFilelistView.getFirstVisiblePosition();
         int pos_y = mTreeFilelistView.getChildAt(0) == null ? 0 : mTreeFilelistView.getChildAt(0).getTop();
         ArrayList<TreeFilelistItem> prev_fl = mTreeFilelistAdapter.getDataList();
-        boolean prev_selected = mTreeFilelistAdapter.isDataItemIsSelected();
+        boolean prev_selected = mTreeFilelistAdapter.isItemSelected();
 
         createFileList(curr_dir, null);
 
@@ -357,10 +357,10 @@ public class LocalFileManager {
 
     private void setContextButtonSelectUnselectVisibility() {
         if (mTreeFilelistAdapter.getCount() > 0) {
-            if (mTreeFilelistAdapter.isAllDataItemIsSelected())
+            if (mTreeFilelistAdapter.isAllItemSelected())
                 mContextButtonSelectAllView.setVisibility(ImageButton.INVISIBLE);
             else mContextButtonSelectAllView.setVisibility(ImageButton.VISIBLE);
-            if (mTreeFilelistAdapter.getDataItemSelectCount() == 0)
+            if (mTreeFilelistAdapter.getSelectedItemCount() == 0)
                 mContextButtonUnselectAllView.setVisibility(ImageButton.INVISIBLE);
             else mContextButtonUnselectAllView.setVisibility(ImageButton.VISIBLE);
         } else {
@@ -1224,7 +1224,7 @@ public class LocalFileManager {
     }
 
     private void copyItem(CustomTreeFilelistAdapter tfa) {
-        if (tfa.isDataItemIsSelected()) {
+        if (tfa.isItemSelected()) {
             mGp.copyCutModeIsCut = false;
             mGp.copyCutList.clear();
             mGp.copyCutType = GlobalParameters.COPY_CUT_FROM_LOCAL;
@@ -1250,7 +1250,7 @@ public class LocalFileManager {
     }
 
     private void cutItem(CustomTreeFilelistAdapter tfa) {
-        if (tfa.isDataItemIsSelected()) {
+        if (tfa.isItemSelected()) {
             mGp.copyCutModeIsCut = true;
             mGp.copyCutList.clear();
             mGp.copyCutType = GlobalParameters.COPY_CUT_FROM_LOCAL;
@@ -3053,7 +3053,7 @@ public class LocalFileManager {
 	};
 	
     private void setContextButtonShareVisibility() {
-    	if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+    	if (mTreeFilelistAdapter.isItemSelected()) {
    			mContextButtonShareView.setVisibility(ImageButton.VISIBLE);
     	} else {
     		mContextButtonShareView.setVisibility(ImageButton.INVISIBLE);
@@ -3142,7 +3142,7 @@ public class LocalFileManager {
 						}
 					}
 				}
-				if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+				if (mTreeFilelistAdapter.isItemSelected()) {
 					mContextButtonCopyView.setVisibility(ImageButton.VISIBLE);
                     setContextButtonViewVisibility(mContextButtonCutView);
 				}
@@ -3209,7 +3209,7 @@ public class LocalFileManager {
 			public void positiveResponse(Context c, Object[] o) {
 				setContextButtonShareVisibility();
 				mContextButtonCreateView.setVisibility(ImageButton.INVISIBLE);
-				if (mTreeFilelistAdapter.getDataItemSelectCount()==1) setContextButtonViewVisibility(mContextButtonRenameView);
+				if (mTreeFilelistAdapter.getSelectedItemCount()==1) setContextButtonViewVisibility(mContextButtonRenameView);
 				else mContextButtonRenameView.setVisibility(ImageButton.INVISIBLE);
                 setContextButtonViewVisibility(mContextButtonDeleteView);
 				mContextButtonArchiveView.setVisibility(ImageButton.VISIBLE);
@@ -3220,10 +3220,10 @@ public class LocalFileManager {
 			}
 			@Override
 			public void negativeResponse(Context c, Object[] o) {
-				if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+				if (mTreeFilelistAdapter.isItemSelected()) {
                     setContextButtonViewVisibility(mContextButtonCreateView);
 					setContextButtonShareVisibility();
-					if (mTreeFilelistAdapter.getDataItemSelectCount()==1) {
+					if (mTreeFilelistAdapter.getSelectedItemCount()==1) {
                         setContextButtonViewVisibility(mContextButtonRenameView);
 					} else {
 						mContextButtonRenameView.setVisibility(ImageButton.INVISIBLE);
@@ -3255,10 +3255,10 @@ public class LocalFileManager {
         mTreeFilelistView.setOnItemClickListener(new OnItemClickListener(){
         	public void onItemClick(AdapterView<?> items, View view, int idx, long id) {
         		if (!isUiEnabled()) return;
-	    		final int pos=mTreeFilelistAdapter.getItem(idx);
-	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getDataItem(pos);
+//	    		final int pos=mTreeFilelistAdapter.getItem(idx);
+	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getItem(idx);
 				if (tfi.getName().startsWith("---")) return;
-				if (!mTreeFilelistAdapter.isDataItemIsSelected() && tfi.isDirectory()) {
+				if (!mTreeFilelistAdapter.isItemSelected() && tfi.isDirectory()) {
 					String curr_dir=mLocalStorage.getSelectedItem().toString()+mCurrentDirectory.getText().toString();
 					if (mCurrentDirectory.getText().toString().equals("/")) curr_dir=mLocalStorage.getSelectedItem().toString();
 					FileManagerDirectoryListItem dli=CommonUtilities.getDirectoryItem(mDirectoryList, curr_dir);
@@ -3297,7 +3297,7 @@ public class LocalFileManager {
 					mContextButtonCopyView.setVisibility(ImageButton.INVISIBLE);
 					mContextButtonCutView.setVisibility(ImageButton.INVISIBLE);
 				} else {
-					if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+					if (mTreeFilelistAdapter.isItemSelected()) {
 						tfi.setChecked(!tfi.isChecked());
 						mTreeFilelistAdapter.notifyDataSetChanged();
 					} else {
@@ -3311,8 +3311,8 @@ public class LocalFileManager {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         		if (!isUiEnabled()) return true;
-	    		final int pos=mTreeFilelistAdapter.getItem(position);
-	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getDataItem(pos);
+//	    		final int pos=mTreeFilelistAdapter.getItem(position);
+	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getItem(position);
 				if (tfi.getName().startsWith("---")) return true;
 				showContextMenu(tfi);
 				return true;
@@ -3469,7 +3469,7 @@ public class LocalFileManager {
 		final CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity, false, false, false);
 		ArrayList<TreeFilelistItem> n_tfl=new ArrayList<TreeFilelistItem>();
 		int sel_count=0;
-		if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+		if (mTreeFilelistAdapter.isItemSelected()) {
 			for(TreeFilelistItem s_tfi:mTreeFilelistAdapter.getDataList()) {
 				if (s_tfi.isChecked()) {
 					n_tfl.add(s_tfi.clone());

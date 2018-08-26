@@ -1,6 +1,66 @@
 package com.sentaroh.android.ZipUtility;
 
-import static com.sentaroh.android.ZipUtility.Constants.*;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.support.v4.app.FragmentManager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.webkit.MimeTypeMap;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.Button;
+import android.widget.CheckedTextView;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
+import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
+import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomContextMenuOnClickListener;
+import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+import com.sentaroh.android.Utilities.Dialog.FileSelectDialogFragment;
+import com.sentaroh.android.Utilities.Dialog.ProgressSpinDialogFragment;
+import com.sentaroh.android.Utilities.MiscUtil;
+import com.sentaroh.android.Utilities.NotifyEvent;
+import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
+import com.sentaroh.android.Utilities.SafFile;
+import com.sentaroh.android.Utilities.StringUtil;
+import com.sentaroh.android.Utilities.ThreadCtrl;
+import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
+import com.sentaroh.android.Utilities.Widget.CustomTextView;
+import com.sentaroh.android.Utilities.ZipFileListItem;
+import com.sentaroh.android.Utilities.ZipUtil;
+
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.progress.ProgressMonitor;
+import net.lingala.zip4j.util.Zip4jConstants;
+
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -25,66 +85,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.FileHeader;
-import net.lingala.zip4j.model.ZipParameters;
-import net.lingala.zip4j.progress.ProgressMonitor;
-import net.lingala.zip4j.util.Zip4jConstants;
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
-import android.support.v4.app.FragmentManager;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
-import android.view.View;
-import android.view.Window;
-import android.view.View.OnClickListener;
-import android.webkit.MimeTypeMap;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.CheckedTextView;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.RadioGroup.OnCheckedChangeListener;
-
-import com.sentaroh.android.Utilities.MiscUtil;
-import com.sentaroh.android.Utilities.NotifyEvent;
-import com.sentaroh.android.Utilities.SafFile;
-import com.sentaroh.android.Utilities.StringUtil;
-import com.sentaroh.android.Utilities.ThreadCtrl;
-import com.sentaroh.android.Utilities.ZipFileListItem;
-import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
-import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
-import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomContextMenuOnClickListener;
-import com.sentaroh.android.Utilities.Dialog.CommonDialog;
-import com.sentaroh.android.Utilities.Dialog.FileSelectDialogFragment;
-import com.sentaroh.android.Utilities.Dialog.ProgressSpinDialogFragment;
-import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
-import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
-import com.sentaroh.android.Utilities.Widget.CustomTextView;
-import com.sentaroh.android.Utilities.ZipUtil;
+import static com.sentaroh.android.ZipUtility.Constants.APPLICATION_TAG;
+import static com.sentaroh.android.ZipUtility.Constants.ENCODING_NAME_LIST;
+import static com.sentaroh.android.ZipUtility.Constants.ENCODING_NAME_UTF8;
+import static com.sentaroh.android.ZipUtility.Constants.MIME_TYPE_TEXT;
+import static com.sentaroh.android.ZipUtility.Constants.MIME_TYPE_ZIP;
+import static com.sentaroh.android.ZipUtility.Constants.WORK_DIRECTORY;
 
 @SuppressWarnings("unused")
 @SuppressLint("ClickableViewAccessibility")
@@ -1444,7 +1450,7 @@ public class TarFileManager {
 	
 	private ArrayList<TreeFilelistItem> buildSelectedFileist(CustomTreeFilelistAdapter tfa) {
 		ArrayList<TreeFilelistItem> sel_file_list=new ArrayList<TreeFilelistItem>();
-		if (tfa.isDataItemIsSelected()) {
+		if (tfa.isItemSelected()) {
 			for (TreeFilelistItem tfli:tfa.getDataList()) {
 //				Log.v("","name="+tfli.getName()+", checked="+tfli.isChecked());
 				if (tfli.isChecked()) {
@@ -2070,29 +2076,7 @@ public class TarFileManager {
 			public void onNothingSelected(AdapterView<?> parent) {
 			}
 		});
-        NotifyEvent ntfy_expand_close=new NotifyEvent(mContext);
-        ntfy_expand_close.setListener(new NotifyEventListener(){
-			@Override
-			public void positiveResponse(Context c, Object[] o) {
-				if (!isUiEnabled()) return;
-				int idx=(Integer)o[0];
-	    		final int pos=mTreeFilelistAdapter.getItem(idx);
-	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getDataItem(pos);
-				if (tfi.getName().startsWith("---")) return;
-				if (tfi.isDirectory()){// && tfi.getSubDirItemCount()>0) {
-					String dir=tfi.getPath().equals("")?tfi.getName():tfi.getPath()+"/"+tfi.getName();
-					ArrayList<TreeFilelistItem> tfl=createTreeFileList(mZipFileList, dir);
-					mTreeFilelistAdapter.setDataList(tfl);
-					mZipFileCurrentDirectory.setText("/"+dir);
-					setTopUpButtonEnabled(true);
-				}
-			}
-			@Override
-			public void negativeResponse(Context c, Object[] o) {
-			}
-        });
-        mTreeFilelistAdapter.setExpandCloseListener(ntfy_expand_close);
-        
+
 		mContextZipButtonDelete.setVisibility(ImageButton.INVISIBLE);
 		NotifyEvent ntfy_cb=new NotifyEvent(mContext);
 		ntfy_cb.setListener(new NotifyEventListener(){
@@ -2105,7 +2089,7 @@ public class TarFileManager {
 			@Override
 			public void negativeResponse(Context c, Object[] o) {
 				if (!isUiEnabled()) return;
-				if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+				if (mTreeFilelistAdapter.isItemSelected()) {
 					mContextZipButtonDelete.setVisibility(ImageButton.VISIBLE);
 					mContextZipButtonAdd.setVisibility(ImageButton.INVISIBLE);
 				} else {
@@ -2118,10 +2102,10 @@ public class TarFileManager {
         mTreeFilelistView.setOnItemClickListener(new OnItemClickListener(){
         	public void onItemClick(AdapterView<?> items, View view, int idx, long id) {
         		if (!isUiEnabled()) return;
-	    		final int pos=mTreeFilelistAdapter.getItem(idx);
-	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getDataItem(pos);
+//	    		final int pos=mTreeFilelistAdapter.getItem(idx);
+	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getItem(idx);
 				if (tfi.getName().startsWith("---")) return;
-				if (!mTreeFilelistAdapter.isDataItemIsSelected() && tfi.isDirectory()) {
+				if (!mTreeFilelistAdapter.isItemSelected() && tfi.isDirectory()) {
 					String dir=tfi.getPath().equals("")?tfi.getName():tfi.getPath()+"/"+tfi.getName();
 					ArrayList<TreeFilelistItem> tfl=createTreeFileList(mZipFileList, dir);
 					mTreeFilelistAdapter.setDataList(tfl);
@@ -2129,7 +2113,7 @@ public class TarFileManager {
 					if (tfl.size()>0) mTreeFilelistView.setSelection(0);
 					setTopUpButtonEnabled(true);
 				} else {
-					if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+					if (mTreeFilelistAdapter.isItemSelected()) {
 						tfi.setChecked(!tfi.isChecked());
 						mTreeFilelistAdapter.notifyDataSetChanged();
 					} else {
@@ -2143,8 +2127,8 @@ public class TarFileManager {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         		if (!isUiEnabled()) return true;
-	    		final int pos=mTreeFilelistAdapter.getItem(position);
-	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getDataItem(pos);
+//	    		final int pos=mTreeFilelistAdapter.getItem(position);
+	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getItem(position);
 				if (tfi.getName().startsWith("---")) return true;
 				processContextMenu(tfi);
 				return true;
@@ -2214,7 +2198,7 @@ public class TarFileManager {
 		final CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity, false, false, false);
 		final ArrayList<TreeFilelistItem> n_tfl=new ArrayList<TreeFilelistItem>();
 		int sel_count=0;
-		if (mTreeFilelistAdapter.isDataItemIsSelected()) {
+		if (mTreeFilelistAdapter.isItemSelected()) {
 			for(TreeFilelistItem s_tfi:mTreeFilelistAdapter.getDataList()) {
 				if (s_tfi.isChecked()) {
 					n_tfl.add(s_tfi.clone());

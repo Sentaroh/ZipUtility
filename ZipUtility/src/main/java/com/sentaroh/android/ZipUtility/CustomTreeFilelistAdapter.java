@@ -27,7 +27,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -49,11 +48,10 @@ import com.sentaroh.android.Utilities.Widget.CustomTextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 public class CustomTreeFilelistAdapter extends BaseAdapter {
 	private Context mContext;
-	private ArrayList<Integer>mShowItems=new ArrayList<Integer>();
+//	private ArrayList<Integer>mShowItems=new ArrayList<Integer>();
 	private ArrayList<TreeFilelistItem>mDataItems=null;
 	private boolean mSingleSelectMode=false;
 	private boolean mShowLastModified=true;
@@ -104,24 +102,19 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 	}
 	
 	@Override
-	public int getCount() {return mShowItems.size();}
+	public int getCount() {return mDataItems.size();}
 
 	@Override
-	public Integer getItem(int arg0) {return mShowItems.get(arg0);}
+	public TreeFilelistItem getItem(int arg0) {return mDataItems.get(arg0);}
 
 	@Override
-	public long getItemId(int arg0) {return mShowItems.get(arg0);}
+	public long getItemId(int arg0) {return arg0;}
 	
 	public ArrayList<TreeFilelistItem> getDataList() {return mDataItems;}
 	
 	public void setDataList(ArrayList<TreeFilelistItem> fl) {
-//		mDataItems.clear();
-//		if (fl!=null) {
-//			for (int i=0;i<fl.size();i++) mDataItems.add(fl.get(i));
-//		}
 		mDataItems=fl;
 		sort();
-//		createShowList();
 	};
 
 	public void setShowLastModified(boolean p) {
@@ -132,22 +125,22 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 		mSingleSelectMode=p;
 	};
 
-	public void setDataItemIsSelected(int pos) {
-		if (mSingleSelectMode) {
-			setAllItemUnchecked();
-			mDataItems.get(pos).setChecked(true);
-		} else {
-			mDataItems.get(pos).setChecked(!mDataItems.get(pos).isChecked());
-		}
-		createShowList();
-	};
+//	public void setItemIsSelected(int pos) {
+//		if (mSingleSelectMode) {
+//			setAllItemUnchecked();
+//			mDataItems.get(pos).setChecked(true);
+//		} else {
+//			mDataItems.get(pos).setChecked(!mDataItems.get(pos).isChecked());
+//		}
+//        notifyDataSetChanged();
+//	};
 
-	public void setDataItemIsUnselected(int pos) {
-		mDataItems.get(pos).setChecked(false);
-		createShowList();
-	};
+//	public void setItemIsUnselected(int pos) {
+//		mDataItems.get(pos).setChecked(false);
+//        notifyDataSetChanged();
+//	};
 
-	public boolean isDataItemIsSelected() {
+	public boolean isItemSelected() {
 		boolean result=false;
 		
 		for (int i=0;i<mDataItems.size();i++) {
@@ -159,7 +152,7 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 		return result;
 	};
 
-	public boolean isAllDataItemIsSelected() {
+	public boolean isAllItemSelected() {
 		boolean result=true;
 		
 		for (int i=0;i<mDataItems.size();i++) {
@@ -171,7 +164,7 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 		return result;
 	};
 
-	public int getDataItemSelectCount() {
+	public int getSelectedItemCount() {
 		int result=0;
 		
 		for (int i=0;i<mDataItems.size();i++) {
@@ -192,269 +185,33 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 			mDataItems.get(i).setChecked(checked); 
 	};
 
-//	public void setItemSelected(int pos) {
-//		if (isSingleSelectMode()) {
-//			setAllItemUnchecked();
-//			mDataItems.get(pos).setChecked(true);
-//		} else {
-//			mDataItems.get(pos).setChecked(!mDataItems.get(pos).isChecked());
-//		}
-//	};
-	
 	public boolean isSingleSelectMode() {
 		return mSingleSelectMode;
 	};
 
-	public void removeDataItem(int dc) {
+	public void removeItem(int dc) {
 		mDataItems.remove(dc);
-		createShowList();
 		notifyDataSetChanged();
 	};
 
-	public void removeDataItem(TreeFilelistItem fi) {
+	public void removeItem(TreeFilelistItem fi) {
 		mDataItems.remove(fi);
-		createShowList();
 		notifyDataSetChanged();
 	};
 
-	public void replaceDataItem(int i, TreeFilelistItem fi) {
+	public void replaceItem(int i, TreeFilelistItem fi) {
 		mDataItems.set(i,fi);
 		notifyDataSetChanged();
 	};
 
-	public int getDataItemCount() {
-		return mDataItems.size();
-	};
-
-	public void addDataItem(TreeFilelistItem fi) {
+	public void addItem(TreeFilelistItem fi) {
 		mDataItems.add(fi);
 		notifyDataSetChanged();
 	};
 
-	public void insertDataItem(int i, TreeFilelistItem fi) {
+	public void insertItem(int i, TreeFilelistItem fi) {
 		mDataItems.add(i,fi);
 		notifyDataSetChanged();
-	};
-
-	public TreeFilelistItem getDataItem(int i) {
-		return mDataItems.get(i);
-	};
-
-	public void createShowList() {
-		mShowItems.clear();
-		if (mDataItems!=null) {
-			for (int i=0;i<mDataItems.size();i++) 
-				if (!mDataItems.get(i).isHideListItem()) mShowItems.add(i);
-		}
-		notifyDataSetChanged();
-	};
-	
-	public void hideChildItem(TreeFilelistItem pfi, int cp) {
-		int sn=pfi.getListLevel()+1;
-		TreeFilelistItem tfi;
-		for (int i=cp+1;i<getDataItemCount();i++) {
-			tfi=getDataItem(i);
-			if (tfi.getListLevel()<sn) {
-				break;
-			} else {
-				tfi.setHideListItem(true);
-			}
-		}
-		pfi.setChildListExpanded(false);
-		createShowList();
-	};
-
-	public void removeChildItem(TreeFilelistItem pfi, int cp) {
-		int sn=pfi.getListLevel()+1;
-		List<Integer> dl=new ArrayList<Integer>();
-		for (int i=cp+1;i<getDataItemCount();i++) {
-			if (getDataItem(i).getListLevel()<sn) break;
-			else dl.add(i);
-		}
-		pfi.setChildListExpanded(false);
-		pfi.setSubDirLoaded(false);
-//		replaceDataItem(cp,pfi);
-		
-		for (int i=dl.size()-1;i>=0;i--) removeDataItem(dl.get(i));
-		
-		createShowList();
-	};
-
-	public void addChildItem(TreeFilelistItem pfi, CustomTreeFilelistAdapter afa, int cp) {
-		//from adapter
-		if (afa.getCount()!=0) {
-			for (int i=0;i<afa.getDataItemCount();i++) {
-				TreeFilelistItem tfi=afa.getDataItem(i);
-				tfi.setListLevel(pfi.getListLevel()+1);
-				insertDataItem(cp+i+1,tfi);
-			}
-			pfi.setChildListExpanded(true);
-			pfi.setSubDirLoaded(true);
-//			replaceDataItem(cp,pfi);
-		} 
-		createShowList();
-	};
-	
-	public void addChildItem(TreeFilelistItem pfi, 
-			ArrayList<TreeFilelistItem> afa, int cp) {
-		//from Arraylist
-		if (afa.size()!=0) {
-			for (int i=0;i<afa.size();i++) {
-				TreeFilelistItem tfi=afa.get(i);
-				tfi.setListLevel(pfi.getListLevel()+1);
-				insertDataItem(cp+i+1,tfi);
-			}
-			pfi.setChildListExpanded(true);
-			pfi.setSubDirLoaded(true);
-//			replaceDataItem(cp,pfi);
-		} 
-		createShowList();
-	};
-
-
-//	public void reshowChildItem(TreeFilelistItem fi, int cp) {
-//		int ll=fi.getListLevel()+1;
-//		for (int i=cp+1;i<getDataItemCount();i++) {
-//			TreeFilelistItem tfi=getDataItem(i);
-//			if (ll>tfi.getListLevel()) break;
-//			else {
-//				if (!singleSelectMode) if (fi.isChk())tfi.setChk(true);
-//				if (fi.isChildListExpanded()) {
-//					tfi.setHideListItem(false);
-//					replaceDataItem(i,tfi);
-//				}
-//			}
-//		}
-//		fi.setChildListExpanded(true);
-//		if (!singleSelectMode) fi.setChk(false);
-//		replaceDataItem(cp,fi);
-//		createShowList();
-//	};
-	
-	public void reshowChildItem(TreeFilelistItem fi, int cp) {
-//		dumpDataItemList();
-		fi.setChildListExpanded(true);
-//		replaceDataItem(cp,fi);
-		if (fi.isDirectory()) {
-			if (fi.isChildListExpanded()) {
-				fi.setHideListItem(false);
-				int litem_pos=0;
-				//Directoryの?��?囲を求め?��?
-				int lvl=fi.getListLevel();
-				int d_lvl=lvl+1;
-				for (int i=cp+1;i<getDataItemCount();i++) {
-					if (lvl>=getDataItem(i).getListLevel()) {//end
-						break;
-					} else litem_pos=i;
-				}
-//				Log.v("","parent range start="+(cp+1)+", end="+litem_pos+
-//						", cp="+cp+", name="+fi.getName()+", ll="+lvl+", d_lvl="+d_lvl);
-				for (int i=cp+1;i<=litem_pos;i++) {
-					//ドリル?��?ウンDirectory
-//					Log.v("","parent cp="+i+", name="+getDataItem(i).getName()+
-//							", ll="+(getDataItem(i).getListLevel()+1)+
-//							", p_ll="+lvl);
-					if (getDataItem(i).getListLevel()==d_lvl)
-						reshowChildByParent(getDataItem(i),i, getDataItem(i).getListLevel()+1);
-				}
-			} else {
-				fi.setHideListItem(false);
-//				replaceDataItem(cp,fi);
-			}
-		} else {
-			fi.setHideListItem(false);
-//			replaceDataItem(cp,fi);
-		}
-		createShowList();
-//		dumpDataItemList();
-	};
-	
-	private void reshowChildByParent(TreeFilelistItem fi, int cp, int p_lvl) {
-//		Log.v("","rc cp="+cp+", name="+fi.getName()+", ll="+p_lvl);
-		if (fi.isDirectory()) {
-			if (fi.isChildListExpanded()) {
-				fi.setHideListItem(false);
-				int litem_pos=0;
-				int lvl=fi.getListLevel();
-				for (int i=cp+1;i<getDataItemCount();i++) {
-					if (lvl>=getDataItem(i).getListLevel()) {//end
-						break;
-					} else litem_pos=i;
-				}
-				for (int i=cp+1;i<=litem_pos;i++) {
-					reshowChildByParent(getDataItem(i),i,getDataItem(i).getListLevel()+1);
-				}
-			} else {
-				fi.setHideListItem(false);
-//				replaceDataItem(cp,fi);
-			}
-		} else {
-			boolean processed=false;
-//			Log.v("","rc child name="+getDataItem(cp).getName()+", pos="+cp+", ll="+getDataItem(cp).getListLevel());
-			for (int i=cp-1;i>=0;i--) {
-//				Log.v("","rc check name="+getDataItem(i).getName()+", pos="+i);
-				if (getDataItem(i).isDirectory() && getDataItem(i).getListLevel()==(getDataItem(cp).getListLevel()-1)) {
-//					Log.v("","rc dir name="+getDataItem(i).getName()+", pos="+i+
-//							", exp="+getDataItem(i).isChildListExpanded());
-					processed=true;
-					if (!getDataItem(i).isChildListExpanded()) {
-						fi.setHideListItem(true);
-//						Log.v("","rc name="+getDataItem(i).getName());
-					} else fi.setHideListItem(false);
-					break;
-				}
-			}
-			if (!processed) fi.setHideListItem(false);
-//			replaceDataItem(cp,fi);
-		}
-	};
-	
-	public void dumpDataItemList() {
-		for (int i=0;i<mDataItems.size();i++) {
-			Log.v("TreeFilelist"," pos="+i+
-					", path="+mDataItems.get(i).getPath()+
-					", name="+mDataItems.get(i).getName()+
-					", level="+mDataItems.get(i).getListLevel()+
-					", hide="+mDataItems.get(i).isHideListItem()+
-					", expand="+mDataItems.get(i).isChildListExpanded()+
-					", loaded="+mDataItems.get(i).isSubDirLoaded());
-		}
-	}
-
-	public void setTriState(TreeFilelistItem fi, int cp) {
-		boolean chk_found=false, unchk_found=false;
-		if (fi.isChecked()) chk_found=true;
-		else unchk_found=true;
-		int ll=fi.getListLevel()+1;
-		for (int i=cp+1;i<getDataItemCount();i++) {
-			TreeFilelistItem tfi=getDataItem(i);
-			if (ll>tfi.getListLevel()) break;
-			else {
-				if (tfi.isChecked()) chk_found=true;
-				else unchk_found=true;
-			}
-		}
-		for (int i=cp-1;i>0;i--) {
-			TreeFilelistItem tfi=getDataItem(i);
-			if (ll<tfi.getListLevel()) break;
-			else {
-				if (tfi.isChecked()) chk_found=true;
-				else unchk_found=true;
-			}
-		}
-		if (chk_found && unchk_found) {
-			//tri state found
-			Log.v("","tri state found");
-			for (int i=cp-1;i>0;i--) {
-				TreeFilelistItem tfi=getDataItem(i);
-				if (ll<tfi.getListLevel()) {
-					tfi.setTriState(true);
-//					replaceDataItem(i,tfi);
-					createShowList();
-					break;
-				}
-			}
-		}
 	};
 
 	private boolean mSortAscendant=true;
@@ -506,7 +263,7 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 		} else if (mSortKey==SORT_KEY_SIZE) {
 			sortBySize(mDataItems,mSortAscendant);
 		}
-		createShowList();
+		notifyDataSetChanged();
 	};
 
 	static private void sortByName(ArrayList<TreeFilelistItem>list, final boolean orderAsc) {
@@ -574,18 +331,10 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 
 	private boolean enableListener=true;
 	
-	public void setExpandCloseListener(NotifyEvent p) {
-		mNotifyExpand=p;
-	}
-
-	public void unsetExpandCloseListener() {
-		mNotifyExpand=null;
-	}
-
 	@Override
 	public boolean isEnabled(int p) {
 //		Log.v("","n="+getDataItem(p).getName()+", e="+getDataItem(p).isEnableItem());
-		return getDataItem(p).isEnableItem();
+		return getItem(p).isEnableItem();
 	}
 	
 	private Drawable mDefaultBgColor=null;
@@ -640,7 +389,7 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
          	   holder= (ViewHolder)v.getTag();
             }
             v.setEnabled(true);
-            final TreeFilelistItem o = mDataItems.get(mShowItems.get(position));
+            final TreeFilelistItem o = mDataItems.get(position);
 //            Log.v("","data_items pos="+show_items.get(position)+", pos="+position);
 //            ListView lv=(ListView)parent;
 //            Log.v("","s_pos="+lv.getCheckedItemPosition());
@@ -823,24 +572,22 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
    				});
            		if (mSingleSelectMode) {
            			if (o.isChecked()) {
-               			int data_item_pos=mShowItems.get(p);
     					TreeFilelistItem fi;
     					for (int i=0;i<mDataItems.size();i++) {
     						fi=mDataItems.get(i);
-    						if (fi.isChecked()&&data_item_pos!=i) {
+    						if (fi.isChecked() && p!=i) {
     							fi.setChecked(false);
     						}
     					}
            			}
-           			holder.rb_rb1.setChecked(mDataItems.get(mShowItems.get(position)).isChecked()); 
-           		} else holder.cb_cb1.setChecked(mDataItems.get(mShowItems.get(position)).isChecked());
+           			holder.rb_rb1.setChecked(mDataItems.get(position).isChecked());
+           		} else holder.cb_cb1.setChecked(mDataItems.get(position).isChecked());
        			
             }
             return v;
     };
 
     private void setButton(TreeFilelistItem o,int p, boolean isChecked) {
-		int data_item_pos=mShowItems.get(p);
 		if (enableListener) {
 			enableListener=false;
 				if (mSingleSelectMode) {
@@ -848,7 +595,7 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 						TreeFilelistItem fi;
 						for (int i=0;i<mDataItems.size();i++) {
 							fi=mDataItems.get(i);
-							if (fi.isChecked()&&data_item_pos!=i) {
+							if (fi.isChecked() && p!=i) {
 								fi.setChecked(false);
 //								replaceDataItem(i,fi);
 							}
@@ -869,45 +616,10 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 		o.setChecked(isChecked);
 //		mDataItems.set(data_item_pos,o);
 		
-		if (cb_ntfy!=null) cb_ntfy.notifyToListener(isChecked, new Object[]{data_item_pos, c_chk});
+		if (cb_ntfy!=null) cb_ntfy.notifyToListener(isChecked, new Object[]{p, c_chk});
 
     };
     
-//	private float toPixel(int dip) {
-//		float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-//				dip, resources.getDisplayMetrics());
-//		return px;
-//	};
-    
-    @SuppressWarnings("unused")
-	private void processParentEntry(TreeFilelistItem cfi, int cp, boolean isChecked) {
-		//process parent entry
-		for (int i=cp-1;i>=0;i--) { //find parent entry
-			if (mDataItems.get(i).getListLevel()==cfi.getListLevel()-1) {
-				//parent founded
-				TreeFilelistItem tfi = mDataItems.get(i);
-				tfi.setChecked(false);
-				mDataItems.set(i,tfi);
-				notifyDataSetChanged();
-				break;
-			} 
-		}
-    };
-	@SuppressWarnings("unused")
-	private void processChildEntry(TreeFilelistItem cfi, int cp, boolean isChecked) {
-		//process child entry
-		int cl=cfi.getListLevel();
-		for (int i=cp+1;i<mDataItems.size();i++) {
-			if (cl>=mDataItems.get(i).getListLevel()) break;
-			else {
-				TreeFilelistItem tfi = mDataItems.get(i);
-				tfi.setChecked(isChecked);
-				mDataItems.set(i, tfi);
-				notifyDataSetChanged();
-			}
-		}
-	};
-
 	static class ViewHolder {
 		 CustomTextView tv_name;
          TextView tv_moddate, tv_modtime, tv_size, tv_spacer, tv_count;
