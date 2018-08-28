@@ -1253,7 +1253,7 @@ public class ZipFileManager {
 			public void onClick(View v) {
 				if (isUiEnabled()) {
 					setContextButtonEnabled(mContextButtonExtract, false);
-					extractDlg(mTreeFilelistAdapter);
+                    if (mTreeFilelistAdapter.isItemSelected()) extractDlg(mTreeFilelistAdapter);
 					setContextButtonEnabled(mContextButtonExtract, true);
 				}
 			}
@@ -1265,7 +1265,7 @@ public class ZipFileManager {
 			public void onClick(View v) {
 				if (isUiEnabled()) {
 					setContextButtonEnabled(mContextButtonCopy, false);
-					copyItem(mTreeFilelistAdapter);
+                    if (mTreeFilelistAdapter.isItemSelected()) copyItem(mTreeFilelistAdapter);
 					setContextButtonEnabled(mContextButtonCopy, true);
 				}
 			}
@@ -1277,7 +1277,7 @@ public class ZipFileManager {
 			public void onClick(View v) {
 				if (isUiEnabled()) {
 					setContextButtonEnabled(mContextButtonCut, false);
-					cutItem(mTreeFilelistAdapter);
+                    if (mTreeFilelistAdapter.isItemSelected()) cutItem(mTreeFilelistAdapter);
 					setContextButtonEnabled(mContextButtonCut, true);
 				}
 			}
@@ -1335,7 +1335,7 @@ public class ZipFileManager {
 			public void onClick(View v) {
 				if (isUiEnabled()) {
 					setContextButtonEnabled(mContextButtonDelete, false);
-					confirmDelete(mTreeFilelistAdapter);
+                    if (mTreeFilelistAdapter.isItemSelected()) confirmDelete(mTreeFilelistAdapter);
 					setContextButtonEnabled(mContextButtonDelete, true);
 				}
 			}

@@ -369,7 +369,6 @@ public class LocalFileManager {
         }
     }
 
-    ;
 
     private void setContextButtonListener() {
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
@@ -391,7 +390,7 @@ public class LocalFileManager {
             public void onClick(View v) {
                 if (isUiEnabled()) {
                     setContextButtonEnabled(mContextButtonShare, false);
-                    shareItem(mTreeFilelistAdapter);
+                    if (mTreeFilelistAdapter.isItemSelected()) shareItem(mTreeFilelistAdapter);
                     setContextButtonEnabled(mContextButtonShare, true);
                 }
             }
@@ -403,7 +402,7 @@ public class LocalFileManager {
             public void onClick(View v) {
                 if (isUiEnabled()) {
                     setContextButtonEnabled(mContextButtonRename, false);
-                    renameItem(mTreeFilelistAdapter);
+                    if (mTreeFilelistAdapter.isItemSelected()) renameItem(mTreeFilelistAdapter);
                     setContextButtonEnabled(mContextButtonRename, true);
                 }
             }
@@ -415,7 +414,7 @@ public class LocalFileManager {
             public void onClick(View v) {
                 if (isUiEnabled()) {
                     setContextButtonEnabled(mContextButtonArchive, false);
-                    prepareZipSelectedItem(mTreeFilelistAdapter);
+                    if (mTreeFilelistAdapter.isItemSelected()) prepareZipSelectedItem(mTreeFilelistAdapter);
                     setContextButtonEnabled(mContextButtonArchive, true);
                 }
             }
@@ -439,7 +438,7 @@ public class LocalFileManager {
             public void onClick(View v) {
                 if (isUiEnabled()) {
                     setContextButtonEnabled(mContextButtonCopy, false);
-                    copyItem(mTreeFilelistAdapter);
+                    if (mTreeFilelistAdapter.isItemSelected()) copyItem(mTreeFilelistAdapter);
                     setContextButtonEnabled(mContextButtonCopy, true);
                 }
             }
@@ -451,7 +450,7 @@ public class LocalFileManager {
             public void onClick(View v) {
                 if (isUiEnabled()) {
                     setContextButtonEnabled(mContextButtonCut, false);
-                    cutItem(mTreeFilelistAdapter);
+                    if (mTreeFilelistAdapter.isItemSelected()) cutItem(mTreeFilelistAdapter);
                     setContextButtonEnabled(mContextButtonCut, true);
                 }
             }
@@ -463,7 +462,7 @@ public class LocalFileManager {
             public void onClick(View v) {
                 if (isUiEnabled()) {
                     setContextButtonEnabled(mContextButtonDelete, false);
-                    confirmDelete(mTreeFilelistAdapter);
+                    if (mTreeFilelistAdapter.isItemSelected()) confirmDelete(mTreeFilelistAdapter);
                     setContextButtonEnabled(mContextButtonDelete, true);
                 }
             }
@@ -499,8 +498,6 @@ public class LocalFileManager {
         });
         ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonUnselectAll, mContext.getString(R.string.msgs_zip_cont_label_unselect_all));
     }
-
-    ;
 
     static private void setCheckedTextView(final CheckedTextView ctv) {
         ctv.setOnClickListener(new OnClickListener() {
