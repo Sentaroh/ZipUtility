@@ -41,6 +41,7 @@ import com.sentaroh.android.Utilities.MiscUtil;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.SafFile;
+import com.sentaroh.android.Utilities.SafManager;
 import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 import com.sentaroh.android.Utilities.Widget.CustomTextView;
@@ -1226,7 +1227,7 @@ public class LocalFileManager {
             mGp.copyCutList.clear();
             mGp.copyCutType = GlobalParameters.COPY_CUT_FROM_LOCAL;
             mGp.copyCutFilePath = mMainFilePath;
-            mGp.copyCutCurrentDirectory = mCurrentDirectory.getText().equals("/") ? "" : (mCurrentDirectory.getText().length() == 0 ? "" : mCurrentDirectory.getText().substring(1));
+            mGp.copyCutCurrentDirectory = mCurrentDirectory.getText().equals("/") ? "" : (mCurrentDirectory.getText().length() == 0 ? "" : mCurrentDirectory.getText().toString().substring(1));
             String c_list = "", sep = "";
             for (TreeFilelistItem tfl : tfa.getDataList()) {
                 if (tfl.isChecked()) {
@@ -1253,7 +1254,7 @@ public class LocalFileManager {
             mGp.copyCutType = GlobalParameters.COPY_CUT_FROM_LOCAL;
             mGp.copyCutFilePath = mMainFilePath;
 //			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().substring(1);
-            mGp.copyCutCurrentDirectory = mCurrentDirectory.getText().equals("/") ? "" : (mCurrentDirectory.getText().length() == 0 ? "" : mCurrentDirectory.getText().substring(1));
+            mGp.copyCutCurrentDirectory = mCurrentDirectory.getText().equals("/") ? "" : (mCurrentDirectory.getText().length() == 0 ? "" : mCurrentDirectory.getText().toString().substring(1));
             String c_list = "", sep = "";
             for (TreeFilelistItem tfl : tfa.getDataList()) {
                 if (tfl.isChecked()) {
@@ -3412,6 +3413,12 @@ public class LocalFileManager {
             } else {
                 mLocalViewMsg.setVisibility(TextView.GONE);
             }
+        }
+    }
+
+    public void setUsbGrantMsg() {
+	    if (!mGp.safMgr.getUsbRootPath().equals(SafManager.UNKNOWN_USB_DIRECTORY)) {
+
         }
     }
 

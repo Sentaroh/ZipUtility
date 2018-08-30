@@ -43,6 +43,9 @@
     <item android:id="@+id/menu_top_show_sdcard_selector"
         android:title="@string/msgs_menu_show_sdcard_selector"
         />
+    <item android:id="@+id/menu_top_show_usb_selector"
+        android:title="@string/msgs_menu_show_usb_selector"
+        />
 
     <item android:id="@+id/menu_top_kill"
           android:title="@string/msgs_menu_kill"

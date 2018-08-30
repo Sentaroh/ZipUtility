@@ -13,4 +13,5 @@
 	<string name="msgs_menu_sort">Sort</string>
 
     <string name="msgs_menu_show_sdcard_selector">SDCARD Write Permission</string>
+    <string name="msgs_menu_show_usb_selector">USB Strorage Access Permission</string>
 </resources>

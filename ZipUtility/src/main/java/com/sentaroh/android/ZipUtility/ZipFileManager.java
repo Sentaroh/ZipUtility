@@ -976,7 +976,7 @@ public class ZipFileManager {
 				if (tfa.isItemSelected()) {
 					mContextButtonPasteView.setVisibility(LinearLayout.INVISIBLE);
 				} else {
-					String c_dir=mCurrentDirectory.getText().length()==0?"":mCurrentDirectory.getText().substring(1);
+					String c_dir=mCurrentDirectory.getText().length()==0?"":mCurrentDirectory.getText().toString().substring(1);
 					String zip_path=mZipFileSpinner.getSelectedItem()==null?mCurrentFilePath:mZipFileSpinner.getSelectedItem().toString();
 					if (isCopyCutDestValid(zip_path, c_dir)) mContextButtonPasteView.setVisibility(LinearLayout.VISIBLE);
 					else mContextButtonPasteView.setVisibility(LinearLayout.INVISIBLE);
@@ -1376,7 +1376,7 @@ public class ZipFileManager {
 		if (tfa.isItemSelected()) {
 			mGp.copyCutModeIsCut=false;
 			mGp.copyCutFilePath=mCurrentFilePath;
-			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().substring(1);
+			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().toString().substring(1);
 			mGp.copyCutEncoding=mEncodingSelected;
 			mGp.copyCutType=GlobalParameters.COPY_CUT_FROM_ZIP;
 			mGp.copyCutList.clear();
@@ -1401,7 +1401,7 @@ public class ZipFileManager {
 		if (tfa.isItemSelected()) {
 			mGp.copyCutModeIsCut=true;
 			mGp.copyCutFilePath=mCurrentFilePath;
-			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().substring(1);
+			mGp.copyCutCurrentDirectory=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().toString().substring(1);
 			mGp.copyCutEncoding=mEncodingSelected;
 			mGp.copyCutType=GlobalParameters.COPY_CUT_FROM_ZIP;
 			mGp.copyCutList.clear();
@@ -2192,7 +2192,7 @@ public class ZipFileManager {
 				ntfy_confirm.setListener(new NotifyEventListener(){
 					@Override
 					public void positiveResponse(Context c, Object[] o) {
-						String t_cd=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().substring(1);
+						String t_cd=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().toString().substring(1);
 						prepareExtractMultipleItem(mCurrentFilePath, mEncodingSelected,
 								tfa, t_cd, dest_path, conf_list, null, true, true);
 					}

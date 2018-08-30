@@ -72,6 +72,7 @@ import com.sentaroh.android.Utilities.ContentProviderUtil;
 import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
+import com.sentaroh.android.Utilities.SafManager;
 import com.sentaroh.android.Utilities.SystemInfo;
 import com.sentaroh.android.Utilities.ThemeUtil;
 import com.sentaroh.android.Utilities.Widget.CustomTabContentView;
@@ -81,9 +82,12 @@ import com.sentaroh.android.ZipUtility.Log.LogFileListDialogFragment;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 import static com.sentaroh.android.ZipUtility.Constants.ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS;
+import static com.sentaroh.android.ZipUtility.Constants.ACTIVITY_REQUEST_CODE_USB_STORAGE_ACCESS;
 
 @SuppressLint("NewApi")
 public class ActivityMain extends AppCompatActivity {
@@ -171,8 +175,25 @@ public class ActivityMain extends AppCompatActivity {
 //            }
 //            cursor.close();
 //          change commit comment
-            String file_path=ContentProviderUtil.getFilePath(mContext, cd, intent.getData());
-    		if (file_path!=null){// && file_path.endsWith(".zip")) {
+            String file_path=null;
+            try {
+                file_path=ContentProviderUtil.getFilePath(mContext, cd, intent.getData());
+//                file_path=null;
+//                String npe=null;
+//                npe.length();
+            } catch(Exception e) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                pw.flush();
+                pw.close();
+                mCommonDlg.showCommonDialog(false,"E","Error occured at getFilePath()",
+                        "Uri="+intent.getData()+"\n"+sw.toString(),null);
+                mUtil.addLogMsg("E","Error occured at getFilePath()"+
+                        "\n"+"Uri="+intent.getData()+"\n"+sw.toString());
+//                return;
+            }
+            if (file_path!=null){// && file_path.endsWith(".zip")) {
                 mLocalFileMgr.showLocalFileView(false);
                 Handler hndl=new Handler();
                 showZipFile(file_path);
@@ -182,9 +203,19 @@ public class ActivityMain extends AppCompatActivity {
                         mLocalFileMgr.showLocalFileView(true);
                     }
                 });
-		        refreshOptionMenu();
-    		}
-		}
+                refreshOptionMenu();
+            } else {
+                Handler hndl=new Handler();
+                hndl.post(new Runnable(){
+                    @Override
+                    public void run() {
+                        mLocalFileMgr.showLocalFileView(true);
+                    }
+                });
+                refreshOptionMenu();
+            }
+
+        }
 	};
 
 	private void initViewWidget() {
@@ -442,6 +473,7 @@ public class ActivityMain extends AppCompatActivity {
         	menu.findItem(R.id.menu_top_about).setEnabled(false);
         	menu.findItem(R.id.menu_top_settings).setEnabled(false);
         }
+        menu.findItem(R.id.menu_top_show_usb_selector).setVisible(false);
         return true;
 	};
 	
@@ -497,7 +529,10 @@ public class ActivityMain extends AppCompatActivity {
 				confirmExit();
 				return true;
             case R.id.menu_top_show_sdcard_selector:
-                startSdcardPicker();
+                reselectSdcard("");
+                return true;
+            case R.id.menu_top_show_usb_selector:
+                reselectUsb("");
                 return true;
 			case R.id.menu_top_kill:
 				confirmKill();
@@ -691,38 +726,30 @@ public class ActivityMain extends AppCompatActivity {
 			mUtil.addDebugMsg(1,"I","Return from Storage Picker. id="+requestCode);
 	        if (resultCode == Activity.RESULT_OK) {
 	        	mUtil.addDebugMsg(1,"I","Intent="+data.getData().toString());
-        		if (mGp.safMgr.isRootTreeUri(data.getData())) {
-	        		mGp.safMgr.addSdcardUuid(data.getData());
-//	        		if (mSafSelectActivityNotify!=null) mSafSelectActivityNotify.notifyToListener(true, null);
-                    mLocalFileMgr.setSdcardGrantMsg();
-	        	} else {
-	        		NotifyEvent ntfy_retry=new NotifyEvent(mContext);
-	        		ntfy_retry.setListener(new NotifyEventListener(){
-						@Override
-						public void positiveResponse(Context c, Object[] o) {
-			        		NotifyEvent ntfy=new NotifyEvent(mContext);
-			        		ntfy.setListener(new NotifyEventListener(){
-								@Override
-								public void positiveResponse(Context c, Object[] o) {
-									startSdcardPicker();
-								}
-								@Override
-								public void negativeResponse(Context c, Object[] o) {
-									mCommonDlg.showCommonDialog(false, "W", 
-											mContext.getString(R.string.msgs_main_external_sdcard_select_required_title),
-											mContext.getString(R.string.msgs_main_external_sdcard_select_required_cancel_msg),
-											null);
-								}
-			        		});
-			        		showSelectSdcardMsg(ntfy);
-						}
-						@Override
-						public void negativeResponse(Context c, Object[] o) {
-						}
-	        		});
-	        		mCommonDlg.showCommonDialog(true, "W", 
-	        				mContext.getString(R.string.msgs_main_external_sdcard_select_retry_select_msg), "", ntfy_retry);
-	        	}
+	        	if (!mGp.safMgr.isUsbUuid(SafManager.getUuidFromUri(data.getData().toString()))) {
+                    if (!mGp.safMgr.isRootTreeUri(data.getData())) {
+                        mUtil.addDebugMsg(1, "I", "Selected UUID="+SafManager.getUuidFromUri(data.getData().toString()));
+                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getMessages());
+                        reselectSdcard(mContext.getString(R.string.msgs_main_external_sdcard_select_retry_select_msg));
+                    } else {
+                        mUtil.addDebugMsg(1, "I", "Selected UUID="+SafManager.getUuidFromUri(data.getData().toString()));
+                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getMessages());
+                        if (mGp.safMgr.isRootTreeUri(data.getData())) {
+                            boolean rc=mGp.safMgr.addSdcardUuid(data.getData());
+                            if (!rc) {
+                                String saf_msg=mGp.safMgr.getMessages();
+                                mCommonDlg.showCommonDialog(false, "W", "External SDCARD UUID registration failed, please reselect SDCARD", saf_msg, null);
+                                mUtil.addLogMsg("E", "External SDCARD UUID registration failed, please reselect SDCARD\n", saf_msg);
+                            } else {
+                                mLocalFileMgr.setSdcardGrantMsg();
+                            }
+                        } else {
+                            reselectSdcard(mContext.getString(R.string.msgs_main_external_sdcard_select_retry_select_msg));
+                        }
+                    }
+                } else {
+                    reselectSdcard(mContext.getString(R.string.msgs_main_external_sdcard_select_retry_select_usb_selected_msg));
+                }
 	        } else {
 	        	if (mGp.safMgr.getSdcardRootSafFile()==null) {
 					mCommonDlg.showCommonDialog(false, "W", 
@@ -731,15 +758,106 @@ public class ActivityMain extends AppCompatActivity {
 							null);
 	        	}
 	        }
-		}
+		} else if (requestCode == ACTIVITY_REQUEST_CODE_USB_STORAGE_ACCESS) {
+            mUtil.addDebugMsg(1,"I","Return from Storage Picker. id="+requestCode);
+            if (resultCode == Activity.RESULT_OK) {
+                mUtil.addDebugMsg(1,"I","Intent="+data.getData().toString());
+                if (mGp.safMgr.isUsbUuid(SafManager.getUuidFromUri(data.getData().toString()))) {
+                    if (!mGp.safMgr.isUsbUuid(SafManager.getUuidFromUri(data.getData().toString()))) {
+                        mUtil.addDebugMsg(1, "I", "Selected UUID="+SafManager.getUuidFromUri(data.getData().toString()));
+                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getMessages());
+                        reselectSdcard(mContext.getString(R.string.msgs_main_external_usb_select_retry_select_msg));
+                    } else {
+                        mUtil.addDebugMsg(1, "I", "Selected UUID="+SafManager.getUuidFromUri(data.getData().toString()));
+                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getMessages());
+                        if (mGp.safMgr.isRootTreeUri(data.getData())) {
+                            boolean rc=mGp.safMgr.addUsbUuid(data.getData());
+                            if (!rc) {
+                                String saf_msg=mGp.safMgr.getMessages();
+                                mCommonDlg.showCommonDialog(false, "W", "USB UUID registration failed, please reselect USB Storage", saf_msg, null);
+                                mUtil.addLogMsg("E", "USB UUID registration failed, please reselect USB Storage\n", saf_msg);
+                            } else {
+                                mLocalFileMgr.setUsbGrantMsg();
+                            }
+                        } else {
+                            reselectUsb(mContext.getString(R.string.msgs_main_external_usb_select_retry_select_msg));
+                        }
+                    }
+                } else {
+                    reselectUsb(mContext.getString(R.string.msgs_main_external_usb_select_retry_select_sdcard_selected_msg));
+                }
+            } else {
+                if (mGp.safMgr.getUsbRootSafFile()==null) {
+                    mCommonDlg.showCommonDialog(false, "W",
+                            mContext.getString(R.string.msgs_main_external_usb_select_required_title),
+                            mContext.getString(R.string.msgs_main_external_usb_select_required_cancel_msg),
+                            null);
+                }
+            }
+        }
 	};
 
-	public void startSdcardPicker() {
+	private void reselectSdcard(String msg) {
+        NotifyEvent ntfy_retry = new NotifyEvent(mContext);
+        ntfy_retry.setListener(new NotifyEventListener() {
+            @Override
+            public void positiveResponse(Context c, Object[] o) {
+                NotifyEvent ntfy = new NotifyEvent(mContext);
+                ntfy.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context c, Object[] o) {
+                        startSdcardPicker();
+                    }
+                    @Override
+                    public void negativeResponse(Context c, Object[] o) {
+                    }
+                });
+                showSelectSdcardMsg(ntfy);
+            }
+            @Override
+            public void negativeResponse(Context c, Object[] o) {
+            }
+        });
+        if (msg.equals("")) ntfy_retry.notifyToListener(true, null);
+        else mCommonDlg.showCommonDialog(true, "W", msg, "", ntfy_retry);
+    }
+
+    private void reselectUsb(String msg) {
+        NotifyEvent ntfy_retry = new NotifyEvent(mContext);
+        ntfy_retry.setListener(new NotifyEventListener() {
+            @Override
+            public void positiveResponse(Context c, Object[] o) {
+                NotifyEvent ntfy = new NotifyEvent(mContext);
+                ntfy.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context c, Object[] o) {
+                        startUsbPicker();
+                    }
+                    @Override
+                    public void negativeResponse(Context c, Object[] o) {
+                    }
+                });
+                showSelectUsbMsg(ntfy);
+            }
+            @Override
+            public void negativeResponse(Context c, Object[] o) {
+            }
+        });
+        if (msg.equals("")) ntfy_retry.notifyToListener(true, null);
+        else mCommonDlg.showCommonDialog(true, "W", msg, "", ntfy_retry);
+    }
+
+    public void startSdcardPicker() {
 		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 	    startActivityForResult(intent, ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS);
 	};
-	
-	public void showSelectSdcardMsg(final NotifyEvent ntfy) {
+
+    public void startUsbPicker() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+        startActivityForResult(intent, ACTIVITY_REQUEST_CODE_USB_STORAGE_ACCESS);
+    };
+
+    public void showSelectSdcardMsg(final NotifyEvent ntfy) {
 		final Dialog dialog = new Dialog(mContext);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    dialog.setContentView(R.layout.show_select_sdcard_dlg);
@@ -768,7 +886,6 @@ public class ActivityMain extends AppCompatActivity {
 		    Bitmap bm = BitmapFactory.decodeStream(is);
 		    func_view.setImageBitmap(bm);
 		} catch (IOException e) {
-		    /* ��O���� */
 		}
 		
 		final Button btnOk = (Button) dialog.findViewById(R.id.show_select_sdcard_dlg_btn_ok);
@@ -776,21 +893,18 @@ public class ActivityMain extends AppCompatActivity {
 
 		CommonDialog.setDlgBoxSizeLimit(dialog,true);
 
-		// OK�{�^���̎w��
 		btnOk.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				dialog.dismiss();
 				ntfy.notifyToListener(true, null);
 			}
 		});
-		// Cancel�{�^���̎w��
 		btnCancel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				dialog.dismiss();
 				ntfy.notifyToListener(false, null);
 			}
 		});
-		// Cancel���X�i�[�̎w��
 		dialog.setOnCancelListener(new Dialog.OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface arg0) {
@@ -802,7 +916,66 @@ public class ActivityMain extends AppCompatActivity {
 
 	}
 
-	private void applySettingParms() {
+    public void showSelectUsbMsg(final NotifyEvent ntfy) {
+        final Dialog dialog = new Dialog(mContext);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.show_select_sdcard_dlg);
+
+        final LinearLayout title_view = (LinearLayout) dialog.findViewById(R.id.show_select_sdcard_dlg_title_view);
+        final TextView title = (TextView) dialog.findViewById(R.id.show_select_sdcard_dlg_title);
+        title_view.setBackgroundColor(mGp.themeColorList.dialog_title_background_color);
+        title.setTextColor(mGp.themeColorList.text_color_dialog_title);
+
+        final TextView dlg_msg=(TextView)dialog.findViewById(R.id.show_select_sdcard_dlg_msg);
+        String msg="";
+        if (Build.VERSION.SDK_INT>=23) msg=mContext.getString(R.string.msgs_main_external_usb_select_required_select_msg_api23);
+        else if (Build.VERSION.SDK_INT>=21) msg=mContext.getString(R.string.msgs_main_external_usb_select_required_select_msg_api21);
+        else msg=mContext.getString(R.string.msgs_main_external_usb_select_required_select_msg_api21);
+        dlg_msg.setText(msg);
+
+        final ImageView func_view=(ImageView)dialog.findViewById(R.id.show_select_sdcard_dlg_image);
+
+
+        try {
+            String fn="";
+            if (Build.VERSION.SDK_INT>=23) fn=mContext.getString(R.string.msgs_main_external_usb_select_required_select_msg_file_api23);
+            else if (Build.VERSION.SDK_INT>=21) fn=mContext.getString(R.string.msgs_main_external_usb_select_required_select_msg_file_api21);
+            else fn=mContext.getString(R.string.msgs_main_external_usb_select_required_select_msg_file_api21);
+            InputStream is=mContext.getResources().getAssets().open(fn);
+            Bitmap bm = BitmapFactory.decodeStream(is);
+            func_view.setImageBitmap(bm);
+        } catch (IOException e) {
+        }
+
+        final Button btnOk = (Button) dialog.findViewById(R.id.show_select_sdcard_dlg_btn_ok);
+        final Button btnCancel = (Button) dialog.findViewById(R.id.show_select_sdcard_dlg_btn_cancel);
+
+        CommonDialog.setDlgBoxSizeLimit(dialog,true);
+
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.dismiss();
+                ntfy.notifyToListener(true, null);
+            }
+        });
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                dialog.dismiss();
+                ntfy.notifyToListener(false, null);
+            }
+        });
+        dialog.setOnCancelListener(new Dialog.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface arg0) {
+                btnCancel.performClick();
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    private void applySettingParms() {
 		int prev_theme=mGp.applicationTheme;
 		mGp.loadSettingsParms(mContext);
 		mGp.setLogParms(mGp);

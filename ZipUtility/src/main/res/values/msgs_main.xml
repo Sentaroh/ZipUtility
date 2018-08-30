@@ -237,13 +237,29 @@ External Library:\n
 	<string name="msgs_main_external_sdcard_select_required_select_msg_api23">In order to access the external SDCARD, Step 1 please tap the &#8220;SDCARD&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
 (Please tap the &#8220;Select&#8221; when the screen of &#8220;SDCARD&#8221; in step2 is displayed directly in the upper left corner. If the upper left is other than &#8220;SDCARD&#8221; are displayed, tap the upper left corner of the menu, from step 1 please try again.)</string>
 	
-	<string name="msgs_main_external_sdcard_select_retry_select_msg">The root directory of the external SDCARD was not selected. Do you wants to re select?</string>
+	<string name="msgs_main_external_sdcard_select_retry_select_msg">The root directory of the external SDCARD was not selected. Do you wants to re select SDCARD?</string>
+    <string name="msgs_main_external_sdcard_select_retry_select_usb_selected_msg">USB Storage was selected. Do you wants to re select SDCARD?</string>
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api21">SMBSync_SD_CARD_5.0_EN.png</string>
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api23">SMBSync_SD_CARD_6.0_EN.png</string>
 	<string name="msgs_main_external_sdcard_select_required_cancel_msg">You can not perform edit until external SD card is selected.</string>
     <string name="msgs_main_external_sdcard_select_required_can_not_write">Write to SDCARD is not allowed.</string>
 	
 	<string name="msgs_main_external_sdcard_mp_changed_title">External SDCARD</string>
+
+    <string name="msgs_main_external_usb_select_required_title">Select USB Storage</string>
+    <string name="msgs_main_external_usb_select_required_select_msg_api21">In order to access the USB storage, Step 1 please tap the &#8220;USB&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
+(Please tap the &#8220;Select the USB&#8221; when the screen of &#8220;Select the USB&#8221; in step 2 is displayed directly)</string>
+    <string name="msgs_main_external_usb_select_required_select_msg_api23">In order to access the USB storage, Step 1 please tap the &#8220;USB&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
+(Please tap the &#8220;Select&#8221; when the screen of &#8220;SDCARD&#8221; in step2 is displayed directly in the upper left corner. If the upper left is other than &#8220;USB&#8221; are displayed, tap the upper left corner of the menu, from step 1 please try again.)</string>
+
+    <string name="msgs_main_external_usb_select_retry_select_msg">The root directory of the USB storage was not selected. Do you wants to re select?</string>
+    <string name="msgs_main_external_usb_select_retry_select_sdcard_selected_msg">SDCARD was selected. Do you wants to re select USB storage?</string>
+    <string name="msgs_main_external_usb_select_required_select_msg_file_api21">SMBSync_USB_MEDIA_8.0_EN.png</string>
+    <string name="msgs_main_external_usb_select_required_select_msg_file_api23">SMBSync_USB_MEDIA_8.0_EN.png</string>
+    <string name="msgs_main_external_usb_select_required_cancel_msg">You can not access until USB storage is selected.</string>
+    <!--<string name="msgs_main_external_usb_select_required_can_not_write">Write to SDCARD is not allowed.</string>-->
+
+    <string name="msgs_main_external_usb_mp_changed_title">USB Storage</string>
 
     <string name="msgs_main_permission_external_storage_title">Internal Storage Permission</string>
     <string name="msgs_main_permission_external_storage_request_msg">Please give permission to access internal storage in order to read and write data and management data to internal storage.</string>

@@ -1,7 +1,5 @@
 package com.sentaroh.android.ZipUtility;
 
-import static com.sentaroh.android.ZipUtility.Constants.APPLICATION_TAG;
-
 /*
 The MIT License (MIT)
 Copyright (c) 2011-2013 Sentaroh
@@ -55,6 +53,7 @@ public class Constants {
 		"WINDOWS-1251","WINDOWS-1252","WINDOWS-1253","WINDOWS-1255"};
 	
 	public static final int ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS=40;
+    public static final int ACTIVITY_REQUEST_CODE_USB_STORAGE_ACCESS=50;
 
 	public final static String SERVICE_HEART_BEAT="com.sentaroh.android."+APPLICATION_TAG+".ACTION_SERVICE_HEART_BEAT";
 
