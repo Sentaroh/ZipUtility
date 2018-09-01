@@ -110,8 +110,6 @@ public class ActivityMain extends AppCompatActivity {
 
 	private LocalFileManager mLocalFileMgr=null;
 	private ZipFileManager mZipFileMgr=null;
-	@SuppressWarnings("unused")
-	private TarFileManager mTarFileMgr=null;
 
 	@Override
 	public void onConfigurationChanged(final Configuration newConfig) {
