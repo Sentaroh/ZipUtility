@@ -1229,6 +1229,7 @@ public class ZipFileManager {
 			tfi.setZipFileCompressionMethod(zfli.getCompressionMethod());
 			tfi.setZipFileCompressedSize(zfli.getCompressedFileLength());
             tfi.setZipFileItem(true);
+//            tfi.dump("zfli");
 //			Log.v("","ft="+ft+", mt="+mt);
 		}
 		return tfi;

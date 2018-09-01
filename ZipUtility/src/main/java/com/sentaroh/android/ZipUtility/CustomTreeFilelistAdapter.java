@@ -427,17 +427,21 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
             	} else {
                 	holder.tv_spacer.setWidth(o.getListLevel()*30);
                 	holder.tv_name.setText(o.getName());
+                    holder.tv_size.setVisibility(TextView.VISIBLE);
+                    holder.tv_count.setVisibility(TextView.VISIBLE);
                 	if (o.getLength()!=-1) {
                 	    holder.tv_size.setText(o.getFileSize());
                         holder.tv_count.setVisibility(TextView.VISIBLE);
                     } else {
 //                	    holder.tv_size.setText(String.format("%3d Item",o.getSubDirItemCount()));
                         holder.tv_size.setText(mContext.getString(R.string.msgs_file_list_size_calculating));
-                        holder.tv_count.setVisibility(TextView.GONE);
+//                        holder.tv_count.setVisibility(TextView.GONE);
                     }
                     if (o.isDirectory()) {
                         if (!o.isZipFileItem()) holder.tv_size.setVisibility(TextView.VISIBLE);
                         else holder.tv_size.setVisibility(TextView.INVISIBLE);
+                    } else {
+                        holder.tv_count.setVisibility(TextView.GONE);
                     }
                 	if (mShowLastModified) {
                         holder.tv_moddate.setText(o.getFileLastModDate());
