@@ -1253,7 +1253,7 @@ public class ZipFileManager {
 			public void onClick(View v) {
 				if (isUiEnabled()) {
 					setContextButtonEnabled(mContextButtonExtract, false);
-                    if (mTreeFilelistAdapter.isItemSelected()) extractDlg(mTreeFilelistAdapter);
+                    extractDlg(mTreeFilelistAdapter);
 					setContextButtonEnabled(mContextButtonExtract, true);
 				}
 			}
@@ -1386,6 +1386,7 @@ public class ZipFileManager {
 					mGp.copyCutList.add(tfl);
 					c_list+=sep+tfl.getPath().replace(mZipFileSpinner.getSelectedItem().toString(), "")+"/"+tfl.getName();
 					sep=", ";
+                    tfl.setChecked(false);
 				}
 			}
 			tfa.notifyDataSetChanged();
@@ -1411,6 +1412,7 @@ public class ZipFileManager {
 					mGp.copyCutList.add(tfl);
 					c_list+=sep+tfl.getPath().replace(mZipFileSpinner.getSelectedItem().toString(), "")+"/"+tfl.getName();
 					sep=", ";
+                    tfl.setChecked(false);
 				}
 			}
 			tfa.notifyDataSetChanged();
@@ -1690,7 +1692,6 @@ public class ZipFileManager {
 
 	@SuppressWarnings("unused")
 	private void addItemDlg() {
-		final Handler hndl=new Handler();
 		NotifyEvent ntfy=new NotifyEvent(mContext);
 		ntfy.setListener(new NotifyEventListener(){
 			@Override
@@ -1858,7 +1859,6 @@ public class ZipFileManager {
 			final NotifyEvent p_ntfy, final String zip_base, final String zip_curr_dir) {
 		setUiDisabled();
 		showDialogProgress();
-		final Handler hndl=new Handler();
 		final ThreadCtrl tc=new ThreadCtrl();
 		mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
 		mDialogProgressSpinCancel.setEnabled(true);
@@ -1959,7 +1959,7 @@ public class ZipFileManager {
 					if (!aborted) mCommonDlg.showCommonDialog(false, "I", 
 							mContext.getString(R.string.msgs_zip_add_file_completed), w_sel_list, null);
 					deleteCopyPasteWorkFile();
-					hndl.postDelayed(new Runnable(){
+                    mUiHandler.postDelayed(new Runnable(){
 						@Override
 						public void run() {
 							setUiEnabled();
@@ -3518,8 +3518,7 @@ public class ZipFileManager {
 					os.write(buff,0,rc);
 					frc+=rc;
 					long progress=(frc*100)/(fsz);
-					putProgressMessage(String.format(mContext.getString(R.string.msgs_zip_extract_file_extracting),
-							zip_file_name, progress));
+					putProgressMessage(String.format(mContext.getString(R.string.msgs_zip_extract_file_extracting), zip_file_name, progress));
 					rc=is.read(buff);
 				}
 				os.flush();
@@ -3576,8 +3575,7 @@ public class ZipFileManager {
 					os.write(buff,0,rc);
 					frc+=rc;
 					long progress=(frc*100)/(fsz);
-					putProgressMessage(String.format(mContext.getString(R.string.msgs_zip_extract_file_extracting),
-							zip_file_name, progress));
+					putProgressMessage(String.format(mContext.getString(R.string.msgs_zip_extract_file_extracting), zip_file_name, progress));
 					rc=is.read(buff);
 				}
 				os.flush();
@@ -3604,12 +3602,10 @@ public class ZipFileManager {
 	
 	private void invokeBrowser(boolean encrypted, final TreeFilelistItem tfli,
 			final String p_dir, final String f_name, String mime_type) {
-		final String work_dir=mGp.internalRootDirectory+"/"+
-				mGp.appSpecificDirectory+"/"+WORK_DIRECTORY;
+		final String work_dir=mGp.internalRootDirectory+"/"+mGp.appSpecificDirectory+"/"+WORK_DIRECTORY;
 		String fid=CommonUtilities.getFileExtention(f_name);
 		String w_mt=MimeTypeMap.getSingleton().getMimeTypeFromExtension(fid);
 		final String mt=mime_type.equals("")?w_mt:mime_type;
-		final Handler hndl=new Handler();
 		if (mt != null) {
 			try {
 				final ZipFile zf=createZipFile(mCurrentFilePath,mEncodingSelected);
@@ -3656,7 +3652,7 @@ public class ZipFileManager {
 									if (extract_required) 
 										extract_rc=extractSpecificFile(tc, zf, e_name, work_dir, f_name, false);
 									final boolean rc=extract_rc;
-									hndl.post(new Runnable(){
+                                    mUiHandler.post(new Runnable(){
 										@Override
 										public void run() {
 											setUiEnabled();
@@ -3690,7 +3686,7 @@ public class ZipFileManager {
 						} catch (ZipException e) {
 							mUtil.addLogMsg("I", e.getMessage());
 							CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
-							hndl.post(new Runnable(){
+                            mUiHandler.post(new Runnable(){
 								@Override
 								public void run() {
 									setUiEnabled();

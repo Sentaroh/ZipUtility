@@ -3829,7 +3829,6 @@ public class LocalFileManager {
 				", dest_file="+dest_name);
 		setUiDisabled();
 		showDialogProgress();
-		final Handler hndl=new Handler();
 		final ThreadCtrl tc=new ThreadCtrl();
 		mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
 		mDialogProgressSpinCancel.setEnabled(true);
@@ -3909,7 +3908,7 @@ public class LocalFileManager {
 					mCommonDlg.showCommonDialog(false, "I", 
 							mContext.getString(R.string.msgs_local_file_add_file_completed), added_item, null);
 				}
-				hndl.postDelayed(new Runnable(){
+                mUiHandler.postDelayed(new Runnable(){
 					@Override
 					public void run() {
 						refreshFileList();
@@ -4034,13 +4033,12 @@ public class LocalFileManager {
 					true, -1, item.lastModified(),
 					false, item.canRead(), item.canWrite(),
 					item.isHidden(), item.getParent(),0);
-            final Handler hndl=new Handler();
             Thread th=new Thread(){
                 @Override
                 public void run() {
                     long dir_size=getAllFileSizeInDirectory(item,true);
                     tfi.setLength(dir_size);
-                    hndl.post(new Runnable(){
+                    mUiHandler.post(new Runnable(){
                         @Override
                         public void run(){
                             if (item.getName().equals(".PGMS")) {
