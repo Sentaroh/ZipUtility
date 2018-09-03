@@ -95,7 +95,7 @@
     	    android:layout_marginRight="5dp"
             android:fadeScrollbars="false"
             android:fastScrollAlwaysVisible="false"
-            android:fastScrollEnabled="true" />
+            android:fastScrollEnabled="false" />
 
         
     	<include layout="@layout/context_view_zip" />

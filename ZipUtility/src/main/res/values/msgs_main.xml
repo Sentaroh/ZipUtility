@@ -49,6 +49,7 @@ External Library:\n
     
     <string name="msgs_main_local_file_ccmenu_top">Move to top</string>
     <string name="msgs_main_local_file_ccmenu_bottom">Move to bottom</string>
+    <string name="msgs_main_local_file_ccmenu_select">Select item</string>
     
     <string name="msgs_local_file_item_property_directory" formatted="false">Directory Count=%s\nFile Count=%,d\nFile Size=%,d</string>
     

@@ -3491,7 +3491,34 @@ public class LocalFileManager {
 		}
 		tfa.setDataList(n_tfl);
 
-		if (tfi.isDirectory() && sel_count==1) {
+        if (!tfi.isChecked()) {
+            mCcMenu.addMenuItem(mContext.getString(R.string.msgs_main_local_file_ccmenu_select) + "(" + sel_list + ")", R.drawable.menu_active)
+                    .setOnClickListener(new CustomContextMenuOnClickListener() {
+                        @Override
+                        public void onClick(CharSequence menuTitle) {
+                            tfi.setChecked(!tfi.isChecked());
+                            mTreeFilelistAdapter.notifyDataSetChanged();
+                        }
+                    });
+        }
+
+        mCcMenu.addMenuItem(mContext.getString(R.string.msgs_main_local_file_ccmenu_top),R.drawable.context_button_top)
+                .setOnClickListener(new CustomContextMenuOnClickListener() {
+            @Override
+            public void onClick(CharSequence menuTitle) {
+                mTreeFilelistView.setSelection(0);
+            }
+        });
+
+        mCcMenu.addMenuItem(mContext.getString(R.string.msgs_main_local_file_ccmenu_bottom),R.drawable.context_button_bottom)
+                .setOnClickListener(new CustomContextMenuOnClickListener() {
+            @Override
+            public void onClick(CharSequence menuTitle) {
+                mTreeFilelistView.setSelection(mTreeFilelistAdapter.getCount()-1);
+            }
+        });
+
+        if (tfi.isDirectory() && sel_count==1) {
 			mCcMenu.addMenuItem(mContext.getString(R.string.msgs_main_local_file_ccmenu_property)+
 					"("+(n_tfl.get(0)).getName()+")",R.drawable.dialog_information)
 	  			.setOnClickListener(new CustomContextMenuOnClickListener() {
@@ -3532,7 +3559,7 @@ public class LocalFileManager {
 					th.start();
 				}
 	  		});
-			
+
 			mCcMenu.addMenuItem(mContext.getString(R.string.msgs_main_local_file_ccmenu_open_directory)+
 					"("+(n_tfl.get(0)).getName()+")",R.drawable.cc_folder)
 	  			.setOnClickListener(new CustomContextMenuOnClickListener() {

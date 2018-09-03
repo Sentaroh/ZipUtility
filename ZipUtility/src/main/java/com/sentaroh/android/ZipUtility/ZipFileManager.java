@@ -3211,7 +3211,7 @@ public class ZipFileManager {
 //	    		final int pos=mTreeFilelistAdapter.getItem(position);
 	    		final TreeFilelistItem tfi=mTreeFilelistAdapter.getItem(position);
 				if (tfi.getName().startsWith("---")) return true;
-				processContextMenu(tfi);
+				showContextMenu(tfi);
 				return true;
 			}
         });
@@ -3312,7 +3312,7 @@ public class ZipFileManager {
 	
 	private ArrayList<FileManagerDirectoryListItem> mDirectoryList=new ArrayList<FileManagerDirectoryListItem>();
 
-	private void processContextMenu(final TreeFilelistItem tfi) {
+	private void showContextMenu(final TreeFilelistItem tfi) {
         final CustomContextMenu mCcMenu = new CustomContextMenu(mContext.getResources(), mFragmentManager);
 		String sel_list="",sep="";
 		final CustomTreeFilelistAdapter tfa=new CustomTreeFilelistAdapter(mActivity, false, false, false);
@@ -3336,7 +3336,34 @@ public class ZipFileManager {
 		}
 		tfa.setDataList(n_tfl);
 
-		if (sel_count==1) {
+		if (!tfi.isChecked()) {
+            mCcMenu.addMenuItem(mContext.getString(R.string.msgs_main_local_file_ccmenu_select)+"("+sel_list+")",R.drawable.menu_active)
+                    .setOnClickListener(new CustomContextMenuOnClickListener() {
+                @Override
+                public void onClick(CharSequence menuTitle) {
+                    tfi.setChecked(true);
+                    mTreeFilelistAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+
+        mCcMenu.addMenuItem(mContext.getString(R.string.msgs_main_local_file_ccmenu_top),R.drawable.context_button_top)
+                .setOnClickListener(new CustomContextMenuOnClickListener() {
+            @Override
+            public void onClick(CharSequence menuTitle) {
+                mTreeFilelistView.setSelection(0);
+            }
+        });
+
+        mCcMenu.addMenuItem(mContext.getString(R.string.msgs_main_local_file_ccmenu_bottom),R.drawable.context_button_bottom)
+                .setOnClickListener(new CustomContextMenuOnClickListener() {
+            @Override
+            public void onClick(CharSequence menuTitle) {
+                mTreeFilelistView.setSelection(mTreeFilelistAdapter.getCount()-1);
+            }
+        });
+
+        if (sel_count==1) {
 			mCcMenu.addMenuItem(mContext.getString(R.string.msgs_main_local_file_ccmenu_property)+"("+(n_tfl.get(0)).getName()+")",R.drawable.dialog_information)
 		  		.setOnClickListener(new CustomContextMenuOnClickListener() {
 				@Override
