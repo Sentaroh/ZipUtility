@@ -89,7 +89,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="5dp"
-                        android:fontFamily="monospace"
                         android:text="2018/12/31" />
 
                     <TextView
@@ -97,7 +96,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="5dp"
-                        android:fontFamily="monospace"
                         android:text="xx:xx:xx" />
                 </LinearLayout>
             </LinearLayout>
