@@ -195,7 +195,7 @@ public class ZipFileManager {
         mUiHandler=new Handler();
         mContext=a.getApplicationContext();
         mFragmentManager=fm;
-        mUtil=new CommonUtilities(mContext, "ZipFolder", gp);
+        mUtil=new CommonUtilities(mContext, "ZipFolder", gp, mCommonDlg);
 
         mEncodingDesired=mContext.getString(R.string.msgs_zip_parm_zip_encoding_auto);
         
@@ -1597,9 +1597,8 @@ public class ZipFileManager {
 								}
 							} else {
 								try {
-									SafFile out_sf=createSafFile(fp, false);
+									SafFile out_sf=mUtil.createSafFile(fp, false);
                                     if (out_sf==null) {
-                                        checkSafFileError(fp);
                                         return;
                                     }
                                     OutputStream fos = mContext.getContentResolver().openOutputStream(out_sf.getUri());
@@ -2328,9 +2327,8 @@ public class ZipFileManager {
 				if (fh_item.isDirectory()) {
 					if (dest_path.startsWith(mGp.externalRootDirectory)) {
 					    String fp=dest_path+"/"+fh_item.getFileName().replace(zip_curr_dir,"");
-						SafFile sf=createSafFile(fp, true);
+						SafFile sf=mUtil.createSafFile(fp, true);
                         if (sf==null) {
-                            checkSafFileError(fp);
                             return false;
                         }
 						sf.exists();
@@ -2887,14 +2885,12 @@ public class ZipFileManager {
 		putProgressMessage(msg);
 
 		boolean result=false;
-		SafFile out_sf=createSafFile(sdcard_path, false);
+		SafFile out_sf=mUtil.createSafFile(sdcard_path, false);
         if (out_sf==null) {
-            checkSafFileError(sdcard_path);
             return false;
         }
-        SafFile temp_sf=createSafFile(sdcard_path+".tmp", false);
+        SafFile temp_sf=mUtil.createSafFile(sdcard_path+".tmp", false);
         if (temp_sf==null) {
-            checkSafFileError(sdcard_path+".tmp");
             return false;
         }
         File from=new File(app_path);
@@ -3582,14 +3578,12 @@ public class ZipFileManager {
 				InputStream is=zf.getInputStream(fh);
 				
 				String w_path=dest_path.endsWith("/")?dest_path+dest_file_name:dest_path+"/"+dest_file_name;
-				SafFile out_dir_sf=createSafFile(dest_path, true);
+				SafFile out_dir_sf=mUtil.createSafFile(dest_path, true);
                 if (out_dir_sf==null) {
-                    checkSafFileError(dest_path);
                     return false;
                 }
-                SafFile out_file_sf=createSafFile(w_path, false);
+                SafFile out_file_sf=mUtil.createSafFile(w_path, false);
                 if (out_file_sf==null) {
-                    checkSafFileError(w_path);
                     return false;
                 }
 				OutputStream os=mContext.getContentResolver().openOutputStream(out_file_sf.getUri());
@@ -3743,15 +3737,5 @@ public class ZipFileManager {
 
 	};
 
-    public SafFile createSafFile(String fp, boolean directory) {
-        SafFile sf=mGp.safMgr.createSdcardItem(fp, directory);
-        return sf;
-    }
-
-    public void checkSafFileError(String fp) {
-        String e_msg=mGp.safMgr.getMessages();
-        mUtil.addLogMsg("E","SafFile create error:fp="+fp+"\n"+e_msg);
-        mCommonDlg.showCommonDialog(false,"E","SafFile creation :fp="+fp,e_msg,null);
-    }
 
 }

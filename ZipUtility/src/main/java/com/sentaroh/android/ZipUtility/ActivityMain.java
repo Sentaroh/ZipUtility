@@ -242,14 +242,14 @@ public class ActivityMain extends AppCompatActivity {
 		mActionBar.setDisplayShowHomeEnabled(false);
 		mActionBar.setHomeButtonEnabled(false);
 
-        mUtil=new CommonUtilities(mContext, "ZipActivity", mGp);
+        mCommonDlg=new CommonDialog(mActivity, mFragmentManager);
+
+        mUtil=new CommonUtilities(mContext, "ZipActivity", mGp, mCommonDlg);
         
         mUtil.addDebugMsg(1, "I", "onCreate entered");
 
         putSystemInfo();
 
-        mCommonDlg=new CommonDialog(mActivity, mFragmentManager);
-        
         if (mGp.settingFixDeviceOrientationToPortrait) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 

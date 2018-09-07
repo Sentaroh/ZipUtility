@@ -23,12 +23,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import static com.sentaroh.android.ZipUtility.Constants.*;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
@@ -36,15 +30,12 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.database.Cursor;
 import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
-import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.LinearLayout;
@@ -52,10 +43,17 @@ import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.sentaroh.android.Utilities.NotifyEvent;
-import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+import com.sentaroh.android.Utilities.NotifyEvent;
+import com.sentaroh.android.Utilities.SafFile;
+import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.ZipUtility.Log.LogUtil;
+
+import java.io.File;
+import java.util.ArrayList;
+
+import static com.sentaroh.android.ZipUtility.Constants.DEFAULT_PREFS_FILENAME;
+import static com.sentaroh.android.ZipUtility.Constants.WORK_DIRECTORY;
 
 public final class CommonUtilities {
 	private Context mContext=null;
@@ -66,12 +64,15 @@ public final class CommonUtilities {
    	
    	@SuppressWarnings("unused")
 	private String mLogIdent="";
-   	
-	public CommonUtilities(Context c, String li, GlobalParameters gp) {
+
+    private CommonDialog mCommonDlg=null;
+
+	public CommonUtilities(Context c, String li, GlobalParameters gp, CommonDialog cd) {
 		mContext=c;// ContextはApplicationContext
 		mLog=new LogUtil(c, li, gp);
 		mLogIdent=li;
         mGp=gp;
+        mCommonDlg=cd;
 	}
 
 	final public SharedPreferences getPrefMgr() {
@@ -85,32 +86,42 @@ public final class CommonUtilities {
 		deleteLocalFile(w_lf);
 	};
 
-	static public int deleteMediaStoreFile(Context c, String fp) {
-		Uri uri=MediaStore.Files.getContentUri("external");
-		int dc=c.getContentResolver().delete(
-			    uri,
-			    MediaStore.Files.FileColumns.DATA + "=?",
-			    new String[]{ fp }
-		);
-		return dc;
-	};
+    public SafFile createSafFile(String fp, boolean directory) {
+        SafFile sf=mGp.safMgr.createSdcardItem(fp, directory);
+        if (sf==null) {
+            String e_msg=mGp.safMgr.getMessages();
+            mLog.addLogMsg("E","SafFile create error:fp="+fp+"\n"+e_msg);
+            mCommonDlg.showCommonDialog(false,"E","SafFile creation :fp="+fp,e_msg,null);
+        }
+        return sf;
+    }
 
-	static public int queryMediaStoreFile(Context c, String fp) {
-		Uri uri=MediaStore.Files.getContentUri("external");
-		Cursor dc=c.getContentResolver().query(uri,
-			    null,
-			    MediaStore.Files.FileColumns.DATA + "=?",
-			    new String[]{ fp },
-			    null
-		);
-		int cnt=0;
-		if (dc!=null) {
-			cnt=dc.getCount();
-			dc.close();
-		}
-//		Log.v("","cnt="+cnt+", dc="+dc);
-		return cnt;
-	};
+//    static public int deleteMediaStoreFile(Context c, String fp) {
+//		Uri uri=MediaStore.Files.getContentUri("external");
+//		int dc=c.getContentResolver().delete(
+//			    uri,
+//			    MediaStore.Files.FileColumns.DATA + "=?",
+//			    new String[]{ fp }
+//		);
+//		return dc;
+//	};
+//
+//	static public int queryMediaStoreFile(Context c, String fp) {
+//		Uri uri=MediaStore.Files.getContentUri("external");
+//		Cursor dc=c.getContentResolver().query(uri,
+//			    null,
+//			    MediaStore.Files.FileColumns.DATA + "=?",
+//			    new String[]{ fp },
+//			    null
+//		);
+//		int cnt=0;
+//		if (dc!=null) {
+//			cnt=dc.getCount();
+//			dc.close();
+//		}
+////		Log.v("","cnt="+cnt+", dc="+dc);
+//		return cnt;
+//	};
 
 	static public void scanMediaFile(GlobalParameters gp, CommonUtilities util, String fp) {
 		MediaScannerConnection.scanFile(gp.appContext, new String[]{fp}, null, null);

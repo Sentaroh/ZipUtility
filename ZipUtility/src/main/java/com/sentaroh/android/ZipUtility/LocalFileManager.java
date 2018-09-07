@@ -106,7 +106,7 @@ public class LocalFileManager {
 
         mFragmentManager = fm;
         mMainFilePath = mGp.internalRootDirectory;
-        mUtil = new CommonUtilities(mContext, "LocalFolder", gp);
+        mUtil = new CommonUtilities(mContext, "LocalFolder", gp, mCommonDlg);
 
         mMainView = mv;
         initViewWidget();
@@ -963,11 +963,8 @@ public class LocalFileManager {
                         boolean rc_create = false;
                         if (create_type.isChecked()) {
                             if (t_dir.startsWith(mGp.safMgr.getSdcardRootPath())) {
-                                SafFile sf = createSafFile(n_path, false);
-                                if (sf==null) {
-                                    checkSafFileError(n_path);
-                                    return;
-                                }
+                                SafFile sf = mUtil.createSafFile(n_path, false);
+                                if (sf==null) return;
                                 rc_create = sf.exists();
                             } else {
                                 try {
@@ -978,11 +975,8 @@ public class LocalFileManager {
                             }
                         } else {
                             if (t_dir.startsWith(mGp.safMgr.getSdcardRootPath())) {
-                                SafFile sf = createSafFile(n_path, true);
-                                if (sf==null) {
-                                    checkSafFileError(n_path);
-                                    return;
-                                }
+                                SafFile sf = mUtil.createSafFile(n_path, true);
+                                if (sf==null) return;
                                 rc_create = sf.exists();
                             } else {
                                 rc_create = lf.mkdirs();
@@ -1111,12 +1105,10 @@ public class LocalFileManager {
                                 if (!tfli.isDirectory()) {
                                     if (current_name.startsWith(mGp.safMgr.getSdcardRootPath())) {
                                         try {
-                                            SafFile sf = createSafFile(current_name, false);
+                                            SafFile sf = mUtil.createSafFile(current_name, false);
                                             if (sf!=null) {
                                                 sf.renameTo(etDir.getText().toString());
                                                 rc_create = sf.exists();
-                                            } else {
-                                                checkSafFileError(current_name);
                                             }
                                         } catch (Exception e) {
                                             mUtil.addLogMsg("E", "Saf file error");
@@ -1129,7 +1121,7 @@ public class LocalFileManager {
                                         rc_create = c_file.renameTo(n_file);
                                     }
                                     if (rc_create) {
-                                        CommonUtilities.deleteMediaStoreFile(mContext, current_name);
+                                        CommonUtilities.scanMediaFile(mGp, mUtil, current_name);
                                         CommonUtilities.scanMediaFile(mGp, mUtil, new_name);
                                         putProgressMessage("Media file scanned :" + new_name);
                                     }
@@ -1138,12 +1130,11 @@ public class LocalFileManager {
                                     CommonUtilities.getAllFileInDirectory(mGp, mUtil, fl, new File(current_name), true);
                                     if (current_name.startsWith(mGp.safMgr.getSdcardRootPath())) {
                                         try {
-                                            SafFile sf = createSafFile(current_name, true);
+                                            SafFile sf = mUtil.createSafFile(current_name, true);
                                             if (sf!=null) {
                                                 sf.renameTo(etDir.getText().toString());
                                                 rc_create = sf.exists();
                                             } else {
-                                                checkSafFileError(current_name);
                                                 return;
                                             }
                                         } catch (Exception e) {
@@ -1158,8 +1149,8 @@ public class LocalFileManager {
                                     }
                                     if (rc_create) {
                                         for (File item : fl) {
-                                            CommonUtilities.deleteMediaStoreFile(mContext, item.getAbsolutePath());
-                                            putProgressMessage("Media store removed : " + item.getAbsolutePath());
+                                            CommonUtilities.scanMediaFile(mGp, mUtil, item.getPath());
+                                            putProgressMessage("Media store removed : " + item.getPath());
                                         }
                                         fl.clear();
                                         CommonUtilities.getAllFileInDirectory(mGp, mUtil, fl, new File(new_name), true);
@@ -1554,17 +1545,15 @@ public class LocalFileManager {
                 from_file.delete();
                 result = true;
             }
-            SafFile out_sf = createSafFile(to_path, true);
+            SafFile out_sf = mUtil.createSafFile(to_path, true);
             if (out_sf==null) {
-                checkSafFileError(to_path);
                 return false;
             }
         } else {
             try {
                 if (confirmReplace(tc, to_path)) {
-                    SafFile out_sf = createSafFile(to_path, false);
+                    SafFile out_sf = mUtil.createSafFile(to_path, false);
                     if (out_sf==null) {
-                        checkSafFileError(to_path);
                         return false;
                     }
 
@@ -1652,18 +1641,16 @@ public class LocalFileManager {
                     result = true;
                 }
                 if (result) {
-                    SafFile out_sf = createSafFile(from_file.getPath(), true);
+                    SafFile out_sf = mUtil.createSafFile(from_file.getPath(), true);
                     if (out_sf==null) {
-                        checkSafFileError(from_file.getPath());
                         return false;
                     }
 
                     out_sf.delete();
                 }
             } else {
-                SafFile in_sf = createSafFile(from_file.getPath(), true);
+                SafFile in_sf = mUtil.createSafFile(from_file.getPath(), true);
                 if (in_sf==null) {
-                    checkSafFileError(from_file.getPath());
                     return false;
                 }
                 in_sf.delete();
@@ -1714,9 +1701,8 @@ public class LocalFileManager {
                         fos.flush();
                         fos.close();
                         fis.close();
-                        SafFile del_sf = createSafFile(from_file.getPath(), false);
+                        SafFile del_sf = mUtil.createSafFile(from_file.getPath(), false);
                         if (del_sf==null) {
-                            checkSafFileError(from_file.getPath());
                             return false;
                         }
                         del_sf.delete();
@@ -1771,33 +1757,29 @@ public class LocalFileManager {
                     result = true;
                 }
                 if (result) {
-                    SafFile out_sf = createSafFile(from_file.getPath(), true);
+                    SafFile out_sf = mUtil.createSafFile(from_file.getPath(), true);
                     if (out_sf==null) {
-                        checkSafFileError(from_file.getPath());
                         return false;
                     }
                     out_sf.delete();
                 }
             } else {
-                SafFile out_sf = createSafFile(from_file.getPath(), true);
+                SafFile out_sf = mUtil.createSafFile(from_file.getPath(), true);
                 if (out_sf==null) {
-                    checkSafFileError(from_file.getPath());
                     return false;
                 }
                 out_sf.delete();
                 result = true;
             }
-            SafFile out_sf = createSafFile(to_path, true);
+            SafFile out_sf = mUtil.createSafFile(to_path, true);
             if (out_sf==null) {
-                checkSafFileError(to_path);
                 return false;
             }
         } else {
             try {
                 if (confirmReplace(tc, to_path)) {
-                    SafFile out_sf = createSafFile(to_path, false);
+                    SafFile out_sf = mUtil.createSafFile(to_path, false);
                     if (out_sf==null) {
-                        checkSafFileError(to_path);
                         return false;
                     }
                     OutputStream fos = mContext.getContentResolver().openOutputStream(out_sf.getUri());
@@ -1833,9 +1815,8 @@ public class LocalFileManager {
                         fos.flush();
                         fos.close();
                         fis.close();
-                        SafFile in_sf = createSafFile(from_file.getPath(), false);
+                        SafFile in_sf = mUtil.createSafFile(from_file.getPath(), false);
                         if (in_sf==null) {
-                            checkSafFileError(from_file.getPath());
                             return false;
                         }
                         in_sf.delete();
@@ -2038,9 +2019,8 @@ public class LocalFileManager {
                 if (fh_item.isDirectory()) {
                     if (dest_path.startsWith(mGp.externalRootDirectory)) {
                         String fp=dest_path + "/" + fh_item.getFileName().replace(mGp.copyCutCurrentDirectory, "");
-                        SafFile sf = createSafFile(fp, true);
+                        SafFile sf = mUtil.createSafFile(fp, true);
                         if (sf==null) {
-                            checkSafFileError(fp);
                             return false;
                         }
                         sf.exists();
@@ -2602,12 +2582,12 @@ public class LocalFileManager {
             } else {
                 result = true;
             }
-            SafFile out_sf = createSafFile(to_path, true);
+            SafFile out_sf = mUtil.createSafFile(to_path, true);
             if (out_sf==null) return false;
         } else {
             try {
                 if (confirmReplace(tc, to_path)) {
-                    SafFile out_sf = createSafFile(to_path, false);
+                    SafFile out_sf = mUtil.createSafFile(to_path, false);
                     if (out_sf==null) return false;
                     OutputStream fos = mContext.getContentResolver().openOutputStream(out_sf.getUri());
 //					BufferedOutputStream bos=new BufferedOutputStream(fos, 1024*1024*8);
@@ -2667,9 +2647,8 @@ public class LocalFileManager {
                         if (item.isDirectory()) deleteLocalItem(tc, item.getPath());
                         else {
                             if (item.getPath().startsWith(mGp.externalRootDirectory)) {
-                                SafFile del_sf = createSafFile(item.getPath(), true);
+                                SafFile del_sf = mUtil.createSafFile(item.getPath(), true);
                                 if (del_sf==null) {
-                                    checkSafFileError(item.getPath());
                                     return false;
                                 }
                                 result = del_sf.delete();
@@ -2683,7 +2662,7 @@ public class LocalFileManager {
                                 mUtil.addLogMsg("I",
                                         String.format(mContext.getString(R.string.msgs_zip_delete_file_was_deleted),
                                                 item.getPath()));
-                                CommonUtilities.deleteMediaStoreFile(mContext, item.getAbsolutePath());
+                                CommonUtilities.scanMediaFile(mGp, mUtil, item.getPath());
                             }
                         }
                         if (!result) break;
@@ -2691,9 +2670,8 @@ public class LocalFileManager {
                 }
                 if (result) {
                     if (fp.startsWith(mGp.externalRootDirectory)) {
-                        SafFile del_sf = createSafFile(fp, true);
+                        SafFile del_sf = mUtil.createSafFile(fp, true);
                         if (del_sf==null) {
-                            checkSafFileError(fp);
                             return false;
                         }
                         result = del_sf.delete();
@@ -2701,19 +2679,14 @@ public class LocalFileManager {
                         result = lf.delete();
                     }
                     if (result) {
-                        putProgressMessage(
-                                String.format(mContext.getString(R.string.msgs_zip_delete_file_was_deleted),
-                                        lf.getPath()));
-                        mUtil.addLogMsg("I",
-                                String.format(mContext.getString(R.string.msgs_zip_delete_file_was_deleted),
-                                        lf.getPath()));
+                        putProgressMessage(String.format(mContext.getString(R.string.msgs_zip_delete_file_was_deleted), lf.getPath()));
+                        mUtil.addLogMsg("I", String.format(mContext.getString(R.string.msgs_zip_delete_file_was_deleted), lf.getPath()));
                     }
                 }
             } else {
                 if (fp.startsWith(mGp.externalRootDirectory)) {
-                    SafFile del_sf = createSafFile(fp, false);
+                    SafFile del_sf = mUtil.createSafFile(fp, false);
                     if (del_sf==null) {
-                        checkSafFileError(fp);
                         return false;
                     }
                     result = del_sf.delete();
@@ -2721,13 +2694,9 @@ public class LocalFileManager {
                     result = lf.delete();
                 }
                 if (result) {
-                    putProgressMessage(
-                            String.format(mContext.getString(R.string.msgs_zip_delete_file_was_deleted),
-                                    lf.getPath()));
-                    mUtil.addLogMsg("I",
-                            String.format(mContext.getString(R.string.msgs_zip_delete_file_was_deleted),
-                                    lf.getPath()));
-                    CommonUtilities.deleteMediaStoreFile(mContext, lf.getAbsolutePath());
+                    putProgressMessage(String.format(mContext.getString(R.string.msgs_zip_delete_file_was_deleted), lf.getPath()));
+                    mUtil.addLogMsg("I", String.format(mContext.getString(R.string.msgs_zip_delete_file_was_deleted), lf.getPath()));
+                    CommonUtilities.scanMediaFile(mGp, mUtil, lf.getPath());
                 }
 
             }
@@ -3686,14 +3655,12 @@ public class LocalFileManager {
 		putProgressMessage(msg);
 
 		boolean result=false;
-		SafFile out_sf=mGp.safMgr.createSdcardItem(sdcard_path, false);
+		SafFile out_sf=mUtil.createSafFile(sdcard_path, false);
 		if (out_sf==null) {
-		    checkSafFileError(sdcard_path);
             return false;
         }
-		SafFile temp_sf=mGp.safMgr.createSdcardItem(sdcard_path+".tmp", false);
+		SafFile temp_sf=mUtil.createSafFile(sdcard_path+".tmp", false);
         if (temp_sf==null) {
-            checkSafFileError(sdcard_path);
             return false;
         }
 		File from=new File(app_path);
@@ -3808,10 +3775,9 @@ public class LocalFileManager {
 									
 								});
 								if (out_fl.getPath().startsWith(mGp.externalRootDirectory)) {
-									SafFile out_sf=mGp.safMgr.createSdcardItem(out_fl.getPath(), true);
+									SafFile out_sf=mUtil.createSafFile(out_fl.getPath(), true);
 									if (out_sf!=null) out_sf.delete();
 									else {
-                                        checkSafFileError(out_fl.getPath());
 									    return;
                                     }
 								} else {
@@ -4109,15 +4075,5 @@ public class LocalFileManager {
         return dir_size;
     };
 
-    public SafFile createSafFile(String fp, boolean directory) {
-        SafFile sf=mGp.safMgr.createSdcardItem(fp, directory);
-        return sf;
-    }
-
-    public void checkSafFileError(String fp) {
-        String e_msg=mGp.safMgr.getMessages();
-        mUtil.addLogMsg("E","SafFile create error:fp="+fp+"\n"+e_msg);
-        mCommonDlg.showCommonDialog(false,"E","SafFile creation :fp="+fp,e_msg,null);
-    }
 
 }

@@ -73,9 +73,12 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:fadeScrollbars="false"
+            android:fadeScrollbars="true"
             android:fastScrollAlwaysVisible="false"
             android:fastScrollEnabled="false" />
+        <!--android:padding="16dp"-->
+        <!--android:clipToPadding="false"-->
+        <!--android:scrollbarStyle="outsideOverlay"-->
 
    		<include layout="@layout/context_view_local"/>
 

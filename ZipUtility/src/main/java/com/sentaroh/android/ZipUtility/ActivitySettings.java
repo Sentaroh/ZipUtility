@@ -23,22 +23,18 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 */
 
-import static com.sentaroh.android.ZipUtility.Constants.*;
-
-import java.util.List;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.text.InputType;
 
 import com.sentaroh.android.Utilities.LocalMountPoint;
+
+import java.util.List;
 
 @SuppressWarnings("unused")
 public class ActivitySettings extends PreferenceActivity{
@@ -65,7 +61,7 @@ public class ActivitySettings extends PreferenceActivity{
 		setTheme(mGp.applicationTheme);
 		super.onCreate(savedInstanceState);
 		mPrefActivity=this;
-		if (mUtil==null) mUtil=new CommonUtilities(this, "SettingsActivity", mGp);
+		if (mUtil==null) mUtil=new CommonUtilities(this, "SettingsActivity", mGp, null);
 		if (mGp.settingDebugLevel>0) mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
 		if (mGp.settingFixDeviceOrientationToPortrait) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
@@ -95,7 +91,7 @@ public class ActivitySettings extends PreferenceActivity{
 		mContext=this;
 		mGp=GlobalWorkArea.getGlobalParameters(mContext);
 //    	mPrefActivity=this;
-		mUtil=new CommonUtilities(this, "SettingsActivity", mGp);
+		mUtil=new CommonUtilities(this, "SettingsActivity", mGp, null);
 		if (mGp.settingDebugLevel>0) mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
 		return true;
 	};
@@ -221,7 +217,7 @@ public class ActivitySettings extends PreferenceActivity{
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			mPrefFrag=this;
-			mUtil=new CommonUtilities(mContext, "SettingsLog", mGp);
+			mUtil=new CommonUtilities(mContext, "SettingsLog", mGp, null);
 			if (mGp.settingDebugLevel>0) mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
 
 			addPreferencesFromResource(R.xml.settings_frag_log);
@@ -269,7 +265,7 @@ public class ActivitySettings extends PreferenceActivity{
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			mPrefFrag=this;
-			mUtil=new CommonUtilities(mContext, "SettingsMisc", mGp);
+			mUtil=new CommonUtilities(mContext, "SettingsMisc", mGp, null);
 			if (mGp.settingDebugLevel>0) mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
 
 			addPreferencesFromResource(R.xml.settings_frag_misc);
@@ -310,7 +306,7 @@ public class ActivitySettings extends PreferenceActivity{
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			mPrefFrag=this;
-			mUtil=new CommonUtilities(mContext, "SettingsCompress", mGp);
+			mUtil=new CommonUtilities(mContext, "SettingsCompress", mGp, null);
 			if (mGp.settingDebugLevel>0) mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
 
 			addPreferencesFromResource(R.xml.settings_frag_compress);
@@ -351,7 +347,7 @@ public class ActivitySettings extends PreferenceActivity{
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			mPrefFrag=this;
-			mUtil=new CommonUtilities(mContext, "SettingsUi", mGp);
+			mUtil=new CommonUtilities(mContext, "SettingsUi", mGp, null);
 			if (mGp.settingDebugLevel>0) mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
 
 			addPreferencesFromResource(R.xml.settings_frag_ui);

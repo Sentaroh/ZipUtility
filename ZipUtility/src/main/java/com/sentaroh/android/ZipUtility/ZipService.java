@@ -1,9 +1,5 @@
 package com.sentaroh.android.ZipUtility;
 
-import static com.sentaroh.android.ZipUtility.Constants.*;
-
-import com.sentaroh.android.ZipUtility.Log.LogUtil;
-
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -21,8 +17,12 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.RemoteException;
 import android.os.PowerManager.WakeLock;
+import android.os.RemoteException;
+
+import com.sentaroh.android.ZipUtility.Log.LogUtil;
+
+import static com.sentaroh.android.ZipUtility.Constants.SERVICE_HEART_BEAT;
 
 @SuppressLint("Wakelock")
 public class ZipService extends Service {
@@ -41,7 +41,7 @@ public class ZipService extends Service {
 		super.onCreate();
         mContext=getApplicationContext();
 		mGp=GlobalWorkArea.getGlobalParameters(mContext);
-		mUtil=new CommonUtilities(getApplicationContext(), "Service", mGp);
+		mUtil=new CommonUtilities(getApplicationContext(), "Service", mGp, null);
 		
 		mUtil.addDebugMsg(1,"I","onCreate entered");
 		
