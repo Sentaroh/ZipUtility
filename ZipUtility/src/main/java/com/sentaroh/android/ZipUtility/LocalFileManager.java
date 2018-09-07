@@ -560,39 +560,44 @@ public class LocalFileManager {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.setAction(Intent.ACTION_SEND_MULTIPLE);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.setType("image/*"); /* This example is sharing jpeg images. */
+//                intent.setType("image/*"); /* This example is sharing jpeg images. */
 
                 ArrayList<Uri> files = new ArrayList<Uri>();
 
                 for (String path : fpl) {
                     File file = new File(path);
                     Uri uri = null;
-                    if (Build.VERSION.SDK_INT >= 24)
-                        uri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(path));
+                    if (Build.VERSION.SDK_INT >= 24) uri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(path));
                     else Uri.fromFile(file);
+//                    Uri.fromFile(file);
                     files.add(uri);
                 }
                 intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
+
+                intent.setType("*/*");
+
                 try {
                     mContext.startActivity(intent);
                 } catch (Exception e) {
                     mCommonDlg.showCommonDialog(false, "E", "startActivity() failed at shareItem() for multiple item. message=" + e.getMessage(), "", null);
                 }
             } else if (fpl.size() == 1) {
-                Intent intent = new Intent(android.content.Intent.ACTION_SEND);
                 File lf = new File(fpl.get(0));
+                String mt=getMimeTypeFromFileExtention(lf.getName());
+                Intent intent = new Intent(android.content.Intent.ACTION_SEND);
                 Uri uri = null;
-                if (Build.VERSION.SDK_INT >= 26)
-                    uri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", lf);
-                else uri = Uri.parse("file://" + fpl.get(0));
+//                if (Build.VERSION.SDK_INT >= 26) uri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", lf);
+//                else uri = Uri.parse("file://" + fpl.get(0));
+                uri = Uri.parse("file://" + fpl.get(0));
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(Intent.EXTRA_STREAM, uri);
-                intent.setType("image/*");
+                if (mt!=null) intent.setType(mt);
+                else intent.setType("*/*");
                 try {
                     mContext.startActivity(intent);
                 } catch (Exception e) {
-                    mCommonDlg.showCommonDialog(false, "E", "startActivity() failed at shareItem() for songle item. message=" + e.getMessage(), "", null);
+                    mCommonDlg.showCommonDialog(false, "E", "startActivity() failed at shareItem() for share item. message=" + e.getMessage(), "", null);
                 }
             } else {
                 mCommonDlg.showCommonDialog(false, "E",
@@ -601,7 +606,15 @@ public class LocalFileManager {
         }
     }
 
-    ;
+    private String getMimeTypeFromFileExtention(String fn) {
+        String fid="", mt=null;
+        if (fn.lastIndexOf(".") > 0) {
+            fid = fn.substring(fn.lastIndexOf(".") + 1, fn.length());
+            fid=fid.toLowerCase();
+        }
+        mt= MimeTypeMap.getSingleton().getMimeTypeFromExtension(fid);
+        return mt;
+    }
 
     private String mFindKey = "*";
     private AdapterSearchFileList mAdapterSearchFileList = null;
