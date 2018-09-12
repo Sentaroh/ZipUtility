@@ -254,14 +254,16 @@ public class ActivityMain extends AppCompatActivity {
         else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 
         initViewWidget();
-        
-    	mGp.copyCutList=new ArrayList<TreeFilelistItem>();
+
+        mGp.copyCutList=new ArrayList<TreeFilelistItem>();
     	mGp.copyCutModeIsCut=false;
 
         mLocalFileMgr=new LocalFileManager(mGp, this, mFragmentManager, mLocalView);
         mLocalFileMgr.showLocalFileView(false);
-//        mTarFileMgr=new TarFileManager(mGp, mActivity, mFragmentManager, mZipView, "");
         mZipFileMgr=new ZipFileManager(mGp, mActivity, mFragmentManager, mZipView);
+
+        Intent intmsg = new Intent(mContext, ZipService.class);
+        startService(intmsg);
 
         checkRequiredPermissions();
 	};
@@ -309,23 +311,21 @@ public class ActivityMain extends AppCompatActivity {
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
-//			        String fp ="";
-					if (mRestartStatus==0) {
-				    	Intent in=getIntent();
-						if (in!=null && in.getData()!=null) showZipFileByIntent(in);
-						else mLocalFileMgr.showLocalFileView(true);
-					} else if (mRestartStatus==2) {
-						if (mGp.activityIsDestroyed) {
-							mCommonDlg.showCommonDialog(false, "W",  
-							getString(R.string.msgs_main_restart_by_destroyed),"",null);
-						} else {
-							mCommonDlg.showCommonDialog(false, "W",  
-							getString(R.string.msgs_main_restart_by_killed),"",null);
-						}
-					}
-					mRestartStatus=1;
-					mGp.activityIsDestroyed=false;
-
+//					if (mRestartStatus==0) {
+//				    	Intent in=getIntent();
+//						if (in!=null && in.getData()!=null) showZipFileByIntent(in);
+//						else mLocalFileMgr.showLocalFileView(true);
+//					} else if (mRestartStatus==2) {
+//						if (mGp.activityIsDestroyed) {
+//							mCommonDlg.showCommonDialog(false, "W",
+//							getString(R.string.msgs_main_restart_by_destroyed),"",null);
+//						} else {
+//							mCommonDlg.showCommonDialog(false, "W",
+//							getString(R.string.msgs_main_restart_by_killed),"",null);
+//						}
+//					}
+//					mRestartStatus=1;
+//					mGp.activityIsDestroyed=false;
 				}
 				@Override
 				public void negativeResponse(Context c, Object[] o) {
@@ -333,7 +333,22 @@ public class ActivityMain extends AppCompatActivity {
 				
 			});
 			openService(ntfy);
-		}
+
+            if (mRestartStatus==0) {
+                Intent in=getIntent();
+                if (in!=null && in.getData()!=null) showZipFileByIntent(in);
+                else mLocalFileMgr.showLocalFileView(true);
+            } else if (mRestartStatus==2) {
+                if (mGp.activityIsDestroyed) {
+                    mCommonDlg.showCommonDialog(false, "W", getString(R.string.msgs_main_restart_by_destroyed),"",null);
+                } else {
+                    mCommonDlg.showCommonDialog(false, "W", getString(R.string.msgs_main_restart_by_killed),"",null);
+                }
+            }
+            mRestartStatus=1;
+            mGp.activityIsDestroyed=false;
+
+        }
 	};
 	
 	@Override
@@ -579,10 +594,18 @@ public class ActivityMain extends AppCompatActivity {
 		}
 	};
 
-	private void showZipFile(final String fp) {
+	public void showZipFile(final String fp) {
 		if (!isUiEnabled()) return;
 		mZipFileMgr.showZipFile(fp);
+		mMainViewPager.setUseFastScroll(true);
 		mMainTabHost.setCurrentTabByTag(mContext.getString(R.string.msgs_main_tab_name_zip));
+		Handler hndl=new Handler();
+		hndl.post(new Runnable() {
+            @Override
+            public void run() {
+                mMainViewPager.setUseFastScroll(false);
+            }
+        });
 //		Handler hndl=new Handler();
 //		hndl.postDelayed(new Runnable(){
 //			@Override
