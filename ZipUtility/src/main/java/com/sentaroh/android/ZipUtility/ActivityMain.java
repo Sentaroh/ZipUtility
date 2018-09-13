@@ -29,6 +29,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,6 +40,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -47,6 +50,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -68,7 +72,6 @@ import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
-import com.sentaroh.android.Utilities.ContentProviderUtil;
 import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
@@ -80,6 +83,8 @@ import com.sentaroh.android.Utilities.Widget.CustomViewPager;
 import com.sentaroh.android.Utilities.Widget.CustomViewPagerAdapter;
 import com.sentaroh.android.ZipUtility.Log.LogFileListDialogFragment;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -110,6 +115,8 @@ public class ActivityMain extends AppCompatActivity {
 
 	private LocalFileManager mLocalFileMgr=null;
 	private ZipFileManager mZipFileMgr=null;
+
+	private Handler mUiHandler=null;
 
 	@Override
 	public void onConfigurationChanged(final Configuration newConfig) {
@@ -154,54 +161,60 @@ public class ActivityMain extends AppCompatActivity {
 		if (in!=null && in.getData()!=null) showZipFileByIntent(in);
 	};
 
-	private void showZipFileByIntent(Intent intent) {
+	private void showZipFileByIntent(final Intent intent) {
 		if (intent!=null && intent.getData()!=null) {
 			mUtil.addDebugMsg(1,"I","showZipFileByIntent entered, "+"Uri="+intent.getData()+", type="+intent.getType());
-			String cd=getCacheDir()+"/Attached/zip/";
+			final String cd=getCacheDir()+"/Attached/zip/";
 
-//            String id=intent.getData().getPath().substring(intent.getData().getPath().toString().length()-3);
-//            Log.v("","id="+id);
-//            String sel = MediaStore.Images.Media._ID + "=?";
-//            File tlf=null;
-//            Cursor cursor = getContentResolver().query(intent.getData(),
-//                    column, sel, new String[]{ id }, null);
-//            int columnIndex = cursor.getColumnIndex(column[1]);
-//            if (cursor.moveToFirst()) {
-//                String path = cursor.getString(columnIndex);
-//                tlf=new File(path);
-//                Log.v("","name="+path);
-//            }
-//            cursor.close();
-//          change commit comment
             String file_path=null;
             try {
-                file_path=ContentProviderUtil.getFilePath(mContext, cd, intent.getData());
-//                file_path=null;
-//                String npe=null;
-//                npe.length();
+                file_path=getFilePath(mContext, cd, intent.getData());
             } catch(Exception e) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
                 pw.flush();
                 pw.close();
-                mCommonDlg.showCommonDialog(false,"E","Error occured at getFilePath()",
-                        "Uri="+intent.getData()+"\n"+sw.toString(),null);
-                mUtil.addLogMsg("E","Error occured at getFilePath()"+
-                        "\n"+"Uri="+intent.getData()+"\n"+sw.toString());
-//                return;
+                mCommonDlg.showCommonDialog(false,"E","Error occured at getFilePath()", "Uri="+intent.getData()+"\n"+sw.toString(),null);
+                mUtil.addLogMsg("E","Error occured at getFilePath()"+ "\n"+"Uri="+intent.getData()+"\n"+sw.toString());
             }
             if (file_path!=null){// && file_path.endsWith(".zip")) {
-                mLocalFileMgr.showLocalFileView(false);
-                Handler hndl=new Handler();
-                showZipFile(file_path);
-                hndl.post(new Runnable(){
-                    @Override
-                    public void run() {
-                        mLocalFileMgr.showLocalFileView(true);
-                    }
-                });
-                refreshOptionMenu();
+                if (file_path.startsWith("content://")) {
+                    final Dialog pd=CommonDialog.showProgressSpinIndicator(mActivity);
+                    pd.show();
+                    Thread th=new Thread() {
+                        public void run() {
+                            final String[] column={MediaStore.MediaColumns._ID,  MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME};
+                            Cursor cursor = mContext.getContentResolver().query(intent.getData(), column, null, null, null);
+                            if (cursor!=null) {
+                                if (cursor.moveToFirst()) {
+                                    String t_file_name = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME));
+                                    clearCacheFile(cd);
+                                    String file_name=t_file_name==null?"attachedFile":t_file_name;
+                                    final File tlf=new File(cd+file_name);
+                                    try {
+                                        InputStream is=mContext.getContentResolver().openInputStream(intent.getData());
+                                        copyFileFromUri(is, tlf);
+                                        mUiHandler.post(new Runnable(){
+                                            @Override
+                                            public void run() {
+                                                invokeZipFileManager(tlf.getPath());
+                                            }
+                                        });
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                cursor.close();
+                            }
+                            pd.dismiss();
+                        }
+                    };
+                    th.start();
+                } else {
+                    invokeZipFileManager(file_path);
+                }
             } else {
                 Handler hndl=new Handler();
                 hndl.post(new Runnable(){
@@ -214,9 +227,120 @@ public class ActivityMain extends AppCompatActivity {
             }
 
         }
-	};
+	}
 
-	private void initViewWidget() {
+	private void invokeZipFileManager(String file_path) {
+        mLocalFileMgr.showLocalFileView(false);
+        Handler hndl=new Handler();
+        showZipFile(file_path);
+        hndl.post(new Runnable(){
+            @Override
+            public void run() {
+                mLocalFileMgr.showLocalFileView(true);
+            }
+        });
+        refreshOptionMenu();
+    }
+
+	private void copyFileFromUri(InputStream is, File tlf) throws IOException {
+        FileOutputStream fos=new FileOutputStream(tlf);
+        byte[] buff=new byte[1024*1024*4];
+        int rc=is.read(buff);
+        while(rc>0) {
+            fos.write(buff, 0, rc);
+            rc=is.read(buff);
+        }
+        fos.flush();
+        fos.close();
+        is.close();
+    }
+
+    private static String getIdFromUri(Uri uri) {
+        String f_path=uri.getPath();
+        String f_name=f_path.substring(f_path.lastIndexOf("/")+1);
+        String id="";
+        if (f_name.lastIndexOf(":")>=0) {
+            id=f_name.substring(0,f_name.indexOf(":")-1);
+        } else {
+            id=f_name;
+        }
+        return id;
+    }
+    private static void clearCacheFile(String cd) {
+        File df=new File(cd);
+        File[] cf_list=df.listFiles();
+        if (cf_list!=null && cf_list.length>0) {
+            for(File ch_file:cf_list) {
+                ch_file.delete();
+            }
+        }
+        File dlf=new File(cd);
+        dlf.mkdirs();
+    };
+
+    public static String getFilePath(Context c, String cache_dir, Uri content_uri) {
+        if (content_uri==null) return null;
+        final String[] column={MediaStore.MediaColumns._ID,  MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME};
+        String cd=cache_dir;
+        File tlf=null;
+        if (ContentResolver.SCHEME_FILE.equals(content_uri.getScheme())) {
+            //File
+            tlf=new File(content_uri.getPath());
+        } else if (content_uri.toString().startsWith("content://media/external/")) {
+            //External
+            ContentResolver resolver = c.getContentResolver();
+            Cursor cursor = resolver.query(content_uri, column, null, null, null);
+            if (cursor.moveToFirst()) {
+                String path=cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA));
+                tlf=new File(path);
+            }
+            cursor.close();
+        } else if (content_uri.toString().startsWith("content://com.android.providers.downloads.documents")) {
+            //Download
+            final String id = getIdFromUri(content_uri);
+
+            long uri_id=-1;
+            try {
+                uri_id=Long.valueOf(id);
+            } catch(Exception e) {}
+            if (uri_id==-1) return null;
+            final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), uri_id);
+
+            String sel = MediaStore.Images.Media._ID + "=?";
+            Cursor cursor = c.getContentResolver().query(contentUri, column, sel, new String[]{ id }, null);
+            int columnIndex = cursor.getColumnIndex(column[1]);
+            if (cursor.moveToFirst()) {
+                String path = cursor.getString(columnIndex);
+                tlf=new File(path);
+            }
+            cursor.close();
+        } else if (content_uri.toString().startsWith("content://downloads/all_downloads")) {
+            //Download
+            final String id = getIdFromUri(content_uri);
+            long uri_id=-1;
+            try {
+                uri_id=Long.valueOf(id);
+            } catch(Exception e) {}
+            if (uri_id==-1) return null;
+
+            final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/all_downloads"), Long.valueOf(id));
+
+            String sel = MediaStore.Images.Media._ID + "=?";
+            Cursor cursor = c.getContentResolver().query(contentUri, column, sel, new String[]{ id }, null);
+            int columnIndex = cursor.getColumnIndex(column[1]);
+            if (cursor.moveToFirst()) {
+                String path = cursor.getString(columnIndex);
+                tlf=new File(path);
+            }
+            cursor.close();
+        } else if (content_uri.toString().startsWith("content://")) {
+            return content_uri.toString();
+        }
+        return tlf==null?null:tlf.getAbsolutePath();
+    };
+
+
+    private void initViewWidget() {
         getWindow().setSoftInputMode(
         WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.main_screen);
@@ -231,6 +355,7 @@ public class ActivityMain extends AppCompatActivity {
 
         mContext=this;
         mActivity=this;
+        mUiHandler=new Handler();
         mFragmentManager=getSupportFragmentManager();
         mRestartStatus=0;
        	mGp=GlobalWorkArea.getGlobalParameters(mContext);
@@ -311,21 +436,21 @@ public class ActivityMain extends AppCompatActivity {
 					} catch (RemoteException e) {
 						e.printStackTrace();
 					}
-//					if (mRestartStatus==0) {
-//				    	Intent in=getIntent();
-//						if (in!=null && in.getData()!=null) showZipFileByIntent(in);
-//						else mLocalFileMgr.showLocalFileView(true);
-//					} else if (mRestartStatus==2) {
-//						if (mGp.activityIsDestroyed) {
-//							mCommonDlg.showCommonDialog(false, "W",
-//							getString(R.string.msgs_main_restart_by_destroyed),"",null);
-//						} else {
-//							mCommonDlg.showCommonDialog(false, "W",
-//							getString(R.string.msgs_main_restart_by_killed),"",null);
-//						}
-//					}
-//					mRestartStatus=1;
-//					mGp.activityIsDestroyed=false;
+					if (mRestartStatus==0) {
+				    	Intent in=getIntent();
+						if (in!=null && in.getData()!=null) showZipFileByIntent(in);
+						else mLocalFileMgr.showLocalFileView(true);
+					} else if (mRestartStatus==2) {
+						if (mGp.activityIsDestroyed) {
+							mCommonDlg.showCommonDialog(false, "W",
+							getString(R.string.msgs_main_restart_by_destroyed),"",null);
+						} else {
+							mCommonDlg.showCommonDialog(false, "W",
+							getString(R.string.msgs_main_restart_by_killed),"",null);
+						}
+					}
+					mRestartStatus=1;
+					mGp.activityIsDestroyed=false;
 				}
 				@Override
 				public void negativeResponse(Context c, Object[] o) {
@@ -333,21 +458,6 @@ public class ActivityMain extends AppCompatActivity {
 				
 			});
 			openService(ntfy);
-
-            if (mRestartStatus==0) {
-                Intent in=getIntent();
-                if (in!=null && in.getData()!=null) showZipFileByIntent(in);
-                else mLocalFileMgr.showLocalFileView(true);
-            } else if (mRestartStatus==2) {
-                if (mGp.activityIsDestroyed) {
-                    mCommonDlg.showCommonDialog(false, "W", getString(R.string.msgs_main_restart_by_destroyed),"",null);
-                } else {
-                    mCommonDlg.showCommonDialog(false, "W", getString(R.string.msgs_main_restart_by_killed),"",null);
-                }
-            }
-            mRestartStatus=1;
-            mGp.activityIsDestroyed=false;
-
         }
 	};
 	

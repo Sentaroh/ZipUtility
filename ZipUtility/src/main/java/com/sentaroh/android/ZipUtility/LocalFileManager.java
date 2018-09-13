@@ -4118,8 +4118,8 @@ public class LocalFileManager {
                 mUiHandler.post(new Runnable(){
                     @Override
                     public void run() {
-                        p_ntfy.notifyToListener(true, new Object[]{tfl});
                         pd.dismiss();
+                        p_ntfy.notifyToListener(true, new Object[]{tfl});
                     }
                 });
             }
