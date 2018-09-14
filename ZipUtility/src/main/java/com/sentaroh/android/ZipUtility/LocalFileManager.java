@@ -4098,6 +4098,7 @@ public class LocalFileManager {
 
 	private void createTreeFileList(final String target_dir, final NotifyEvent p_ntfy) {
 //	    Thread.dumpStack();
+        if (mActivity.isFinishing()) return;
 	    final Dialog pd=CommonDialog.showProgressSpinIndicator(mActivity);
 	    pd.show();
 	    Thread th=new Thread(){
