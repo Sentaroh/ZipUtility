@@ -22,15 +22,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 OTHER DEALINGS IN THE SOFTWARE.
 
 */
-import static com.sentaroh.android.ZipUtility.Constants.*;
-import static com.sentaroh.android.ZipUtility.Log.LogConstants.*;
-
-import java.io.File;
-import java.util.ArrayList;
-
-import com.sentaroh.android.Utilities.CommonGlobalParms;
-import com.sentaroh.android.Utilities.SafManager;
-import com.sentaroh.android.Utilities.ThemeColorList;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -47,6 +38,16 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.widget.Button;
+
+import com.sentaroh.android.Utilities.CommonGlobalParms;
+import com.sentaroh.android.Utilities.SafManager;
+import com.sentaroh.android.Utilities.ThemeColorList;
+
+import java.io.File;
+import java.util.ArrayList;
+
+import static com.sentaroh.android.ZipUtility.Constants.APPLICATION_TAG;
+import static com.sentaroh.android.ZipUtility.Constants.LOG_FILE_NAME;
 
 public class GlobalParameters extends CommonGlobalParms {
 	public boolean debugEnabled=true;
@@ -86,7 +87,7 @@ public class GlobalParameters extends CommonGlobalParms {
 	public Button copyCutItemInfo=null;
 	
 //	Settings parameter	    	
-	public boolean settingExitClean=false;
+	public boolean settingExitClean=true;
 	public int     settingDebugLevel=3;
 	public boolean settingUseLightTheme=false;
 	public int     settingLogMaxFileCount=10;		

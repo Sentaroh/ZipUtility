@@ -145,7 +145,7 @@ public class ZipService extends Service {
 				}
 			}, 100);
 		} else {
-			mGp=null;
+//			mGp=null;
 			System.gc();
 		}
 	};
