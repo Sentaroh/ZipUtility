@@ -2655,6 +2655,7 @@ public class LocalFileManager {
                 File[] file_list = lf.listFiles();
                 if (file_list != null) {
                     for (File item : file_list) {
+                        if (!tc.isEnabled()) return false;
                         if (item.isDirectory()) deleteLocalItem(tc, item.getPath());
                         else {
                             if (item.getPath().startsWith(mGp.externalRootDirectory)) {
@@ -2695,6 +2696,7 @@ public class LocalFileManager {
                     }
                 }
             } else {
+                if (!tc.isEnabled()) return false;
                 if (fp.startsWith(mGp.externalRootDirectory)) {
                     SafFile del_sf = mUtil.createSafFile(fp, false);
                     if (del_sf==null) {
