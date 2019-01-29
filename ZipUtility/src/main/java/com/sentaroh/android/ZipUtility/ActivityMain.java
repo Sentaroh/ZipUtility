@@ -84,6 +84,7 @@ import com.sentaroh.android.Utilities.Widget.CustomViewPagerAdapter;
 import com.sentaroh.android.ZipUtility.Log.LogFileListDialogFragment;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -180,38 +181,57 @@ public class ActivityMain extends AppCompatActivity {
             }
             if (file_path!=null){// && file_path.endsWith(".zip")) {
                 if (file_path.startsWith("content://")) {
-                    final Dialog pd=CommonDialog.showProgressSpinIndicator(mActivity);
-                    pd.show();
-                    Thread th=new Thread() {
-                        public void run() {
-                            final String[] column={MediaStore.MediaColumns._ID,  MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME};
-                            Cursor cursor = mContext.getContentResolver().query(intent.getData(), column, null, null, null);
-                            if (cursor!=null) {
-                                if (cursor.moveToFirst()) {
-                                    String t_file_name = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME));
-                                    clearCacheFile(cd);
-                                    String file_name=t_file_name==null?"attachedFile":t_file_name;
-                                    final File tlf=new File(cd+file_name);
-                                    try {
-                                        InputStream is=mContext.getContentResolver().openInputStream(intent.getData());
-                                        copyFileFromUri(is, tlf);
-                                        mUiHandler.post(new Runnable(){
-                                            @Override
-                                            public void run() {
-                                                invokeZipFileManager(tlf.getPath());
-                                            }
-                                        });
+                    InputStream is=null;
+                    try {
+                        is=mContext.getContentResolver().openInputStream(intent.getData());
+                        if (is!=null) {
+                            final Dialog pd=CommonDialog.showProgressSpinIndicator(mActivity);
+                            pd.show();
+                            Thread th=new Thread() {
+                                public void run() {
+                                    final String[] column={MediaStore.MediaColumns._ID,  MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME};
+                                    Cursor cursor = mContext.getContentResolver().query(intent.getData(), column, null, null, null);
+                                    if (cursor!=null) {
+                                        if (cursor.moveToFirst()) {
+                                            String t_file_name = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME));
+                                            clearCacheFile(cd);
+                                            String file_name=t_file_name==null?"attachedFile":t_file_name;
+                                            final File tlf=new File(cd+file_name);
+                                            try {
+                                                InputStream is=mContext.getContentResolver().openInputStream(intent.getData());
+                                                copyFileFromUri(is, tlf);
+                                                mUiHandler.post(new Runnable(){
+                                                    @Override
+                                                    public void run() {
+                                                        invokeZipFileManager(tlf.getPath());
+                                                    }
+                                                });
 
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        cursor.close();
                                     }
+                                    pd.dismiss();
                                 }
-                                cursor.close();
-                            }
-                            pd.dismiss();
+                            };
+                            th.start();
+                        } else {
+                            mCommonDlg.showCommonDialog(false,"E","showZipFileByIntent()Input stream open error", ", Uri="+intent.getData(),null);
+                            mUtil.addLogMsg("E","showZipFileByIntent()Input stream open error"+ ", Uri="+intent.getData());
                         }
-                    };
-                    th.start();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                        mCommonDlg.showCommonDialog(false,"E","showZipFileByIntent() File not found exception occured", ", Uri="+intent.getData(),null);
+                        mUtil.addLogMsg("E","showZipFileByIntent() File not found exception occured"+", Uri="+intent.getData());
+                        final StringWriter sw = new StringWriter();
+                        final PrintWriter pw = new PrintWriter(sw);
+                        e.printStackTrace(pw);
+                        pw.flush();
+                        pw.close();
+                        mUtil.addLogMsg("E","showZipFileByIntent() ","\n",sw.toString());
+                    }
                 } else {
                     invokeZipFileManager(file_path);
                 }
@@ -860,15 +880,15 @@ public class ActivityMain extends AppCompatActivity {
 	        	if (!mGp.safMgr.isUsbUuid(SafManager.getUuidFromUri(data.getData().toString()))) {
                     if (!mGp.safMgr.isRootTreeUri(data.getData())) {
                         mUtil.addDebugMsg(1, "I", "Selected UUID="+SafManager.getUuidFromUri(data.getData().toString()));
-                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getMessages());
+                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getLastErrorMessage());
                         reselectSdcard(mContext.getString(R.string.msgs_main_external_sdcard_select_retry_select_msg));
                     } else {
                         mUtil.addDebugMsg(1, "I", "Selected UUID="+SafManager.getUuidFromUri(data.getData().toString()));
-                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getMessages());
+                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getLastErrorMessage());
                         if (mGp.safMgr.isRootTreeUri(data.getData())) {
                             boolean rc=mGp.safMgr.addSdcardUuid(data.getData());
                             if (!rc) {
-                                String saf_msg=mGp.safMgr.getMessages();
+                                String saf_msg=mGp.safMgr.getLastErrorMessage();
                                 mCommonDlg.showCommonDialog(false, "W", "External SDCARD UUID registration failed, please reselect SDCARD", saf_msg, null);
                                 mUtil.addLogMsg("E", "External SDCARD UUID registration failed, please reselect SDCARD\n", saf_msg);
                             } else {
@@ -896,15 +916,15 @@ public class ActivityMain extends AppCompatActivity {
                 if (mGp.safMgr.isUsbUuid(SafManager.getUuidFromUri(data.getData().toString()))) {
                     if (!mGp.safMgr.isUsbUuid(SafManager.getUuidFromUri(data.getData().toString()))) {
                         mUtil.addDebugMsg(1, "I", "Selected UUID="+SafManager.getUuidFromUri(data.getData().toString()));
-                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getMessages());
+                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getLastErrorMessage());
                         reselectSdcard(mContext.getString(R.string.msgs_main_external_usb_select_retry_select_msg));
                     } else {
                         mUtil.addDebugMsg(1, "I", "Selected UUID="+SafManager.getUuidFromUri(data.getData().toString()));
-                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getMessages());
+                        mUtil.addDebugMsg(1, "I", "SafMessage="+mGp.safMgr.getLastErrorMessage());
                         if (mGp.safMgr.isRootTreeUri(data.getData())) {
                             boolean rc=mGp.safMgr.addUsbUuid(data.getData());
                             if (!rc) {
-                                String saf_msg=mGp.safMgr.getMessages();
+                                String saf_msg=mGp.safMgr.getLastErrorMessage();
                                 mCommonDlg.showCommonDialog(false, "W", "USB UUID registration failed, please reselect USB Storage", saf_msg, null);
                                 mUtil.addLogMsg("E", "USB UUID registration failed, please reselect USB Storage\n", saf_msg);
                             } else {

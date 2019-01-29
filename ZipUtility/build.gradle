@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.sentaroh.android.ZipUtility"
         minSdkVersion 21
@@ -67,7 +67,7 @@ android {
 dependencies {
 //    implementation project(':Utilities')
 //    implementation(name:'Utilities-1.0.5', ext:'aar')
-    implementation files('libs/Utilities-1.0.13.aar')
+    implementation files('libs/Utilities-1.0.14.aar')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation files('libs/commons-compress-1.12.jar')
 }

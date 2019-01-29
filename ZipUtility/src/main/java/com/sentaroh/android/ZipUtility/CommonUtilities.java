@@ -89,7 +89,7 @@ public final class CommonUtilities {
     public SafFile createSafFile(String fp, boolean directory) {
         SafFile sf=mGp.safMgr.createSdcardItem(fp, directory);
         if (sf==null) {
-            String e_msg=mGp.safMgr.getMessages();
+            String e_msg=mGp.safMgr.getLastErrorMessage();
             mLog.addLogMsg("E","SafFile create error:fp="+fp+"\n"+e_msg);
             mCommonDlg.showCommonDialog(false,"E","SafFile creation :fp="+fp,e_msg,null);
         }

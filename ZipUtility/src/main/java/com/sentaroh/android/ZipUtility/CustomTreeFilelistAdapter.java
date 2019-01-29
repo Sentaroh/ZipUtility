@@ -334,7 +334,8 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 	@Override
 	public boolean isEnabled(int p) {
 //		Log.v("","n="+getDataItem(p).getName()+", e="+getDataItem(p).isEnableItem());
-		return getItem(p).isEnableItem();
+        if (p<getCount()) return getItem(p).isEnableItem();
+        else return false;
 	}
 	
 	private Drawable mDefaultBgColor=null;

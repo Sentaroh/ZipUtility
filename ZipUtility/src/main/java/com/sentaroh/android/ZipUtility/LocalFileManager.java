@@ -1118,12 +1118,11 @@ public class LocalFileManager {
                                         try {
                                             SafFile sf = mUtil.createSafFile(current_name, false);
                                             if (sf!=null) {
-                                                sf.renameTo(etDir.getText().toString());
-                                                rc_create = sf.exists();
+                                                rc_create = sf.renameTo(etDir.getText().toString());
                                             }
                                         } catch (Exception e) {
                                             mUtil.addLogMsg("E", "Saf file error");
-                                            mUtil.addLogMsg("E", mGp.safMgr.getMessages());
+                                            mUtil.addLogMsg("E", mGp.safMgr.getLastErrorMessage());
                                             CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
                                         }
                                     } else {
@@ -1143,14 +1142,13 @@ public class LocalFileManager {
                                         try {
                                             SafFile sf = mUtil.createSafFile(current_name, true);
                                             if (sf!=null) {
-                                                sf.renameTo(etDir.getText().toString());
-                                                rc_create = sf.exists();
+                                                rc_create =sf.renameTo(etDir.getText().toString());
                                             } else {
                                                 return;
                                             }
                                         } catch (Exception e) {
                                             mUtil.addLogMsg("E", "Saf directory error");
-                                            mUtil.addLogMsg("E", mGp.safMgr.getMessages());
+                                            mUtil.addLogMsg("E", mGp.safMgr.getLastErrorMessage());
                                             CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
                                         }
                                     } else {
@@ -2254,7 +2252,7 @@ public class LocalFileManager {
                 String w_path = dest_path.endsWith("/") ? dest_path + dest_file_name : dest_path + "/" + dest_file_name;
                 SafFile out_dir_sf = mGp.safMgr.createSdcardItem(dest_path, true);
                 if (out_dir_sf == null) {
-                    String e_msg = mGp.safMgr.getMessages();
+                    String e_msg = mGp.safMgr.getLastErrorMessage();
                     mUtil.addLogMsg("E", "SafFile create error:dir=" + out_dir_sf + e_msg);
                     mCommonDlg.showCommonDialog(false, "E", "SafFile creation :dir=" + out_dir_sf, e_msg, null);
                     return false;
@@ -2263,7 +2261,7 @@ public class LocalFileManager {
                 out_dir_sf.exists();
                 SafFile out_file_sf = mGp.safMgr.createSdcardItem(w_path, false);
                 if (out_file_sf == null) {
-                    String e_msg = mGp.safMgr.getMessages();
+                    String e_msg = mGp.safMgr.getLastErrorMessage();
                     mUtil.addLogMsg("E", "SafFile create error:fp=" + out_file_sf + e_msg);
                     mCommonDlg.showCommonDialog(false, "E", "SafFile creation :fp=" + out_file_sf, e_msg, null);
                     return false;
