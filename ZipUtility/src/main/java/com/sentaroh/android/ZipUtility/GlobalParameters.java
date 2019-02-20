@@ -42,6 +42,11 @@ import android.widget.Button;
 import com.sentaroh.android.Utilities.CommonGlobalParms;
 import com.sentaroh.android.Utilities.SafManager;
 import com.sentaroh.android.Utilities.ThemeColorList;
+import com.sentaroh.android.ZipUtility.Log.LogUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.LoggerWriter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -141,6 +146,11 @@ public class GlobalParameters extends CommonGlobalParms {
         applicationRootDirectory=c.getFilesDir().toString();
         applicationCacheDirectory=c.getCacheDir().toString();
 
+        final LogUtil slf4j_lu = new LogUtil(appContext, "SLF4J", this);
+        Slf4jLogWriter slf4j_lw=new Slf4jLogWriter(slf4j_lu);
+        slf4jLog.setWriter(slf4j_lw);
+
+
         initSettingsParms(c);
         loadSettingsParms(c);
         setLogParms(this);
@@ -148,6 +158,16 @@ public class GlobalParameters extends CommonGlobalParms {
         initStorageStatus(c);
 
     };
+    class Slf4jLogWriter extends LoggerWriter {
+        private LogUtil mLu =null;
+        public Slf4jLogWriter(LogUtil lu) {
+            mLu =lu;
+        }
+        @Override
+        public void write(String msg) {
+            mLu.addDebugMsg(1,"I", msg);
+        }
+    }
 
     public void clearParms() {
 	};
@@ -171,7 +191,8 @@ public class GlobalParameters extends CommonGlobalParms {
 	};
 	
 	public void refreshMediaDir(Context c) {
-		File[] fl=ContextCompat.getExternalFilesDirs(c, null);
+//		File[] fl=ContextCompat.getExternalFilesDirs(c, null);
+        File[] fl=c.getExternalFilesDirs(null);
 		if (fl!=null) {
 			for(File item:fl) {
 				if (item!=null && !item.getPath().startsWith(internalRootDirectory)) {
@@ -241,7 +262,8 @@ public class GlobalParameters extends CommonGlobalParms {
         this.settingLogOption=enabled;
         setLogParms(this);
     };
-	
+
+    private static Logger slf4jLog = LoggerFactory.getLogger(GlobalParameters.class);
 	public void loadSettingsParms(Context c) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
 
@@ -265,6 +287,12 @@ public class GlobalParameters extends CommonGlobalParms {
 		settingFixDeviceOrientationToPortrait=prefs.getBoolean(c.getString(R.string.settings_device_orientation_portrait),false);
 		
 		settingZipDefaultEncoding=prefs.getString(c.getString(R.string.settings_zip_default_encoding), "UTF-8");
+
+		if (settingDebugLevel==1) {
+            slf4jLog.setLogOption(false,true,true,false,true);
+        } else if (settingDebugLevel==2) {
+            slf4jLog.setLogOption(true,true,true,true,true);
+        }
 	};
 	
 	private boolean isDebuggable() {

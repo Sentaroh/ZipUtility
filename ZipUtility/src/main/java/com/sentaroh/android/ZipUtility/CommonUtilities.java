@@ -305,7 +305,8 @@ public final class CommonUtilities {
 //			c.getExternalFilesDirs(null);
 //		} else {
 //		}
-		ContextCompat.getExternalFilesDirs(c, null);
+//		ContextCompat.getExternalFilesDirs(c, null);
+        c.getExternalFilesDirs(null);
 	};
 	
 	public boolean isWifiActive() { 

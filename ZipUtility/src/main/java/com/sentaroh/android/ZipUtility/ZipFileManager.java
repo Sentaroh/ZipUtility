@@ -59,7 +59,6 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.sentaroh.android.Utilities.BufferedZipFile;
 import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomContextMenuOnClickListener;
@@ -1840,15 +1839,13 @@ public class ZipFileManager {
 				for(File cf:fl) {
 					if (cf.isDirectory()) {
 						sel_item_list.add(cf);
-//						Log.v("","added name="+lf.getPath().replace(base+"/","")+"/");
 						getAllItemInLocalDirectory(sel_item_list, cf);
 					} else {
 						sel_item_list.add(cf);
-//						Log.v("","added name="+cf.getPath().replace(base+"/",""));
 					}
 				}
-			} else {
-				sel_item_list.add(lf);
+//			} else {
+//				sel_item_list.add(lf);
 			}
 		} else {
 			sel_item_list.add(lf);
@@ -1871,104 +1868,85 @@ public class ZipFileManager {
 		Thread th=new Thread(){
 			@Override
 			public void run() {
-				putProgressMessage(mContext.getString(R.string.msgs_zip_add_file_starting));
-				boolean copy_back_required=false, result_work_copy=true, aborted=false;
-				String w_zf_path="";
-				if (mCurrentFilePath.startsWith(mGp.externalRootDirectory)) {
-					w_zf_path=mGp.internalRootDirectory+"/"+
-							mGp.appSpecificDirectory+"/"+WORK_DIRECTORY+"/"+"tmp.zip";
-					result_work_copy=copyFileSdcardToInternal(tc, w_zf_path, mCurrentFilePath);
-					copy_back_required=true;
-				} else {
-					w_zf_path=mCurrentFilePath;
-					copy_back_required=false;
-				}
-				
-				final String zf_path=w_zf_path;
-				if (result_work_copy) {
-//					bypassHeaderCorruptBug(createZipFile(zf_path,mEncodingSelected));
-//					SystemClock.sleep(1000);
-					BufferedZipFile bzf=new BufferedZipFile(zf_path,mEncodingSelected, mGp.settingDebugLevel>1);
-					for(String item:add_item) {
-						if (item!=null) {
-							File add_file=new File(item);
-							ZipParameters n_zp=null;
-							try {
-								n_zp=(ZipParameters) zp.clone();
-							} catch (CloneNotSupportedException e) {
-								e.printStackTrace();
-							}
-							n_zp.setDefaultFolderPath(zip_base);
-							n_zp.setRootFolderInZip(zip_curr_dir);
-							ArrayList<File>sel_list=new ArrayList<File>();
-							getAllItemInLocalDirectory(sel_list,add_file);
-							Log.v("","size="+sel_list.size());
-							for(File sel_file:sel_list) {
-								try {
-									bzf.addItem(sel_file, n_zp);
-									if (!tc.isEnabled()) {
-										mCommonDlg.showCommonDialog(false, "W", String.format(mContext.getString(R.string.msgs_zip_add_file_cancelled), sel_file.getPath()), "", null);
-										aborted=true;
-										break;
-									}
-									putProgressMessage(String.format(mContext.getString(R.string.msgs_zip_add_file_added),sel_file.getPath()));
-								} catch (ZipException e) {
-									tc.setThreadMessage(e.getMessage());
-									mUtil.addLogMsg("I", String.format(mContext.getString(R.string.msgs_zip_add_file_failed),sel_file.getPath()));
-									mCommonDlg.showCommonDialog(false, "E", String.format(mContext.getString(R.string.msgs_zip_add_file_failed),sel_file.getPath()), 
-											tc.getThreadMessage(), null);
-									aborted=true;
-									break;
-								}
-							}
-						}
-					}
-					try {
-						bzf.close();
-					} catch (ZipException e) {
-						tc.setThreadMessage(e.getMessage());
-						mUtil.addLogMsg("I",mContext.getString(R.string.msgs_zip_add_file_close_failed));
-						mCommonDlg.showCommonDialog(false, "E", mContext.getString(R.string.msgs_zip_add_file_close_failed), 
-								tc.getThreadMessage(), null);
-						aborted=true;
-                    } catch (Exception e) {
-                        tc.setThreadMessage(e.getMessage());
-                        mUtil.addLogMsg("I",mContext.getString(R.string.msgs_zip_add_file_close_failed));
-                        mCommonDlg.showCommonDialog(false, "E", mContext.getString(R.string.msgs_zip_add_file_close_failed),
-                                tc.getThreadMessage(), null);
-                        aborted=true;
-					}
-					if (p_ntfy!=null) p_ntfy.notifyToListener(true, new Object[]{add_item});
-					if (copy_back_required) {
-						if (!copyFileInternalToSdcard(tc, zf_path, mCurrentFilePath)) {
-							aborted=true;
-							mCommonDlg.showCommonDialog(false, "E", mContext.getString(R.string.msgs_zip_sdcard_create_zip_file_failed), 
-									mCurrentFilePath+"\n"+tc.getThreadMessage(), null);
-						}
-					}
-				} else {
-					mCommonDlg.showCommonDialog(false, "E", mContext.getString(R.string.msgs_zip_sdcard_create_work_file_failed), 
-							tc.getThreadMessage(), null);
-				}
-				String w_sel_list="", sep="";
-				for(String sel_item:add_item) {
-					w_sel_list+=sep+sel_item;
-					sep=", ";
-				}
-				if (comp_msg_required) {
-					if (!aborted) mCommonDlg.showCommonDialog(false, "I", 
-							mContext.getString(R.string.msgs_zip_add_file_completed), w_sel_list, null);
-					deleteCopyPasteWorkFile();
-                    mUiHandler.postDelayed(new Runnable(){
-						@Override
-						public void run() {
-							setUiEnabled();
-							refreshFileList(true);
+                putProgressMessage(mContext.getString(R.string.msgs_zip_add_file_starting));
+                String out_zf_path = "";
+                String zip_file_name = mCurrentFilePath.substring(mCurrentFilePath.lastIndexOf("/"));
+                if (mCurrentFilePath.startsWith(mGp.externalRootDirectory)) {
+                    out_zf_path = mGp.safMgr.getSdcardRootPath() + "/" + mGp.appSpecificDirectory + zip_file_name;
+                    File out_fl=new File(mCurrentFilePath);
+                    if (!out_fl.exists()) {
+                        SafFile out=mGp.safMgr.createSdcardFile(out_fl.getPath());
+                    }
+                } else {
+                    out_zf_path = mGp.internalRootDirectory + "/" + mGp.appSpecificDirectory + zip_file_name;
+                }
+                BufferedZipFile2 bzf = new BufferedZipFile2(mCurrentFilePath, out_zf_path, mEncodingSelected);
+                for (String item : add_item) {
+                    if (item != null) {
+                        File add_file = new File(item);
+                        ZipParameters n_zp = null;
+                        try {
+                            n_zp = (ZipParameters) zp.clone();
+                        } catch (CloneNotSupportedException e) {
+                            e.printStackTrace();
+                        }
+                        n_zp.setDefaultFolderPath(zip_base);
+                        n_zp.setRootFolderInZip(zip_curr_dir);
+                        ArrayList<File> sel_list = new ArrayList<File>();
+                        getAllItemInLocalDirectory(sel_list, add_file);
+//                        Log.v("", "size=" + sel_list.size());
+                        for (File sel_file : sel_list) {
+                            try {
+                                bzf.addItem(sel_file, n_zp);
+                                if (!tc.isEnabled()) {
+                                    mCommonDlg.showCommonDialog(false, "W", String.format(mContext.getString(R.string.msgs_zip_add_file_cancelled), sel_file.getPath()), "", null);
+                                    break;
+                                }
+                                putProgressMessage(String.format(mContext.getString(R.string.msgs_zip_add_file_added), sel_file.getPath()));
+                            } catch (ZipException e) {
+                                tc.setThreadMessage(e.getMessage());
+                                mUtil.addLogMsg("I", String.format(mContext.getString(R.string.msgs_zip_add_file_failed), sel_file.getPath()));
+                                mCommonDlg.showCommonDialog(false, "E", String.format(mContext.getString(R.string.msgs_zip_add_file_failed), sel_file.getPath()),
+                                        tc.getThreadMessage(), null);
+                                break;
+                            }
+                        }
+                    }
+                }
+                try {
+                    bzf.close();
+                    renameWorkFileToDestFile(mGp, tc, mCurrentFilePath, out_zf_path);
+                    if (p_ntfy != null) p_ntfy.notifyToListener(true, new Object[]{add_item});
+                    String w_sel_list = "", sep = "";
+                    for (String sel_item : add_item) {
+                        w_sel_list += sep + sel_item;
+                        sep = ", ";
+                    }
+                    if (comp_msg_required) {
+                        mCommonDlg.showCommonDialog(false, "I",
+                                mContext.getString(R.string.msgs_zip_add_file_completed), w_sel_list, null);
+                        deleteCopyPasteWorkFile();
+                        mUiHandler.postDelayed(new Runnable(){
+                            @Override
+                            public void run() {
+                                setUiEnabled();
+                                refreshFileList(true);
 //							createFileList(mCurrentFilePath, null, zip_curr_dir);
-						}
-					}, 500);
-				}
-			}
+                            }
+                        }, 500);
+                    }
+                } catch (ZipException e) {
+                    tc.setThreadMessage(e.getMessage());
+                    mUtil.addLogMsg("I", mContext.getString(R.string.msgs_zip_add_file_close_failed));
+                    mCommonDlg.showCommonDialog(false, "E", mContext.getString(R.string.msgs_zip_add_file_close_failed),
+                            tc.getThreadMessage(), null);
+                } catch (Exception e) {
+                    tc.setThreadMessage(e.getMessage());
+                    mUtil.addLogMsg("I", mContext.getString(R.string.msgs_zip_add_file_close_failed));
+                    mCommonDlg.showCommonDialog(false, "E", mContext.getString(R.string.msgs_zip_add_file_close_failed),
+                            tc.getThreadMessage(), null);
+                }
+            }
 		};
 		th.start();
 	};
@@ -2796,57 +2774,53 @@ public class ZipFileManager {
 				boolean abort=false;
 				mUtil.addDebugMsg(1, "I", "Delete started");
 //				final ArrayList<TreeFilelistItem> sel_file_list=buildSelectedFileist(tfa);
-				boolean copy_back_required=false, result_work_copy=true;
-				String w_zf_path="";
+				String out_zf_path="";
+				String zip_file_name=zip_file_path.substring(zip_file_path.lastIndexOf("/"));
 				if (zip_file_path.startsWith(mGp.externalRootDirectory)) {
-					w_zf_path=mGp.internalRootDirectory+"/"+
-							mGp.appSpecificDirectory+"/"+WORK_DIRECTORY+"/"+"tmp.zip";
-					result_work_copy=copyFileSdcardToInternal(tc, w_zf_path, zip_file_path);
-					copy_back_required=true;
-				} else {
-					w_zf_path=zip_file_path;
-					copy_back_required=false;
+                    out_zf_path=mGp.safMgr.getSdcardRootPath()+"/"+mGp.appSpecificDirectory+zip_file_name;
+                    File out_fl=new File(zip_file_path);
+                    if (!out_fl.exists()) {
+                        SafFile out=mGp.safMgr.createSdcardFile(out_fl.getPath());
+                    }
+                } else {
+                    out_zf_path=mGp.internalRootDirectory+"/"+mGp.appSpecificDirectory+zip_file_name;
 				}
-				final String zf_path=w_zf_path;
 				String error_msg="";
-				if (result_work_copy) {
-					putProgressMessage(mContext.getString(R.string.msgs_zip_delete_file_has_been_started));
-					ZipFile zf=createZipFile(zf_path, zip_encoding);
+                putProgressMessage(mContext.getString(R.string.msgs_zip_delete_file_has_been_started));
+                ZipFile zf=createZipFile(zip_file_path, zip_encoding);
 //					bypassHeaderCorruptBug(zf);
-					BufferedZipFile bzf=new BufferedZipFile(zf_path, zip_encoding, mGp.settingDebugLevel>1);
-					ArrayList<FileHeader>sel_fh=buildSelectedFileHeaderList(zf, tfa);
-					
-					try {
-						String msg=mContext.getString(R.string.msgs_zip_delete_file_was_deleted);
-						for(FileHeader fh:sel_fh) {
-							if (!tc.isEnabled()) {
-								mCommonDlg.showCommonDialog(false, "I", 
-										String.format(mContext.getString(R.string.msgs_zip_delete_file_was_cancelled),fh.getFileName()), 
-										"", null);
-								abort=true;
-								break;
-							}
-							bzf.removeItem(fh);
-							putProgressMessage(String.format(msg,fh.getFileName()));
-						}
-						if (tc.isEnabled()) bzf.close();
-						if (copy_back_required) {
-							if (!copyFileInternalToSdcard(tc, zf_path, mCurrentFilePath)) {
-								abort=true;
-							}
-						}
-					} catch (ZipException e) {
-						mUtil.addLogMsg("I", e.getMessage());
-						error_msg=e.getMessage();
-						CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
-						abort=true;
-                    } catch (Exception e) {
-                        mUtil.addLogMsg("I", e.getMessage());
-                        error_msg=e.getMessage();
-                        CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
-                        abort=true;
-					}
-				}
+                BufferedZipFile2 bzf=new BufferedZipFile2(zip_file_path, out_zf_path, zip_encoding);
+                ArrayList<FileHeader>sel_fh=buildSelectedFileHeaderList(zf, tfa);
+                try {
+                    String msg=mContext.getString(R.string.msgs_zip_delete_file_was_deleted);
+                    for(FileHeader fh:sel_fh) {
+                        if (!tc.isEnabled()) {
+                            mCommonDlg.showCommonDialog(false, "I",
+                                    String.format(mContext.getString(R.string.msgs_zip_delete_file_was_cancelled),fh.getFileName()), "", null);
+                            abort=true;
+                            break;
+                        }
+                        bzf.removeItem(fh);
+                        putProgressMessage(String.format(msg,fh.getFileName()));
+                    }
+                    if (tc.isEnabled()) {
+                        bzf.close();
+                        renameWorkFileToDestFile(mGp, tc, zip_file_path, out_zf_path);
+                    }
+//                    if (!copyFileInternalToSdcard(tc, zf_path, mCurrentFilePath)) {
+//                        abort=true;
+//                    }
+                } catch (ZipException e) {
+                    mUtil.addLogMsg("I", e.getMessage());
+                    error_msg=e.getMessage();
+                    CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
+                    abort=true;
+                } catch (Exception e) {
+                    mUtil.addLogMsg("I", e.getMessage());
+                    error_msg=e.getMessage();
+                    CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
+                    abort=true;
+                }
 				
 				mUtil.addDebugMsg(1, "I", "Delete ended");
 				
@@ -2876,163 +2850,59 @@ public class ZipFileManager {
 		th.start();
 
 	}
+
+	static public void renameWorkFileToDestFile(GlobalParameters mGp, ThreadCtrl tc, String zip_file_path,String out_zf_path ) throws IOException {
+        if (zip_file_path.startsWith(mGp.internalRootDirectory)) {
+            File wf=new File(out_zf_path);
+            File of=new File(zip_file_path);
+            of.delete();
+            wf.renameTo(of);
+        } else {
+            if (Build.VERSION.SDK_INT>=24) {
+                SafFile of=mGp.safMgr.createSdcardFile(zip_file_path);
+                SafFile wf=mGp.safMgr.createSdcardFile(out_zf_path);
+                if (of.exists()) of.delete();
+                wf.moveTo(of);
+            } else {
+                File wf=new File(out_zf_path);
+                InputStream fis=new FileInputStream(wf);
+                SafFile of=mGp.safMgr.createSdcardFile(zip_file_path);
+                OutputStream fos=mGp.appContext.getContentResolver().openOutputStream(of.getUri());
+                boolean result=copyWorkFileToDestFile(tc, fis, fos);
+                fis.close();
+                fos.flush();
+                fos.close();
+                wf.delete();
+                if (!result) {
+                    of.delete();
+                }
+            }
+        }
+    }
+
+	static private boolean copyWorkFileToDestFile(ThreadCtrl tc, InputStream fis, OutputStream fos) {
+	    boolean result=true;
+        try {
+            byte[] buff=new byte[IO_AREA_SIZE];
+            int rc=fis.read(buff);
+            while(rc>0) {
+                if (!tc.isEnabled()) {
+                    return false;
+                }
+                fos.write(buff, 0, rc);
+                rc=fis.read(buff);
+            }
+            fis.close();
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            tc.setThreadMessage(e.getMessage());
+            return false;
+        }
+        return result;
+    }
 	
-	private boolean copyFileInternalToSdcard(ThreadCtrl tc, String app_path, String sdcard_path) {
-		long begin=System.currentTimeMillis();
-		mUtil.addDebugMsg(1, "I", "copyFileInternalToSdcard copy stated");
-		String msg=mContext.getString(R.string.msgs_zip_sdcard_create_zip_file_start);
-		mUtil.addLogMsg("I", msg);
-		putProgressMessage(msg);
-
-		boolean result=false;
-		SafFile out_sf=mUtil.createSafFile(sdcard_path, false);
-        if (out_sf==null) {
-            return false;
-        }
-        SafFile temp_sf=mUtil.createSafFile(sdcard_path+".tmp", false);
-        if (temp_sf==null) {
-            return false;
-        }
-        File from=new File(app_path);
-		OutputStream fos=null;
-		FileInputStream fis=null;
-		try {
-			fos=mContext.getContentResolver().openOutputStream(temp_sf.getUri());
-//			BufferedOutputStream bos=new BufferedOutputStream(fos,1024*1024*8);
-			fis=new FileInputStream(from);
-//			BufferedInputStream bis=new BufferedInputStream(fis,1024*1024*8);
-			byte[] buff=new byte[IO_AREA_SIZE];
-			int rc=fis.read(buff);
-			while(rc>0) {
-				if (!tc.isEnabled()) break;
-				fos.write(buff, 0, rc);
-				rc=fis.read(buff);
-			}
-			fis.close();
-			fos.flush();
-			fos.close();
-			
-			if (tc.isEnabled()) {
-				String o_name=out_sf.getName();
-				out_sf.delete();
-				temp_sf.renameTo(o_name);
-				FileInputStream t_fis=new FileInputStream(sdcard_path);
-				rc=t_fis.read(buff, 0, 1024);
-				t_fis.close();
-				from.delete();
-			} else {
-				temp_sf.delete();
-			}
-			result=tc.isEnabled();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			tc.setThreadMessage(e.getMessage());
-			try {
-				fis.close();
-				fos.flush();
-				fos.close();
-				temp_sf.delete();
-			} catch (IOException e1) {
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			tc.setThreadMessage(e.getMessage());
-			try {
-				fis.close();
-				fos.flush();
-				fos.close();
-				temp_sf.delete();
-			} catch (IOException e1) {
-			}
-		}
-		if (tc.isEnabled()) {
-			if (result) {
-				msg=mContext.getString(R.string.msgs_zip_sdcard_create_zip_file_end);
-				mUtil.addLogMsg("I", msg);
-			} else {
-				msg=mContext.getString(R.string.msgs_zip_sdcard_create_zip_file_failed);
-				mUtil.addLogMsg("W", msg+"\n"+tc.getThreadMessage());
-			}
-		} else {
-			msg=mContext.getString(R.string.msgs_zip_sdcard_create_zip_file_cancelled);
-			mUtil.addLogMsg("W", msg);
-		}
-		putProgressMessage(msg);
-
-		mUtil.addDebugMsg(1, "I", "copyFileInternalToSdcard copy ended, elapsed time="+(System.currentTimeMillis()-begin));
-		return result;
-	};
-
-	private boolean copyFileSdcardToInternal(ThreadCtrl tc, String app_path, String sdcard_path) {
-		long begin=System.currentTimeMillis();
-		mUtil.addDebugMsg(1, "I", "copyFileSdcardToInternal copy started");
-		String msg=mContext.getString(R.string.msgs_zip_sdcard_create_work_file_start);
-		mUtil.addLogMsg("I", msg);
-		putProgressMessage(msg);
-		
-		boolean result=false;
-		File from=new File(sdcard_path);
-		File to=new File(app_path);
-		new File(to.getParent()).mkdirs();
-		to.delete();
-		FileOutputStream fos=null;
-		FileInputStream fis=null;
-		try {
-			fos=new FileOutputStream(to);
-//			BufferedOutputStream bos=new BufferedOutputStream(fos,1024*1024*8);
-			fis=new FileInputStream(from);
-//			BufferedInputStream bis=new BufferedInputStream(fis,1024*1024*8);
-			byte[] buff=new byte[IO_AREA_SIZE];
-			int rc=fis.read(buff);
-			while(rc>0) {
-				if (!tc.isEnabled()) break;
-				fos.write(buff, 0, rc);
-				rc=fis.read(buff);
-			}
-			fis.close();
-			fos.flush();
-			fos.close();
-			if (!tc.isEnabled()) to.delete();
-			result=tc.isEnabled();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			tc.setThreadMessage(e.getMessage());
-			try {
-				fis.close();
-				fos.flush();
-				fos.close();
-				to.delete();
-			} catch (IOException e1) {
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			tc.setThreadMessage(e.getMessage());
-			try {
-				fis.close();
-				fos.flush();
-				fos.close();
-				to.delete();
-			} catch (IOException e1) {
-			}
-		}
-		if (tc.isEnabled()) {
-			if (result) {
-				msg=mContext.getString(R.string.msgs_zip_sdcard_create_work_file_end);
-				mUtil.addLogMsg("I", msg);
-			} else {
-				msg=mContext.getString(R.string.msgs_zip_sdcard_create_work_file_failed);
-				mUtil.addLogMsg("E", msg+"\n"+tc.getThreadMessage());
-			}
-		} else {
-			msg=mContext.getString(R.string.msgs_zip_sdcard_create_work_file_cancelled);
-			mUtil.addLogMsg("W", msg);
-		}
-		putProgressMessage(msg);
-
-		mUtil.addDebugMsg(1, "I", "copyFileSdcardToInternal copy ended, elapsed time="+(System.currentTimeMillis()-begin));
-		return result;
-	};
-
 	private void putProgressMessage(final String msg) {
 		mUiHandler.post(new Runnable(){
 			@Override
@@ -3682,10 +3552,10 @@ public class ZipFileManager {
 												try {
                                                     Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
                                                     if (Build.VERSION.SDK_INT>=26) {
-                                                        Uri uri= FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(work_dir+"/"+f_name));
-                                                        intent.setDataAndType(uri, mt);
-                                                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                                                        mActivity.startActivity(Intent.createChooser(intent, work_dir+"/"+f_name));
+                                                        intent.setDataAndType(Uri.parse("file://"+work_dir+"/"+f_name), mt);
+//                                                        Uri uri= FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(work_dir+"/"+f_name));
+//                                                        intent.setDataAndType(uri, mt);
+//                                                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                                     } else {
                                                         intent.setDataAndType(Uri.parse("file://"+work_dir+"/"+f_name), mt);
                                                     }
