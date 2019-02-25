@@ -177,7 +177,27 @@ public class BufferedZipFile2 {
         return endCentralDirRecord;
     }
 
+    private boolean isDuplicateEntry(File input) {
+        boolean result=false;
+        for(BufferedZipFile2.BzfFileHeaderItem added:add_file_header_list) {
+//            String fn=added.file_header.getFileName();
+            if (input.isFile()) {
+                if (!added.isRemovedItem && added.file_header.getFileName().equals(input.getPath())) {
+                    result=true;
+                    break;
+                }
+            } else {
+                if (!added.isRemovedItem && added.file_header.getFileName().equals(input.getPath()+"/")) {
+                    result=true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     private void addItemInternal(File input, ZipParameters parameters) throws ZipException {
+        if (isDuplicateEntry(input)) throw new ZipException("BufferedZipFile2 Already added, name="+input.getPath());
         BufferedInputStream inputStream =null;
         try {
             byte[] readBuff = new byte[IO_AREA_SIZE];
@@ -301,6 +321,19 @@ public class BufferedZipFile2 {
         }
     };
 
+    public void destroy() throws ZipException, IOException {
+        checkClosed();
+        closed =true;
+        if (temp_os_output_stream!=null) temp_os_output_stream.close();
+        if (input_raf!=null) input_raf.close();
+        if (primary_bos!=null) primary_bos.close();
+        if (add_zip_output_stream!=null) add_zip_output_stream.close();
+
+        if (temp_os_file!=null && temp_os_file.exists()) temp_os_file.delete();
+        if (add_os_file!=null && add_os_file.exists()) add_os_file.delete();
+
+    }
+
     public void close() throws ZipException, Exception {
         checkClosed();
         closed =true;
@@ -309,7 +342,7 @@ public class BufferedZipFile2 {
         else closeUpdate();
     }
 
-    public void closeAdd() throws ZipException, Exception {
+    private void closeAdd() throws ZipException, Exception {
         try {
             primary_output_pos=0;
             if (add_zip_file !=null) {
@@ -331,7 +364,54 @@ public class BufferedZipFile2 {
         }
     }
 
-    public void closeUpdate() throws ZipException, Exception {
+    private void closeUpdate() throws ZipException, Exception {
+        try {
+            primary_output_pos=0;
+
+            removeItemIfExistst();
+
+            if (primary_file_changed) writePrimaryZipFile();
+            else {
+                if (add_zip_file !=null) {
+                    writePrimaryZipFile();
+                }
+            }
+
+            if (add_zip_file !=null) writeAddZipFile();
+
+            if (primary_output_pos>0 || primary_file_changed) {
+                if (input_zip_model !=null && input_zip_model.getEndCentralDirRecord()!=null) {
+                    input_zip_model.getEndCentralDirRecord().setOffsetOfStartOfCentralDir(primary_output_pos);
+
+                    dumpRemoveList("WriteHeader", input_file_header_list);
+                    dumpRemoveList("WriteHeader", add_file_header_list);
+
+                    HeaderWriter hw=new HeaderWriter();
+                    hw.finalizeZipFile(input_zip_model, primary_bos);
+
+                    primary_bos.flush();
+                    primary_bos.close();
+                    input_raf.close();
+                }
+                if (add_zip_file !=null) add_zip_file.getFile().delete();
+                temp_os_file.renameTo(output_os_file);
+            } else {
+                if (primary_bos!=null) {
+                    primary_bos.flush();
+                    primary_bos.close();
+                }
+                input_raf.close();
+                temp_os_file.delete();
+                if (add_zip_file !=null) add_zip_file.getFile().delete();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new ZipException(e.getMessage());
+        }
+    }
+
+    public void closeUpdateX() throws ZipException, Exception {
         try {
             primary_output_pos=0;
 

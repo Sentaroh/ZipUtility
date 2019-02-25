@@ -3939,6 +3939,17 @@ public class LocalFileManager {
 								msg=String.format(mContext.getString(R.string.msgs_local_file_add_file_cancelled),item);
 								mUtil.addLogMsg("W", msg);
 								mCommonDlg.showCommonDialog(false, "W",msg, "", null);
+                                bzf.close();
+                                File lf=new File(out_zf_path);
+                                lf.delete();
+
+                                mUiHandler.postDelayed(new Runnable(){
+                                    @Override
+                                    public void run() {
+                                        refreshFileList();
+                                        setUiEnabled();
+                                    }
+                                },100);
 								break;
 							} else {
 								mUtil.addLogMsg("I", 
@@ -3950,18 +3961,20 @@ public class LocalFileManager {
 						added_item+=added_sep+item;
 						added_sep=", ";
 					}
-					bzf.close();
-                    ZipFileManager.renameWorkFileToDestFile(mGp, tc, dest_file_path, out_zf_path);
-                    mUtil.addDebugMsg(1, "I", "zipSelectedItem elapsed time="+(System.currentTimeMillis()-b_time));
-                    mCommonDlg.showCommonDialog(false, "I",
-                            mContext.getString(R.string.msgs_local_file_add_file_completed), added_item, null);
-                    mUiHandler.postDelayed(new Runnable(){
-                        @Override
-                        public void run() {
-                            refreshFileList();
-                            setUiEnabled();
-                        }
-                    },100);
+					if (tc.isEnabled()) {
+                        bzf.close();
+                        ZipFileManager.renameWorkFileToDestFile(mGp, tc, dest_file_path, out_zf_path);
+                        mUtil.addDebugMsg(1, "I", "zipSelectedItem elapsed time="+(System.currentTimeMillis()-b_time));
+                        mCommonDlg.showCommonDialog(false, "I",
+                                mContext.getString(R.string.msgs_local_file_add_file_completed), added_item, null);
+                        mUiHandler.postDelayed(new Runnable(){
+                            @Override
+                            public void run() {
+                                refreshFileList();
+                                setUiEnabled();
+                            }
+                        },100);
+                    }
 				} catch (ZipException e) {
 					e.printStackTrace();
 					String msg=String.format(mContext.getString(R.string.msgs_local_file_add_file_failed),processed_file.getPath());

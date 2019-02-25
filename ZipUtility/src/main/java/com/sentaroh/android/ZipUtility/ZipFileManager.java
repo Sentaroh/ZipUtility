@@ -1878,7 +1878,7 @@ public class ZipFileManager {
                         SafFile out=mGp.safMgr.createSdcardFile(out_fl.getPath());
                     }
                 } else {
-                    out_zf_path = mGp.internalRootDirectory + "/" + mGp.appSpecificDirectory + zip_file_name;
+                    out_zf_path = mGp.internalRootDirectory + mGp.appSpecificDirectory + zip_file_name;
                 }
                 BufferedZipFile2 bzf = new BufferedZipFile2(mCurrentFilePath, out_zf_path, mEncodingSelected);
                 for (String item : add_item) {
@@ -1900,6 +1900,19 @@ public class ZipFileManager {
                                 bzf.addItem(sel_file, n_zp);
                                 if (!tc.isEnabled()) {
                                     mCommonDlg.showCommonDialog(false, "W", String.format(mContext.getString(R.string.msgs_zip_add_file_cancelled), sel_file.getPath()), "", null);
+                                    try {
+                                        bzf.destroy();
+                                    } catch (Exception e) {
+                                    }
+                                    File lf=new File(out_zf_path);
+                                    lf.delete();
+                                    mUiHandler.postDelayed(new Runnable(){
+                                        @Override
+                                        public void run() {
+                                            refreshFileList(true);
+                                            setUiEnabled();
+                                        }
+                                    }, 500);
                                     break;
                                 }
                                 putProgressMessage(String.format(mContext.getString(R.string.msgs_zip_add_file_added), sel_file.getPath()));
@@ -1913,6 +1926,7 @@ public class ZipFileManager {
                         }
                     }
                 }
+                if (!tc.isEnabled()) return;
                 try {
                     bzf.close();
                     renameWorkFileToDestFile(mGp, tc, mCurrentFilePath, out_zf_path);
@@ -2798,10 +2812,15 @@ public class ZipFileManager {
                             mCommonDlg.showCommonDialog(false, "I",
                                     String.format(mContext.getString(R.string.msgs_zip_delete_file_was_cancelled),fh.getFileName()), "", null);
                             abort=true;
+                            try {
+                                bzf.destroy();
+                            } catch(ZipException e) {
+                            }
                             break;
+                        } else {
+                            bzf.removeItem(fh);
+                            putProgressMessage(String.format(msg,fh.getFileName()));
                         }
-                        bzf.removeItem(fh);
-                        putProgressMessage(String.format(msg,fh.getFileName()));
                     }
                     if (tc.isEnabled()) {
                         bzf.close();
