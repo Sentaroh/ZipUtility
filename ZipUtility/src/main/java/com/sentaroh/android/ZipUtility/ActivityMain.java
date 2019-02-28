@@ -479,9 +479,9 @@ public class ActivityMain extends AppCompatActivity {
 			});
 			openService(ntfy);
         }
-	};
-	
-	@Override
+	}
+
+    @Override
 	public void onLowMemory() {
 		super.onLowMemory();
 		mUtil.addDebugMsg(1, "I", "onLowMemory entered");

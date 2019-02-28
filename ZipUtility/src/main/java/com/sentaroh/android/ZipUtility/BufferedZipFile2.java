@@ -177,6 +177,30 @@ public class BufferedZipFile2 {
         return endCentralDirRecord;
     }
 
+    private ZipModel readZipInfo(String file, String encoding) throws ZipException {
+        ZipModel zipModel=null;
+        RandomAccessFile raf = null;
+        try {
+            raf = new RandomAccessFile(new File(file), InternalZipConstants.READ_MODE);
+            HeaderReader headerReader = new HeaderReader(raf);
+            zipModel = headerReader.readAllHeaders(encoding);
+            if (zipModel != null) {
+                zipModel.setZipFile(file);
+            }
+        } catch (FileNotFoundException e) {
+            throw new ZipException(e);
+        } finally {
+            if (raf != null) {
+                try {
+                    raf.close();
+                } catch (IOException e) {
+                    //ignore
+                }
+            }
+        }
+        return zipModel;
+    }
+
     private boolean isDuplicateEntry(File input) {
         boolean result=false;
         for(BufferedZipFile2.BzfFileHeaderItem added:add_file_header_list) {
@@ -286,6 +310,7 @@ public class BufferedZipFile2 {
                 }
             });
 
+            //Check duplicate entry
             String prev_name="";
             ArrayList<BzfFileHeaderItem>removed_list_for_add=new ArrayList<BzfFileHeaderItem>();
             for(BufferedZipFile2.BzfFileHeaderItem item:sort_list) {
