@@ -242,7 +242,8 @@ ZIPファイルの作成・編集・抽出のためのアプリケーション�
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api21">SMBSync_SD_CARD_5.0_JA.png</string>
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api23">SMBSync_SD_CARD_6.0_JA.png</string>
 	<string name="msgs_main_external_sdcard_select_required_cancel_msg">外部SDCARDが選択されるまで編集できません。</string>
-    <string name="msgs_main_external_sdcard_select_required_can_not_write">SDCARDへの書き込みが許可さていません。</string>
+    <string name="msgs_main_external_sdcard_select_required_can_not_write">SDCARDへの書き込みが許可さていません。メニューから「SDCARD書込許可」を行ってください。</string>
+    <string name="msgs_main_external_sdcard_select_required_can_not_selected">メニューから「SDCARD書込許可」が行われるまで外部SDCARDは選択できません。</string>
 
     <string name="msgs_main_external_usb_select_required_title">USBストレージの選択</string>
     <string name="msgs_main_external_usb_select_required_select_msg_api21">USBストレージにアクセスするために、ステップ１.「USB」をタップしてください、ステップ２.その後表示された画面で「USBを選択」をタップしてください。\n

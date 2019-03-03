@@ -63,6 +63,7 @@ import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomContextMenuOnClickListener;
 import com.sentaroh.android.Utilities.Dialog.CommonDialog;
+import com.sentaroh.android.Utilities.Dialog.CommonFileSelector;
 import com.sentaroh.android.Utilities.Dialog.FileSelectDialogFragment;
 import com.sentaroh.android.Utilities.Dialog.ProgressSpinDialogFragment;
 import com.sentaroh.android.Utilities.LocalMountPoint;
@@ -1312,9 +1313,10 @@ public class ZipFileManager {
 			@Override
 			public void onClick(View v) {
 				if (isUiEnabled()) {
-					setContextButtonEnabled(mContextButtonNew, false);
-					createNewZipFileDialog();
-					setContextButtonEnabled(mContextButtonNew, true);
+                    setContextButtonEnabled(mContextButtonNew, false);
+                    createNewZipFileDialog();
+                    setContextButtonEnabled(mContextButtonNew, true);
+                    mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_external_sdcard_select_required_can_not_selected),"", null);
 				}
 			}
         });
@@ -1631,8 +1633,8 @@ public class ZipFileManager {
 			public void negativeResponse(Context c, Object[] o) {
 			}
 		});
-		FileSelectDialogFragment frag=FileSelectDialogFragment.newInstance(mGp.debugEnabled,
-						enableCreate, true, false, false, true, true, lurl, ldir, filename, title);
+        CommonFileSelector frag=CommonFileSelector.newInstance(mGp.debugEnabled,
+                enableCreate, false, CommonFileSelector.DIALOG_SELECT_CATEGORY_FILE, true, true, lurl, ldir, filename, title);
 		frag.showDialog(mFragmentManager, frag, ntfy);
 	};
 	
