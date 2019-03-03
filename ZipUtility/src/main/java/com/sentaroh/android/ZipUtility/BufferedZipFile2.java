@@ -44,7 +44,6 @@ public class BufferedZipFile2 {
     private File temp_os_file =null, add_os_file =null;
     private ZipModel input_zip_model =null;
     private ZipModel add_zip_model =null;
-    private OutputStream temp_os_output_stream =null;
     private RandomAccessFile input_raf =null;
     private ArrayList<BzfFileHeaderItem> input_file_header_list =null;
     private ArrayList<BzfFileHeaderItem> add_file_header_list =null;
@@ -54,7 +53,6 @@ public class BufferedZipFile2 {
 
     private static final int IO_AREA_SIZE=1024*1024;
     private ZipOutputStream add_zip_output_stream =null;
-    byte[] readBuff = new byte[IO_AREA_SIZE];
 
     private String file_name_encoding=DEFAULT_ZIP_FILENAME_ENCODING;
     private static final String DEFAULT_ZIP_FILENAME_ENCODING="UTF-8";
@@ -70,26 +68,19 @@ public class BufferedZipFile2 {
     }
 
     public BufferedZipFile2(String input_path, String output_path) {
-        this(new File(input_path), new File(output_path), null, DEFAULT_ZIP_FILENAME_ENCODING);
+        this(new File(input_path), new File(output_path), DEFAULT_ZIP_FILENAME_ENCODING);
     }
 
     public BufferedZipFile2(String input_path, String output_path, String encoding) {
-        this(new File(input_path), new File(output_path), null, encoding);
+        this(new File(input_path), new File(output_path), encoding);
     }
 
-    public BufferedZipFile2(String input_path, OutputStream fos, String encoding) {
-        this(new File(input_path), null, fos, encoding);
+    public BufferedZipFile2(File input_file, File output_file) {
+        this(input_file, output_file, DEFAULT_ZIP_FILENAME_ENCODING);
     }
 
-    public BufferedZipFile2(File input, File output, String encoding) {
-        this(input, output, null, encoding);
-    }
-
-    private void putDebugMsg(String msg) {
-        slf4jLog.debug(msg);
-    }
-
-    public BufferedZipFile2(File input_file, File output_file, OutputStream fos, String encoding) {
+    public BufferedZipFile2(File input_file, File output_file, String encoding) {
+        slf4jLog.debug("<init> Input="+input_file+", Output="+output_file+", Encoding="+encoding);
         file_name_encoding=encoding;
         input_os_file =input_file;
         output_os_file =output_file;
@@ -97,7 +88,6 @@ public class BufferedZipFile2 {
             temp_os_file =new File(output_file.getParent()+"/ziputility.tmp");
             add_os_file =new File(output_file.getParent()+"/ziputility.add");
         }
-        temp_os_output_stream =fos;
         input_file_header_list =new ArrayList<BzfFileHeaderItem>();
         try {
             if (input_file==null || !input_file.exists()) {
@@ -233,8 +223,7 @@ public class BufferedZipFile2 {
                     fileParameters.setSourceFileCRC((int) CRCUtil.computeFileCRC(input.getAbsolutePath(), null));
                 }
                 //Add no compress function 2016/07/22 F.Hoshino
-                if (Zip4jUtil.getFileLengh(input)<100 ||
-                        !fileParameters.isCompressFileExtention(input.getName())) {
+                if (Zip4jUtil.getFileLengh(input)<100 || !fileParameters.isCompressFileExtention(input.getName())) {
                     fileParameters.setCompressionMethod(Zip4jConstants.COMP_STORE);
                 }
             }
@@ -259,7 +248,7 @@ public class BufferedZipFile2 {
                 BufferedZipFile2.BzfFileHeaderItem bfhi=new BufferedZipFile2.BzfFileHeaderItem();
                 bfhi.file_header=fh;
                 add_file_header_list.add(bfhi);
-                putDebugMsg("addItemInternal added name="+fh.getFileName());
+                slf4jLog.info("addItemInternal added name="+fh.getFileName());
             }
         } catch (ZipException e) {
             if (inputStream != null) {
@@ -349,7 +338,6 @@ public class BufferedZipFile2 {
     public void destroy() throws ZipException, IOException {
         checkClosed();
         closed =true;
-        if (temp_os_output_stream!=null) temp_os_output_stream.close();
         if (input_raf!=null) input_raf.close();
         if (primary_bos!=null) primary_bos.close();
         if (add_zip_output_stream!=null) add_zip_output_stream.close();
@@ -363,11 +351,11 @@ public class BufferedZipFile2 {
         checkClosed();
         closed =true;
 //        closeFull();
-        if (input_os_file!=null && input_os_file.length()==0) closeAdd();
+        if (input_os_file!=null && input_os_file.length()==0) closeAddOnly();
         else closeUpdate();
     }
 
-    private void closeAdd() throws ZipException, Exception {
+    private void closeAddOnly() throws ZipException, Exception {
         try {
             primary_output_pos=0;
             if (add_zip_file !=null) {
@@ -419,54 +407,6 @@ public class BufferedZipFile2 {
                     input_raf.close();
                 }
                 if (add_zip_file !=null) add_zip_file.getFile().delete();
-                temp_os_file.renameTo(output_os_file);
-            } else {
-                if (primary_bos!=null) {
-                    primary_bos.flush();
-                    primary_bos.close();
-                }
-                input_raf.close();
-                temp_os_file.delete();
-                if (add_zip_file !=null) add_zip_file.getFile().delete();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new ZipException(e.getMessage());
-        }
-    }
-
-    public void closeUpdateX() throws ZipException, Exception {
-        try {
-            primary_output_pos=0;
-
-            removeItemIfExistst();
-
-            if (primary_file_changed) writePrimaryZipFile();
-            else {
-                if (add_zip_file !=null) {
-                    writePrimaryZipFile();
-                }
-            }
-
-            if (add_zip_file !=null) writeAddZipFile();
-
-            if (primary_output_pos>0 || primary_file_changed) {
-                if (input_zip_model !=null && input_zip_model.getEndCentralDirRecord()!=null) {
-                    input_zip_model.getEndCentralDirRecord().setOffsetOfStartOfCentralDir(primary_output_pos);
-
-                    dumpRemoveList("WriteHeader", input_file_header_list);
-                    dumpRemoveList("WriteHeader", add_file_header_list);
-
-                    HeaderWriter hw=new HeaderWriter();
-                    hw.finalizeZipFile(input_zip_model, primary_bos);
-
-                    primary_bos.flush();
-                    primary_bos.close();
-                    input_raf.close();
-                }
-                if (add_zip_file !=null) add_zip_file.getFile().delete();
-                input_zip_file.getFile().delete();
                 temp_os_file.renameTo(output_os_file);
             } else {
                 if (primary_bos!=null) {
@@ -576,7 +516,7 @@ public class BufferedZipFile2 {
     @SuppressLint("NewApi")
     private long copyZipFile(String name, BufferedOutputStream bos, RandomAccessFile input_file, long start_pos, long end_pos)
             throws IOException, Exception {
-        putDebugMsg("CopyZipFile output="+String.format("%#010x",primary_output_pos)+
+        slf4jLog.trace("CopyZipFile output="+String.format("%#010x",primary_output_pos)+
                 ", start="+String.format("%#010x",start_pos)+", end="+String.format("%#010x",end_pos)+", Name="+name);
         int item_size=(int) (end_pos-start_pos)+1;
         byte[] buff=null;
@@ -644,7 +584,7 @@ public class BufferedZipFile2 {
     private void removeItemInternal(ArrayList<FileHeader> remove_item_list,
                                     ArrayList<BzfFileHeaderItem>bzf_file_header_list) throws ZipException {
         checkClosed();
-        for(FileHeader fh:remove_item_list) putDebugMsg("removeItem selected name="+fh.getFileName());
+        for(FileHeader fh:remove_item_list) slf4jLog.trace("removeItem selected name="+fh.getFileName());
         for(int i=0;i<bzf_file_header_list.size();i++) {
             BufferedZipFile2.BzfFileHeaderItem rfhli=bzf_file_header_list.get(i);
             if (!rfhli.isRemovedItem) {
@@ -661,34 +601,34 @@ public class BufferedZipFile2 {
 
     @SuppressWarnings("unchecked")
     private void dumpZipModel(String id, ZipModel zm) {
-//        if (!slf4jLog.isDebugEnabled() ||zm==null || zm.getEndCentralDirRecord()==null) return;
-//        long offsetStartCentralDir = zm.getEndCentralDirRecord().getOffsetOfStartOfCentralDir();
-//        if (zm.isZip64Format()) {
-//            if (zm.getZip64EndCentralDirRecord() != null) {
-//                offsetStartCentralDir = zm.getZip64EndCentralDirRecord().getOffsetStartCenDirWRTStartDiskNo();
-//            }
-//        }
-//
-//        putDebugMsg(id+" offsetStartCentralDir="+String.format("%#010x", offsetStartCentralDir));
-//        ArrayList<FileHeader> fhl=zm.getCentralDirectory().getFileHeaders();
-//        for(FileHeader fh:fhl) {
-//            putDebugMsg(id+" FileHeader comp size="+fh.getCompressedSize()+
-//                    ", header offset="+String.format("%#010x",fh.getOffsetLocalHeader())+
-//                    ", crc32="+String.format("%#010x",fh.getCrc32())+
-//                    ", name="+fh.getFileName());
-//        }
+        if (!slf4jLog.isTraceEnabled() ||zm==null || zm.getEndCentralDirRecord()==null) return;
+        long offsetStartCentralDir = zm.getEndCentralDirRecord().getOffsetOfStartOfCentralDir();
+        if (zm.isZip64Format()) {
+            if (zm.getZip64EndCentralDirRecord() != null) {
+                offsetStartCentralDir = zm.getZip64EndCentralDirRecord().getOffsetStartCenDirWRTStartDiskNo();
+            }
+        }
+
+        slf4jLog.trace(id+" offsetStartCentralDir="+String.format("%#010x", offsetStartCentralDir));
+        ArrayList<FileHeader> fhl=zm.getCentralDirectory().getFileHeaders();
+        for(FileHeader fh:fhl) {
+            slf4jLog.trace(id+" FileHeader comp size="+fh.getCompressedSize()+
+                    ", header offset="+String.format("%#010x",fh.getOffsetLocalHeader())+
+                    ", crc32="+String.format("%#010x",fh.getCrc32())+
+                    ", name="+fh.getFileName());
+        }
     }
 
     private void dumpRemoveList(String id, ArrayList<BzfFileHeaderItem>bzf_file_header_list) {
-//        if (!slf4jLog.isDebugEnabled() || bzf_file_header_list==null) return;
-//        for(int i=0;i<bzf_file_header_list.size();i++) {
-//            BufferedZipFile2.BzfFileHeaderItem rfhli=bzf_file_header_list.get(i);
-//            putDebugMsg(id+" BzFileHeader comp size="+rfhli.file_header.getCompressedSize()+
-//                    ", header offset="+String.format("%#010x",rfhli.file_header.getOffsetLocalHeader())+
-//                    ", crc32="+String.format("%#010x",rfhli.file_header.getCrc32())+
-//                    ", removed="+rfhli.isRemovedItem+
-//                    ", name="+rfhli.file_header.getFileName());
-//        }
+        if (!slf4jLog.isTraceEnabled() || bzf_file_header_list==null) return;
+        for(int i=0;i<bzf_file_header_list.size();i++) {
+            BufferedZipFile2.BzfFileHeaderItem rfhli=bzf_file_header_list.get(i);
+            slf4jLog.trace(id+" BzFileHeader comp size="+rfhli.file_header.getCompressedSize()+
+                    ", header offset="+String.format("%#010x",rfhli.file_header.getOffsetLocalHeader())+
+                    ", crc32="+String.format("%#010x",rfhli.file_header.getCrc32())+
+                    ", removed="+rfhli.isRemovedItem+
+                    ", name="+rfhli.file_header.getFileName());
+        }
     }
 
 }

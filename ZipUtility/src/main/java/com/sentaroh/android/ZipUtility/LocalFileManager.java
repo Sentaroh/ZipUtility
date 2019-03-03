@@ -3811,7 +3811,7 @@ public class LocalFileManager {
 				ntfy_select_dest.setListener(new NotifyEventListener(){
 					@Override
 					public void positiveResponse(Context c, Object[] o) {
-						final File out_fl=new File((String)o[0]);
+						final File out_fl=new File((String)o[0]+"/"+(String)o[1]+(String)o[2]);
 						NotifyEvent ntfy_create=new NotifyEvent(mContext);
 						ntfy_create.setListener(new NotifyEventListener(){
 							@Override
@@ -3844,7 +3844,7 @@ public class LocalFileManager {
 								});
 								if (out_fl.getPath().startsWith(mGp.externalRootDirectory)) {
 									SafFile out_sf=mUtil.createSafFile(out_fl.getPath(), true);
-									if (out_sf!=null) out_sf.delete();
+									if (out_sf!=null && out_sf.exists()) out_sf.delete();
 									else {
 									    return;
                                     }
@@ -3870,10 +3870,12 @@ public class LocalFileManager {
 					public void negativeResponse(Context c, Object[] o) {
 					}
 				});
-				String sep=out_dir.equals("")?"/":"";  
-				mCommonDlg.fileOnlySelectWithCreateLimitMP(mLocalStorage.getSelectedItem().toString(),
-						out_dir, sep+out_fn, 
-						mContext.getString(R.string.msgs_zip_create_new_zip_file_select_dest), ntfy_select_dest);
+				String sep=out_dir.equals("")?"/":"";
+                mCommonDlg.fileSelectorFileOnlyWithCreate(true, mLocalStorage.getSelectedItem().toString(), out_dir, sep+out_fn,
+                        mContext.getString(R.string.msgs_zip_create_new_zip_file_select_dest), ntfy_select_dest);
+//				mCommonDlg.fileOnlySelectWithCreateLimitMP(mLocalStorage.getSelectedItem().toString(),
+//						out_dir, sep+out_fn,
+//						mContext.getString(R.string.msgs_zip_create_new_zip_file_select_dest), ntfy_select_dest);
 			}
 			@Override
 			public void negativeResponse(Context c, Object[] o) {
