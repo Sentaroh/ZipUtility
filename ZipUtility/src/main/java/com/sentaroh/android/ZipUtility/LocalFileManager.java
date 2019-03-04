@@ -3707,7 +3707,7 @@ public class LocalFileManager {
 								ntfy_zip.setListener(new NotifyEventListener(){
 									@Override
 									public void positiveResponse(Context c, Object[] o) {
-										String dest_dir="", dest_name="";
+                                        String dest_dir="", dest_name="";
                                         dest_dir=out_fl.getParent();
                                         dest_name=out_fl.getName();
 										ZipParameters zp=(ZipParameters)o[0];
@@ -3723,6 +3723,9 @@ public class LocalFileManager {
 											add_item[i]=sel_list.get(i);
 										}
 										zipSelectedItem(zp, add_item, dest_dir, dest_name, out_fl);
+
+                                        mTreeFilelistAdapter.setAllItemUnchecked();
+                                        mTreeFilelistAdapter.notifyDataSetChanged();
 									}
 									@Override
 									public void negativeResponse(Context c, Object[] o) {
@@ -3758,8 +3761,17 @@ public class LocalFileManager {
 					}
 				});
 				String sep=out_dir.equals("")?"/":"";
-                mCommonDlg.fileSelectorFileOnlyWithCreate(true, mLocalStorage.getSelectedItem().toString(), out_dir, sep+out_fn,
+				String o_mp=mLocalStorage.getSelectedItem().toString();
+				if (mLocalStorage.getSelectedItemPosition()!=0) {
+				    if (!mGp.safMgr.isSdcardMounted()) {
+				        o_mp=mGp.internalRootDirectory;
+                    }
+                }
+                mCommonDlg.fileSelectorFileOnlyWithCreate(true, o_mp, out_dir, sep+out_fn,
                         mContext.getString(R.string.msgs_zip_create_new_zip_file_select_dest), ntfy_select_dest);
+
+                if (!mGp.safMgr.isSdcardMounted())
+                    mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_external_sdcard_select_required_can_not_selected), "", null);
 //				mCommonDlg.fileOnlySelectWithCreateLimitMP(mLocalStorage.getSelectedItem().toString(),
 //						out_dir, sep+out_fn,
 //						mContext.getString(R.string.msgs_zip_create_new_zip_file_select_dest), ntfy_select_dest);
