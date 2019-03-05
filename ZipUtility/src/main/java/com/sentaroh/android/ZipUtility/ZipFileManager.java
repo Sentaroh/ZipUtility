@@ -2172,7 +2172,8 @@ public class ZipFileManager {
 		ntfy.setListener(new NotifyEventListener(){
 			@Override
 			public void positiveResponse(Context c, Object[] o) {
-				final String dest_path=((String)o[0]).endsWith("/")?((String)o[0]).substring(0,((String)o[0]).length()-1):((String)o[0]);
+//				final String dest_path=((String)o[0]).endsWith("/")?((String)o[0]).substring(0,((String)o[0]).length()-1):((String)o[0]);
+                final String dest_path=((String)o[0])+((String)o[1]);
 				String w_conf_list="";
 				String sep="";
 				for (TreeFilelistItem item:tfa.getDataList()) {
@@ -2189,6 +2190,8 @@ public class ZipFileManager {
 						String t_cd=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().toString().substring(1);
 						prepareExtractMultipleItem(mCurrentFilePath, mEncodingSelected,
 								tfa, t_cd, dest_path, conf_list, null, true, true);
+						mTreeFilelistAdapter.setAllItemUnchecked();
+                        mTreeFilelistAdapter.notifyDataSetChanged();
 					}
 					@Override
 					public void negativeResponse(Context c, Object[] o) {
@@ -2202,18 +2205,22 @@ public class ZipFileManager {
 			public void negativeResponse(Context c, Object[] o) {
 			}
 		});
-		FileSelectDialogFragment fsdf=FileSelectDialogFragment.newInstance(
-//				false, true, false, false, true, false, true, true, 
-				mGp.internalRootDirectory, "", "", mContext.getString(R.string.msgs_zip_extract_select_dest_directory));
-		fsdf.setOptionDebug(false);
-		fsdf.setOptionEnableCreate(true);
-		fsdf.setOptionFileOnly(false);
-		fsdf.setOptionDirectoryOnly(true);
-		fsdf.setOptionHideMountPoint(false);
-		fsdf.setOptionIncludeRoot(false);
-		fsdf.setOptionSingleSelect(true);
-		fsdf.setOptionLimitMountPoint(true);
-		fsdf.showDialog(mFragmentManager, fsdf, ntfy);
+        mCommonDlg.fileSelectorDirOnlyWithCreate(true, mGp.internalRootDirectory, "",
+                mContext.getString(R.string.msgs_zip_extract_select_dest_directory), ntfy);
+        if (!mGp.safMgr.isSdcardMounted())
+            mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_external_sdcard_select_required_can_not_selected), "", null);
+
+//		FileSelectDialogFragment fsdf=FileSelectDialogFragment.newInstance(
+//				mGp.internalRootDirectory, "", "", mContext.getString(R.string.msgs_zip_extract_select_dest_directory));
+//		fsdf.setOptionDebug(false);
+//		fsdf.setOptionEnableCreate(true);
+//		fsdf.setOptionFileOnly(false);
+//		fsdf.setOptionDirectoryOnly(true);
+//		fsdf.setOptionHideMountPoint(false);
+//		fsdf.setOptionIncludeRoot(false);
+//		fsdf.setOptionSingleSelect(true);
+//		fsdf.setOptionLimitMountPoint(true);
+//		fsdf.showDialog(mFragmentManager, fsdf, ntfy);
 	};
 	
 	private void prepareExtractMultipleItem(final String zip_file_path, final String zip_file_encoding,
