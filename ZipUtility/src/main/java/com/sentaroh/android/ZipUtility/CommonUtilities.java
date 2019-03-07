@@ -87,11 +87,12 @@ public final class CommonUtilities {
 	};
 
     public SafFile createSafFile(String fp, boolean directory) {
-        SafFile sf=mGp.safMgr.createSdcardItem(fp, directory);
+        SafFile sf=null;
+        if (mGp.safMgr.getSdcardRootSafFile()!=null) sf=mGp.safMgr.createSdcardItem(fp, directory);
         if (sf==null) {
             String e_msg=mGp.safMgr.getLastErrorMessage();
-            mLog.addLogMsg("E","SafFile create error:fp="+fp+"\n"+e_msg);
-            mCommonDlg.showCommonDialog(false,"E","SafFile creation :fp="+fp,e_msg,null);
+            mLog.addLogMsg("E","SafFile creation error, fp="+fp+"\n"+e_msg+"\n SafRootFile="+mGp.safMgr.getSdcardRootSafFile());
+            mCommonDlg.showCommonDialog(false,"E","SafFile creation error, fp="+fp,e_msg+"\n SafRootFile="+mGp.safMgr.getSdcardRootSafFile(),null);
         }
         return sf;
     }
