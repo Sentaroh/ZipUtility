@@ -2190,8 +2190,6 @@ public class ZipFileManager {
 						String t_cd=mCurrentDirectory.getText().equals("/")?"":mCurrentDirectory.getText().toString().substring(1);
 						prepareExtractMultipleItem(mCurrentFilePath, mEncodingSelected,
 								tfa, t_cd, dest_path, conf_list, null, true, true);
-						mTreeFilelistAdapter.setAllItemUnchecked();
-                        mTreeFilelistAdapter.notifyDataSetChanged();
 					}
 					@Override
 					public void negativeResponse(Context c, Object[] o) {
@@ -2278,6 +2276,15 @@ public class ZipFileManager {
                     }
                     ArrayList<FileHeader> ext_fhl=new ArrayList<FileHeader>();
                     extractMultipleItem(tc, dest_path, zf, zip_curr_dir, sel_fhl, ext_fhl, conf_list, p_ntfy, comp_msg_required, scan_media);
+
+                    mUiHandler.post(new Runnable(){
+                        @Override
+                        public void run() {
+                            mTreeFilelistAdapter.setAllItemUnchecked();
+                            mTreeFilelistAdapter.notifyDataSetChanged();
+                        }
+                    });
+
                     mUtil.addDebugMsg(1, "I", "Extract exited");
                 } else {
 				    String ste_info="";
