@@ -46,6 +46,7 @@ import android.widget.TextView;
 import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.SafFile;
+import com.sentaroh.android.Utilities.SystemInfo;
 import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.ZipUtility.Log.LogUtil;
 
@@ -91,8 +92,11 @@ public final class CommonUtilities {
         if (mGp.safMgr.getSdcardRootSafFile()!=null) sf=mGp.safMgr.createSdcardItem(fp, directory);
         if (sf==null) {
             String e_msg=mGp.safMgr.getLastErrorMessage();
-            mLog.addLogMsg("E","SafFile creation error, fp="+fp+"\n"+e_msg+"\n SafRootFile="+mGp.safMgr.getSdcardRootSafFile());
-            mCommonDlg.showCommonDialog(false,"E","SafFile creation error, fp="+fp,e_msg+"\n SafRootFile="+mGp.safMgr.getSdcardRootSafFile(),null);
+            ArrayList<String>sil= SystemInfo.listSystemInfo(mContext, mGp.safMgr);
+            String si_str="";
+            for(String s_item:sil) si_str+=" "+s_item+"\n";
+            mLog.addLogMsg("E","SafFile creation error, fp="+fp+"\n"+e_msg+"\n SafRootFile="+mGp.safMgr.getSdcardRootSafFile()+"\n\n"+si_str);
+            mCommonDlg.showCommonDialog(false,"E","SafFile creation error, fp="+fp,e_msg+"\n SafRootFile="+mGp.safMgr.getSdcardRootSafFile()+"\n\n"+si_str,null);
         }
         return sf;
     }
