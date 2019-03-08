@@ -75,6 +75,7 @@ public class ZipReceiver extends BroadcastReceiver {
                 mLog.addDebugMsg(1, "I", "Receiver action=" + action);
                 Intent in = new Intent(mContext, ZipService.class);
                 in.setAction(action);
+                in.setData(received_intent.getData());
                 if (received_intent.getExtras() != null) in.putExtras(received_intent.getExtras());
                 try {
                     mContext.startService(in);
