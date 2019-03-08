@@ -1316,7 +1316,11 @@ public class ZipFileManager {
                     setContextButtonEnabled(mContextButtonNew, false);
                     createNewZipFileDialog();
                     setContextButtonEnabled(mContextButtonNew, true);
-                    mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_external_sdcard_select_required_can_not_selected),"", null);
+                    if (!mGp.safMgr.isSdcardMounted()) {
+                        if (mGp.safMgr.hasExternalMediaPath()) {
+                            mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_external_sdcard_select_required_can_not_selected),"", null);
+                        }
+                    }
 				}
 			}
         });
@@ -1582,7 +1586,7 @@ public class ZipFileManager {
 		ntfy.setListener(new NotifyEventListener(){
 			@Override
 			public void positiveResponse(Context c, Object[] o) {
-				final String fp=(String)o[0];
+				final String fp=(String)o[0]+(String)o[1]+"/"+(String)o[2];
 				final File lf=new File(fp);
 				if (!lf.isDirectory()) {
 					NotifyEvent ntfy_dup=new NotifyEvent(mContext);
@@ -2205,8 +2209,11 @@ public class ZipFileManager {
 		});
         mCommonDlg.fileSelectorDirOnlyWithCreate(true, mGp.internalRootDirectory, "",
                 mContext.getString(R.string.msgs_zip_extract_select_dest_directory), ntfy);
-        if (!mGp.safMgr.isSdcardMounted())
-            mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_external_sdcard_select_required_can_not_selected), "", null);
+        if (!mGp.safMgr.isSdcardMounted()) {
+            if (mGp.safMgr.hasExternalMediaPath()) {
+                mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_external_sdcard_select_required_can_not_selected), "", null);
+            }
+        }
 
 //		FileSelectDialogFragment fsdf=FileSelectDialogFragment.newInstance(
 //				mGp.internalRootDirectory, "", "", mContext.getString(R.string.msgs_zip_extract_select_dest_directory));

@@ -191,20 +191,21 @@ public class GlobalParameters extends CommonGlobalParms {
 	};
 	
 	public void refreshMediaDir(Context c) {
+        if (safMgr==null) {
+            safMgr=new SafManager(c, settingDebugLevel>0);
+        } else {
+            safMgr.loadSafFile();
+        }
 //		File[] fl=ContextCompat.getExternalFilesDirs(c, null);
         File[] fl=c.getExternalFilesDirs(null);
+        externalRootDirectory=STORAGE_STATUS_UNMOUNT;
 		if (fl!=null) {
 			for(File item:fl) {
-				if (item!=null && !item.getPath().startsWith(internalRootDirectory)) {
+				if (item!=null && !item.getPath().startsWith(internalRootDirectory) && safMgr.hasExternalMediaPath()) {
 					externalRootDirectory=item.getPath().substring(0,item.getPath().indexOf("/Android"));
 					break;
 				}
 			}
-		}
-		if (safMgr==null) {
-			safMgr=new SafManager(c, settingDebugLevel>0);
-		} else {
-			safMgr.loadSafFile();
 		}
 	};
 	

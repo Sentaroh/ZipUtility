@@ -88,15 +88,22 @@ public class ZipService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
 		WakeLock wl=((PowerManager)getSystemService(Context.POWER_SERVICE))
-    			.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
-	    				| PowerManager.ACQUIRE_CAUSES_WAKEUP
-	    				, "ZipUtility-Service-1");
+    			.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK|PowerManager.ACQUIRE_CAUSES_WAKEUP, "ZipUtility-Service-1");
 		wl.acquire();
 		String action="";
 		if (intent!=null) if (intent.getAction()!=null) action=intent.getAction();
 		if (action.equals(SERVICE_HEART_BEAT)) {
-//            mUtil.addDebugMsg(1,"I","onStartCommand entered, action="+action);
-			setHeartBeat();
+            setHeartBeat();
+        } else if (action.equals(Intent.ACTION_MEDIA_MOUNTED) || action.equals(Intent.ACTION_MEDIA_UNMOUNTED)) {
+            mUtil.addDebugMsg(1,"I","onStartCommand entered, action="+action);
+            mGp.refreshMediaDir(mContext);
+            if (mGp.callbackStub!=null) {
+                try {
+                    mGp.callbackStub.cbNotifyMediaStatus(action);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
 		} else {
 			mUtil.addDebugMsg(2,"I","onStartCommand entered, action="+action);
 		}

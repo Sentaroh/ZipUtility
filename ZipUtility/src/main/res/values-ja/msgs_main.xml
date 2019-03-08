@@ -260,7 +260,7 @@ ZIPファイルの作成・編集・抽出のためのアプリケーション�
     <string name="msgs_main_external_usb_mp_changed_title">USB Storage</string>
 
 
-	<string name="msgs_main_permission_external_storage_title">内部ストレージ許可許可</string>
+	<string name="msgs_main_permission_external_storage_title">内部ストレージ許可</string>
 	<string name="msgs_main_permission_external_storage_request_msg">内部ストレージにデータや管理用データの読み書きを行うために内部ストレージにアクセスする許可を与えてください。</string>
 	<string name="msgs_main_permission_external_storage_denied_msg">内部ストレージにアクセスする許可が与えられていないためアプリケーションを続行できません、アプリケーションを終了します。</string>
 
@@ -270,4 +270,6 @@ ZIPファイルの作成・編集・抽出のためのアプリケーション�
 	<string name="msgs_local_file_scan_scan_was_completed">メディアファイルのスキャンが終了しました。</string>
 
     <string name="msgs_file_list_size_calculating">計算中</string>
+
+    <string name="msgs_main_local_mount_point_unmounted">SDCARDが取り外されたためローカルフォルダーは内部ストレージを表示しています。</string>
 </resources>

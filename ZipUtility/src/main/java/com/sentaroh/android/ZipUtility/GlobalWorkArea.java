@@ -8,6 +8,8 @@ public class GlobalWorkArea {
         if (gp ==null) {
             gp =new GlobalParameters();
             gp.initGlobalParameter(c);
+        } else {
+            gp.refreshMediaDir(c);
         }
         return gp;
     }

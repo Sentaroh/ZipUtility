@@ -241,6 +241,28 @@ public class LocalFileManager {
         else lv.setVisibility(LinearLayout.INVISIBLE);
     }
 
+    public int getLocalMpSpinnerSelectedPosition() {
+        if (mLocalStorage!=null) {
+            return mLocalStorage.getSelectedItemPosition();
+        }
+        return 0;
+    }
+
+    public void setLocalMpSpinner(boolean animate) {
+        final CustomSpinnerAdapter stg_adapter =
+                new CustomSpinnerAdapter(mActivity, android.R.layout.simple_spinner_item);
+        stg_adapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
+        stg_adapter.add(mGp.internalRootDirectory);
+        if (!mGp.externalRootDirectory.equals(GlobalParameters.STORAGE_STATUS_UNMOUNT))
+            stg_adapter.add(mGp.externalRootDirectory);
+//		if (!mGp.safMgr.getUsbFileSystemDirectory().equals(SafFileManager.UNKNOWN_USB_FS_DIRECTORY))
+//			stg_adapter.add(mGp.safMgr.getUsbFileSystemDirectory());
+        mLocalStorage.setAdapter(stg_adapter);
+        mLocalStorage.setSelection(0, animate);
+//        if (stg_adapter.getCount() > 1) mLocalStorage.setEnabled(true);
+//        else mLocalStorage.setEnabled(false);
+    }
+
     private void initViewWidget() {
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " entered");
         mContextButton = (LinearLayout) mMainView.findViewById(R.id.context_view_local_file);
@@ -259,18 +281,7 @@ public class LocalFileManager {
 
         mLocalStorage = (Spinner) mMainView.findViewById(R.id.local_file_storage_spinner);
         CommonUtilities.setSpinnerBackground(mActivity, mLocalStorage, mGp.themeIsLight);
-        final CustomSpinnerAdapter stg_adapter =
-                new CustomSpinnerAdapter(mActivity, android.R.layout.simple_spinner_item);
-        stg_adapter.setDropDownViewResource(android.R.layout.select_dialog_singlechoice);
-        stg_adapter.add(mGp.internalRootDirectory);
-        if (!mGp.externalRootDirectory.equals(GlobalParameters.STORAGE_STATUS_UNMOUNT))
-            stg_adapter.add(mGp.externalRootDirectory);
-//		if (!mGp.safMgr.getUsbFileSystemDirectory().equals(SafFileManager.UNKNOWN_USB_FS_DIRECTORY))
-//			stg_adapter.add(mGp.safMgr.getUsbFileSystemDirectory());
-        mLocalStorage.setAdapter(stg_adapter);
-        mLocalStorage.setSelection(0, false);
-        if (stg_adapter.getCount() > 1) mLocalStorage.setEnabled(true);
-        else mLocalStorage.setEnabled(false);
+        setLocalMpSpinner(false);
 
         mFileListUp = (Button) mMainView.findViewById(R.id.local_file_up_btn);
         if (mGp.themeIsLight)
@@ -3770,8 +3781,11 @@ public class LocalFileManager {
                 mCommonDlg.fileSelectorFileOnlyWithCreate(true, o_mp, out_dir, sep+out_fn,
                         mContext.getString(R.string.msgs_zip_create_new_zip_file_select_dest), ntfy_select_dest);
 
-                if (!mGp.safMgr.isSdcardMounted())
-                    mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_external_sdcard_select_required_can_not_selected), "", null);
+                if (!mGp.safMgr.isSdcardMounted()) {
+                    if (mGp.safMgr.hasExternalMediaPath()) {
+                        mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_external_sdcard_select_required_can_not_selected), "", null);
+                    }
+                }
 //				mCommonDlg.fileOnlySelectWithCreateLimitMP(mLocalStorage.getSelectedItem().toString(),
 //						out_dir, sep+out_fn,
 //						mContext.getString(R.string.msgs_zip_create_new_zip_file_select_dest), ntfy_select_dest);

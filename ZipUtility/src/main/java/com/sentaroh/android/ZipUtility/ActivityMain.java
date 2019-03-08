@@ -1341,6 +1341,7 @@ public class ActivityMain extends AppCompatActivity {
     		public void onServiceConnected(ComponentName arg0, IBinder service) {
     	    	mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");
     	    	mSvcClient=ISvcClient.Stub.asInterface(service);
+                setCallbackListener();
    	    		p_ntfy.notifyToListener(true, null);
     		}
     		public void onServiceDisconnected(ComponentName name) {
@@ -1362,6 +1363,7 @@ public class ActivityMain extends AppCompatActivity {
     	
 		mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered, conn="+mSvcConnection);
 
+        unsetCallbackListener();
     	if (mSvcConnection!=null) {
 //    		try {
 //				if (mSvcClient!=null) mSvcClient.aidlStopService();
@@ -1377,35 +1379,38 @@ public class ActivityMain extends AppCompatActivity {
 //        stopService(intent);
 	};
 	
-//	final private void setCallbackListener() {
-//		mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
-//		try{
-//			mSvcClient.setCallBack(mSvcCallbackStub);
-//		} catch (RemoteException e){
-//			e.printStackTrace();
-//			mUtil.addDebugMsg(1,"E", "setCallbackListener error :"+e.toString());
-//		}
-//	};
-//
-//	final private void unsetCallbackListener() {
-//		mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
-//		if (mSvcClient!=null) {
-//			try{
-//				mSvcClient.removeCallBack(mSvcCallbackStub);
-//			} catch (RemoteException e){
-//				e.printStackTrace();
-//				mUtil.addDebugMsg(1,"E", "unsetCallbackListener error :"+e.toString());
-//			}
-//		}
-//	};
+	final private void setCallbackListener() {
+		mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
+		try{
+			mSvcClient.setCallBack(mSvcCallbackStub);
+		} catch (RemoteException e){
+			e.printStackTrace();
+			mUtil.addDebugMsg(1,"E", "setCallbackListener error :"+e.toString());
+		}
+	};
 
-	@SuppressWarnings("unused")
+	final private void unsetCallbackListener() {
+		mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName()+" entered");
+		if (mSvcClient!=null) {
+			try{
+				mSvcClient.removeCallBack(mSvcCallbackStub);
+			} catch (RemoteException e){
+				e.printStackTrace();
+				mUtil.addDebugMsg(1,"E", "unsetCallbackListener error :"+e.toString());
+			}
+		}
+	};
+
 	private ISvcCallback mSvcCallbackStub=new ISvcCallback.Stub() {
 		@Override
-		public void cbThreadStarted() throws RemoteException {
-		}
-		@Override
-		public void cbThreadEnded() throws RemoteException {
+		public void cbNotifyMediaStatus(String action) throws RemoteException {
+            mUtil.addDebugMsg(1,"I", "cbNotifyMediaStatus entered, Action="+action);
+            if (mLocalFileMgr!=null) {
+                int sc=mLocalFileMgr.getLocalMpSpinnerSelectedPosition();
+                mLocalFileMgr.setLocalMpSpinner(true);
+                if (action.equals(Intent.ACTION_MEDIA_UNMOUNTED) && sc>0)
+                    mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_local_mount_point_unmounted), "", null);
+            }
 		}
     };
 
