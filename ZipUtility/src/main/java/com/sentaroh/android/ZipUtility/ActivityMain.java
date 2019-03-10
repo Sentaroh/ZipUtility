@@ -1361,7 +1361,7 @@ public class ActivityMain extends AppCompatActivity {
 
 	private void closeService() {
     	
-		mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered, conn="+mSvcConnection);
+		mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");
 
         unsetCallbackListener();
     	if (mSvcConnection!=null) {

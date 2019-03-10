@@ -120,19 +120,15 @@ External Library:\n
 	<string name="msgs_zip_zip_item_property_directory" formatted="false">Item count=%s\nCompressed size=%,d\nUncmpress size=%,d</string>
 	<string name="msgs_zip_zip_item_property_encrypted_yes">Yes</string>
 	<string name="msgs_zip_zip_item_property_encrypted_no">No</string>
-		
-	
-	<string name="msgs_zip_sdcard_create_work_file_start">Began the creation of the work file.</string>
-	<string name="msgs_zip_sdcard_create_work_file_end">Creating a work file was completed.</string>
-	<string name="msgs_zip_sdcard_create_work_file_cancelled">Aborted the creation of a work file.</string>
-	<string name="msgs_zip_sdcard_create_work_file_failed">Creating a work file failed.</string>
+
+    <string name="msgs_zip_zip_file_being_updated">The zip file is being updated. Please wait.</string>
+    <string name="msgs_zip_zip_file_creation_failed">BufferedZipFile作成に失敗しました。</string>
 
 	<string name="msgs_zip_sdcard_create_zip_file_start">Began the creation of the ZIP file.</string>
 	<string name="msgs_zip_sdcard_create_zip_file_end">Creating a ZIP file was completed.</string>
 	<string name="msgs_zip_sdcard_create_zip_file_cancelled">Aborted the creation of a ZIP file.</string>
 	<string name="msgs_zip_sdcard_create_zip_file_failed">Creating a ZIP file failed.</string>
-		
-	
+
 	<string name="msgs_folder_view_up_btn">Up</string>
 	<string name="msgs_folder_view_top_btn">Top</string>
 	

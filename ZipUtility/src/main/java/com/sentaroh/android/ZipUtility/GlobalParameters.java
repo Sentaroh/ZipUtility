@@ -299,7 +299,7 @@ public class GlobalParameters extends CommonGlobalParms {
 		settingZipDefaultEncoding=prefs.getString(c.getString(R.string.settings_zip_default_encoding), "UTF-8");
 
 		if (settingDebugLevel==1) {
-            slf4jLog.setLogOption(false,true,true,false,true);
+            slf4jLog.setLogOption(true,true,true,false,true);
         } else if (settingDebugLevel==2) {
             slf4jLog.setLogOption(true,true,true,true,true);
         }

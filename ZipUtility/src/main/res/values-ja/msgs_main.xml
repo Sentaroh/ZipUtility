@@ -122,12 +122,10 @@ ZIPファイルの作成・編集・抽出のためのアプリケーション�
 	<string name="msgs_zip_zip_item_property_directory" formatted="false">項目数=%s\n圧縮後サイズ=%,d\n圧縮前サイズ=%,d</string>
 	<string name="msgs_zip_zip_item_property_encrypted_yes">有り</string>
 	<string name="msgs_zip_zip_item_property_encrypted_no">無し</string>
-	
-	<string name="msgs_zip_sdcard_create_work_file_start">ワークファイルの作成を開始しました。</string>
-	<string name="msgs_zip_sdcard_create_work_file_end">ワークファイルの作成が完了しました。</string>
-	<string name="msgs_zip_sdcard_create_work_file_cancelled">ワークファイルの作成を中止しました。</string>
-	<string name="msgs_zip_sdcard_create_work_file_failed">ワークファイルの作成が失敗しました。</string>
 
+    <string name="msgs_zip_zip_file_being_updated">ZIPファイルを更新しています。しばらくお待ちください。</string>
+    <string name="msgs_zip_zip_file_creation_failed">BufferedZipFile作成に失敗しました。</string>
+	
 	<string name="msgs_zip_sdcard_create_zip_file_start">ZIPの作成を開始しました。</string>
 	<string name="msgs_zip_sdcard_create_zip_file_end">ZIPの作成が完了しました。</string>
 	<string name="msgs_zip_sdcard_create_zip_file_cancelled">ZIPの作成を中止しました。</string>
