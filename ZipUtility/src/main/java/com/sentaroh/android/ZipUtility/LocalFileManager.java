@@ -31,6 +31,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.sentaroh.android.Utilities.BufferedZipFile2;
 import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomContextMenuOnClickListener;
@@ -543,6 +544,7 @@ public class LocalFileManager {
     }
 
     private void shareItem(CustomTreeFilelistAdapter tfa) {
+        mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");
         ArrayList<TreeFilelistItem> tfl = tfa.getDataList();
         ArrayList<String> fpl = new ArrayList<String>();
         for (int i = 0; i < tfl.size(); i++) {
@@ -563,6 +565,7 @@ public class LocalFileManager {
         if (fpl.size() >= 100) {
             mCommonDlg.showCommonDialog(false, "E",
                     mContext.getString(R.string.msgs_local_file_share_file_max_file_count_reached), "", null);
+            mUtil.addDebugMsg(1,"I",mContext.getString(R.string.msgs_local_file_share_file_max_file_count_reached));
         } else {
             if (fpl.size() > 1) {
                 Intent intent = new Intent();
@@ -589,6 +592,7 @@ public class LocalFileManager {
                     mContext.startActivity(intent);
                 } catch (Exception e) {
                     mCommonDlg.showCommonDialog(false, "E", "startActivity() failed at shareItem() for multiple item. message=" + e.getMessage(), "", null);
+                    mUtil.addDebugMsg(1,"E","startActivity() failed at shareItem() for multiple item. message=" + e.getMessage());
                 }
             } else if (fpl.size() == 1) {
                 File lf = new File(fpl.get(0));
@@ -607,10 +611,12 @@ public class LocalFileManager {
                     mContext.startActivity(intent);
                 } catch (Exception e) {
                     mCommonDlg.showCommonDialog(false, "E", "startActivity() failed at shareItem() for share item. message=" + e.getMessage(), "", null);
+                    mUtil.addDebugMsg(1,"E","startActivity() failed at shareItem() for share item. message=" + e.getMessage());
                 }
             } else {
                 mCommonDlg.showCommonDialog(false, "E",
                         mContext.getString(R.string.msgs_local_file_share_file_no_file_selected), "", null);
+                mUtil.addDebugMsg(1,"E",mContext.getString(R.string.msgs_local_file_share_file_no_file_selected));
             }
         }
     }
@@ -919,6 +925,7 @@ public class LocalFileManager {
     ;
 
     private void createItem(CustomTreeFilelistAdapter tfa, final String c_dir) {
+        mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");
         final Dialog dialog = new Dialog(mActivity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.single_item_input_dlg);
@@ -989,6 +996,7 @@ public class LocalFileManager {
                                 try {
                                     rc_create = lf.createNewFile();
                                 } catch (IOException e) {
+                                    mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" createNewFile failed, error="+e.getMessage());
                                     e.printStackTrace();
                                 }
                             }
@@ -1034,9 +1042,8 @@ public class LocalFileManager {
 
     }
 
-    ;
-
     private void renameItem(CustomTreeFilelistAdapter tfa) {
+        mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");
         final Dialog dialog = new Dialog(mActivity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.single_item_input_dlg);
@@ -1252,6 +1259,7 @@ public class LocalFileManager {
             mGp.copyCutItemClear.setVisibility(Button.VISIBLE);
             mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
             mNotifyCheckBoxChanged.notifyToListener(false, null);
+            mUtil.addDebugMsg(1,"I","copyItem copy="+mGp.copyCutItemInfo.getText().toString());
         }
     }
 
@@ -1278,6 +1286,7 @@ public class LocalFileManager {
             mGp.copyCutItemInfo.setVisibility(TextView.VISIBLE);
             mGp.copyCutItemClear.setVisibility(Button.VISIBLE);
             mNotifyCheckBoxChanged.notifyToListener(false, null);
+            mUtil.addDebugMsg(1,"I","copyItem cut="+mGp.copyCutItemInfo.getText().toString());
         }
         mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
     }
@@ -1873,6 +1882,7 @@ public class LocalFileManager {
     }
 
     private void confirmCopyFromZip() {
+        mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");
         final String to_dir = mLocalStorage.getSelectedItem().toString() + mCurrentDirectory.getText().toString();
         String w_conf_list = "";
         String sep = "";
@@ -1896,8 +1906,6 @@ public class LocalFileManager {
                 String.format(mContext.getString(R.string.msgs_zip_extract_file_confirm_extract), to_dir),
                 conf_list, ntfy_confirm);
     }
-
-    ;
 
     private void prepareExtractMultipleItem(final String dest_path, final String conf_list,
                                             final boolean move_mode) {
@@ -2307,6 +2315,7 @@ public class LocalFileManager {
     ;
 
     private void confirmCopyFromLocal() {
+        mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");
         final String to_dir = mLocalStorage.getSelectedItem().toString() + mCurrentDirectory.getText().toString();
         NotifyEvent ntfy = new NotifyEvent(mContext);
         ntfy.setListener(new NotifyEventListener() {
