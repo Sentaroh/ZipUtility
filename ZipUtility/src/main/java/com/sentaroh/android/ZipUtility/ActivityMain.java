@@ -407,8 +407,8 @@ public class ActivityMain extends AppCompatActivity {
         mLocalFileMgr.showLocalFileView(false);
         mZipFileMgr=new ZipFileManager(mGp, mActivity, mFragmentManager, mZipView);
 
-        Intent intmsg = new Intent(mContext, ZipService.class);
-        startService(intmsg);
+//        Intent intmsg = new Intent(mContext, ZipService.class);
+//        startService(intmsg);
 
         checkRequiredPermissions();
 	};
