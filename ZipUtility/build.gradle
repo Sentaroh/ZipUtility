@@ -9,7 +9,7 @@ android {
 //        targetSdkVersion 22
         targetSdkVersion 26
 
-        versionCode 101
+        versionCode 105
         versionName "1.83"
 
 //        multiDexEnabled true

@@ -230,23 +230,23 @@ ZIPファイルの作成・編集・抽出のためのアプリケーション�
 	<string name="msgs_zip_specific_extract_mime_type_not_found">MIMEタイプが見つかりません、 ファイル=%s</string>
 
     <string name="msgs_main_external_sdcard_mp_changed_title">外部SDCARD</string>
-	<string name="msgs_main_external_sdcard_select_required_title">外部SDCARDの選択</string>
-	<string name="msgs_main_external_sdcard_select_required_select_msg_api21">外部SDCARDにアクセスするために、ステップ１.「SDCARD」をタップしてください、ステップ２.その後表示された画面で「ＳＤＣＡＲＤを選択」をタップしてください。\n
+	<string name="msgs_main_external_sdcard_select_required_title">外部SDCARDの書込許可</string>
+	<string name="msgs_main_external_sdcard_select_required_select_msg_api21">外部SDCARDに書込みするために、ステップ１.「SDCARD」をタップしてください、ステップ２.その後表示された画面で「ＳＤＣＡＲＤを選択」をタップしてください。\n
 (ステップ２の「ＳＤＣＡＲＤを選択」の画面が直接表示された時は「ＳＤＣＡＲＤを選択」をタップしてください)</string>
-	<string name="msgs_main_external_sdcard_select_required_select_msg_api23">外部SDCARDにアクセスするために、ステップ１.「SDCARD」をタップしてください、ステップ２.その後表示された画面で「選択」をタップしてください。\n
+	<string name="msgs_main_external_sdcard_select_required_select_msg_api23">外部SDCARDに書込みするために、ステップ１.「SDCARD」をタップしてください、ステップ２.その後表示された画面で「選択」をタップしてください。\n
 (ステップ２で左上に「ＳＤＣＡＲＤ」の画面が直接表示された時は「選択」をタップしてください。左上に「ＳＤＣＡＲＤ」以外が表示されている場合は左上のメニューをタップし、ステップ１からやり直してください。)</string>
 	<string name="msgs_main_external_sdcard_select_retry_select_msg">外部SDCARDのルートディレクトリが選択されませんでした。選択しなおしますか？</string>
     <string name="msgs_main_external_sdcard_select_retry_select_usb_selected_msg">USBストレージが選択されました。SDCARDを選択しなおしますか？</string>
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api21">SMBSync_SD_CARD_5.0_JA.png</string>
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api23">SMBSync_SD_CARD_6.0_JA.png</string>
-	<string name="msgs_main_external_sdcard_select_required_cancel_msg">外部SDCARDが選択されるまで編集できません。</string>
+	<string name="msgs_main_external_sdcard_select_required_cancel_msg">外部SDCARDの書込み許可されるまで編集できません。</string>
     <string name="msgs_main_external_sdcard_select_required_can_not_write">SDCARDへの書き込みが許可さていません。メニューから「SDCARD書込許可」を行ってください。</string>
     <string name="msgs_main_external_sdcard_select_required_can_not_selected">メニューから「SDCARD書込許可」が行われるまで外部SDCARDは選択できません。</string>
 
     <string name="msgs_main_external_usb_select_required_title">USBストレージの選択</string>
-    <string name="msgs_main_external_usb_select_required_select_msg_api21">USBストレージにアクセスするために、ステップ１.「USB」をタップしてください、ステップ２.その後表示された画面で「USBを選択」をタップしてください。\n
+    <string name="msgs_main_external_usb_select_required_select_msg_api21">USBストレージに書込みするために、ステップ１.「USB」をタップしてください、ステップ２.その後表示された画面で「USBを選択」をタップしてください。\n
 (ステップ２の「USBを選択」の画面が直接表示された時は「USBを選択」をタップしてください)</string>
-    <string name="msgs_main_external_usb_select_required_select_msg_api23">USBストレージにアクセスするために、ステップ１.「USB」をタップしてください、ステップ２.その後表示された画面で「選択」をタップしてください。\n
+    <string name="msgs_main_external_usb_select_required_select_msg_api23">USBストレージに書込みするために、ステップ１.「USB」をタップしてください、ステップ２.その後表示された画面で「選択」をタップしてください。\n
 (ステップ２で左上に「USB」の画面が直接表示された時は「選択」をタップしてください。左上に「USB」以外が表示されている場合は左上のメニューをタップし、ステップ１からやり直してください。)</string>
     <string name="msgs_main_external_usb_select_retry_select_msg">USBストレージのルートディレクトリが選択されませんでした。選択しなおしますか？</string>
     <string name="msgs_main_external_usb_select_retry_select_sdcard_selected_msg">SDCARDが選択されました。USBストレージを選択しなおしますか？</string>

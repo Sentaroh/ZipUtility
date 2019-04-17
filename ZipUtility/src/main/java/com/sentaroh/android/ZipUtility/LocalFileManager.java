@@ -2120,11 +2120,11 @@ public class LocalFileManager {
         String dir = "", fn = fh_item.getFileName();
         boolean result = true;
         if (fh_item.getFileName().lastIndexOf("/") > 0) {
-            dir = fh_item.getFileName().substring(0, fh_item.getFileName().lastIndexOf("/")).replace(mGp.copyCutCurrentDirectory, "");
+            dir = "/"+fh_item.getFileName().substring(0, fh_item.getFileName().lastIndexOf("/")).replace(mGp.copyCutCurrentDirectory, "");
             fn = fh_item.getFileName().substring(fh_item.getFileName().lastIndexOf("/") + 1);
         }
 //		Log.v("","dir="+dir+", fn="+fn+", cd="+mGp.copyCutCurrentFilePath);
-        if (confirmReplace(tc, dest_path + dir + "/" + fn)) {
+        if (confirmReplace(tc, (dest_path + dir + "/" + fn).replaceAll("//","/").replaceAll("//","/"))) {
             if (extractSpecificFile(tc, zf, fh_item.getFileName(), dest_path + dir, fn)) {
                 if (tc.isEnabled()) {
                     putProgressMessage(
@@ -3720,7 +3720,7 @@ public class LocalFileManager {
 				ntfy_select_dest.setListener(new NotifyEventListener(){
 					@Override
 					public void positiveResponse(Context c, Object[] o) {
-						final File out_fl=new File((String)o[0]+"/"+(String)o[1]+(String)o[2]);
+						final File out_fl=new File((String)o[0]+"/"+(String)o[1]+"/"+(String)o[2]);
 						NotifyEvent ntfy_create=new NotifyEvent(mContext);
 						ntfy_create.setListener(new NotifyEventListener(){
 							@Override
@@ -3835,7 +3835,7 @@ public class LocalFileManager {
 
                 BufferedZipFile2 bzf=ZipFileManager.createBufferedZipFile(mGp, mUtil, dest_path, out_path);
                 if (bzf!=null) {
-                    String base_dir=out_fl.getPath().startsWith(mGp.externalRootDirectory)?mGp.externalRootDirectory:mGp.internalRootDirectory;
+                    String base_dir=(out_fl.getPath().startsWith(mGp.externalRootDirectory)?mGp.externalRootDirectory:mGp.internalRootDirectory)+mCurrentDirectory.getText().toString();
                     String added_item="", added_sep="";
                     putProgressMessage(mContext.getString(R.string.msgs_local_file_add_file_begin));
 
@@ -3847,6 +3847,7 @@ public class LocalFileManager {
                         for(String item:add_item) {
                             File in_file=new File(item);
                             ArrayList<File>sel_list=new ArrayList<File>();
+                            if (in_file.isDirectory()) sel_list.add(in_file);
                             ZipFileManager.getAllItemInLocalDirectory(sel_list, in_file);
                             for(File sel_item:sel_list) {
                                 processed_file=sel_item;

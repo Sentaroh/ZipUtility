@@ -228,10 +228,10 @@ External Library:\n
 	<string name="msgs_zip_specific_extract_file_viewer_not_found" formatted="false">Corresponding application not found. File name=%s, MIME Type=%s</string>
 	<string name="msgs_zip_specific_extract_mime_type_not_found">MIME type is not found. File name=%s</string>
 	
-	<string name="msgs_main_external_sdcard_select_required_title">Select external SDCARD</string>
-	<string name="msgs_main_external_sdcard_select_required_select_msg_api21">In order to access the external SDCARD, Step 1 please tap the &#8220;SDCARD&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
+	<string name="msgs_main_external_sdcard_select_required_title">External SDCARD write permission</string>
+	<string name="msgs_main_external_sdcard_select_required_select_msg_api21">In order to write the external SDCARD, Step 1 please tap the &#8220;SDCARD&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
 (Please tap the &#8220;Select the SDCARD&#8221; when the screen of &#8220;Select the SDCARD&#8221; in step 2 is displayed directly)</string>
-	<string name="msgs_main_external_sdcard_select_required_select_msg_api23">In order to access the external SDCARD, Step 1 please tap the &#8220;SDCARD&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
+	<string name="msgs_main_external_sdcard_select_required_select_msg_api23">In order to write the external SDCARD, Step 1 please tap the &#8220;SDCARD&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
 (Please tap the &#8220;Select&#8221; when the screen of &#8220;SDCARD&#8221; in step2 is displayed directly in the upper left corner. If the upper left is other than &#8220;SDCARD&#8221; are displayed, tap the upper left corner of the menu, from step 1 please try again.)</string>
 	
 	<string name="msgs_main_external_sdcard_select_retry_select_msg">The root directory of the external SDCARD was not selected. Do you wants to re select SDCARD?</string>
@@ -244,10 +244,10 @@ External Library:\n
 	
 	<string name="msgs_main_external_sdcard_mp_changed_title">External SDCARD</string>
 
-    <string name="msgs_main_external_usb_select_required_title">Select USB Storage</string>
-    <string name="msgs_main_external_usb_select_required_select_msg_api21">In order to access the USB storage, Step 1 please tap the &#8220;USB&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
+    <string name="msgs_main_external_usb_select_required_title">USB storage write permission</string>
+    <string name="msgs_main_external_usb_select_required_select_msg_api21">In order to write the USB storage, Step 1 please tap the &#8220;USB&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
 (Please tap the &#8220;Select the USB&#8221; when the screen of &#8220;Select the USB&#8221; in step 2 is displayed directly)</string>
-    <string name="msgs_main_external_usb_select_required_select_msg_api23">In order to access the USB storage, Step 1 please tap the &#8220;USB&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
+    <string name="msgs_main_external_usb_select_required_select_msg_api23">In order to write the USB storage, Step 1 please tap the &#8220;USB&#8221;, Step2 then　Please tap the &#8220;Select&#8221; in the displayed screen.\n
 (Please tap the &#8220;Select&#8221; when the screen of &#8220;SDCARD&#8221; in step2 is displayed directly in the upper left corner. If the upper left is other than &#8220;USB&#8221; are displayed, tap the upper left corner of the menu, from step 1 please try again.)</string>
 
     <string name="msgs_main_external_usb_select_retry_select_msg">The root directory of the USB storage was not selected. Do you wants to re select?</string>

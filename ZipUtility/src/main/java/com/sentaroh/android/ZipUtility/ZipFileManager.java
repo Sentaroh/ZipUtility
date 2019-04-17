@@ -1508,6 +1508,7 @@ public class ZipFileManager {
 							File lf=new File(item);
 							if (lf.isDirectory()) {
 								ArrayList<File>fl=new ArrayList<File>();
+								fl.add(lf);
 								CommonUtilities.getAllFileInDirectory(mGp, mUtil, fl, lf, true);
 								CommonUtilities.deleteLocalFile(lf);
 								for(File d_file:fl) CommonUtilities.scanMediaFile(mGp, mUtil, d_file.getAbsolutePath());
@@ -1908,6 +1909,7 @@ public class ZipFileManager {
                             n_zp.setDefaultFolderPath(zip_base);
                             n_zp.setRootFolderInZip(zip_curr_dir);
                             ArrayList<File> sel_list = new ArrayList<File>();
+                            if (add_file.isDirectory()) sel_list.add(add_file);
                             getAllItemInLocalDirectory(sel_list, add_file);
 //                        Log.v("", "size=" + sel_list.size());
                             for (File sel_file : sel_list) {
@@ -1950,6 +1952,15 @@ public class ZipFileManager {
                                     mContext.getString(R.string.msgs_zip_add_file_completed), w_sel_list, null);
                             deleteCopyPasteWorkFile();
                             closeUiDialogView(500);
+
+                            if (p_ntfy==null) {
+                                mUiHandler.postDelayed(new Runnable(){
+                                    @Override
+                                    public void run() {
+                                        refreshFileList();
+                                    }
+                                },500);
+                            }
                         }
                     } catch (ZipException e) {
                         tc.setThreadMessage(e.getMessage());
