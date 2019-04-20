@@ -50,6 +50,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.StrictMode;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -91,6 +93,7 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.sentaroh.android.ZipUtility.Constants.ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS;
 import static com.sentaroh.android.ZipUtility.Constants.ACTIVITY_REQUEST_CODE_USB_STORAGE_ACCESS;
@@ -616,6 +619,10 @@ public class ActivityMain extends AppCompatActivity {
         	menu.findItem(R.id.menu_top_about).setEnabled(false);
         	menu.findItem(R.id.menu_top_settings).setEnabled(false);
         }
+
+        if (mGp.safMgr.getSdcardRootPath().equals(SafManager.UNKNOWN_SDCARD_DIRECTORY)) menu.findItem(R.id.menu_top_show_sdcard_selector).setVisible(true);
+        else menu.findItem(R.id.menu_top_show_sdcard_selector).setVisible(false);
+
         menu.findItem(R.id.menu_top_show_usb_selector).setVisible(false);
         return true;
 	};
@@ -963,7 +970,11 @@ public class ActivityMain extends AppCompatActivity {
                     public void negativeResponse(Context c, Object[] o) {
                     }
                 });
-                showSelectSdcardMsg(ntfy);
+                if (Build.VERSION.SDK_INT>=24 && Build.VERSION.SDK_INT<=28) {
+                    ntfy.notifyToListener(true, null);
+                } else {
+                    showSelectSdcardMsg(ntfy);
+                }
             }
             @Override
             public void negativeResponse(Context c, Object[] o) {
@@ -999,8 +1010,21 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     public void startSdcardPicker() {
-		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-	    startActivityForResult(intent, ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS);
+        if (Build.VERSION.SDK_INT>=24 && Build.VERSION.SDK_INT<=28) {
+            StorageManager sm = (StorageManager) mContext.getSystemService(Context.STORAGE_SERVICE);
+            List<StorageVolume> vol_list=sm.getStorageVolumes();
+            StorageVolume sdcard_sv=null;
+            for(StorageVolume item:vol_list) {
+                if (item.getDescription(mContext).startsWith("SD")) {
+                    Intent intent = item.createAccessIntent(null);
+                    startActivityForResult(intent, ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS);
+                    break;
+                }
+            }
+        } else {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+            startActivityForResult(intent, ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS);
+        }
 	};
 
     public void startUsbPicker() {
