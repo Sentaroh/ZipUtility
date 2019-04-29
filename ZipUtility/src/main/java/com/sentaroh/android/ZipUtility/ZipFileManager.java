@@ -2902,7 +2902,18 @@ public class ZipFileManager {
         long b_time=System.currentTimeMillis();
         if (dest_path.startsWith(gp.externalRootDirectory)) {
             SafFile out=gp.safMgr.createSdcardFile(out_path);
-//            if (out.exists()) out.delete();
+            if (out==null) {
+                util.addLogMsg("E","createBufferedZipFile failed. SafFile create error. error="+gp.safMgr.getLastErrorMessage());
+            } else {
+                try {
+                    bzf=new BufferedZipFile2(dest_path, gp.appContext.getContentResolver().openOutputStream(out.getUri()),
+                            ZipUtil.DEFAULT_ZIP_FILENAME_ENCODING, gp.safMgr.getSdcardRootPath() + gp.appSpecificDirectory);
+                } catch (FileNotFoundException e) {
+                    util.addLogMsg("E","createBufferedZipFile failed. msg="+e.getMessage());
+                    util.addLogMsg("E","dest="+dest_path+", out="+out_path);
+                    try {if (out!=null && out.exists()) out.delete();} catch(Exception e2){};
+                }
+            }
             try {
                 bzf=new BufferedZipFile2(dest_path, gp.appContext.getContentResolver().openOutputStream(out.getUri()),
                         ZipUtil.DEFAULT_ZIP_FILENAME_ENCODING, gp.safMgr.getSdcardRootPath() + gp.appSpecificDirectory);
@@ -2910,7 +2921,6 @@ public class ZipFileManager {
                 util.addLogMsg("E","createBufferedZipFile failed. msg="+e.getMessage());
                 util.addLogMsg("E","dest="+dest_path+", out="+out_path);
                 try {if (out!=null && out.exists()) out.delete();} catch(Exception e2){};
-//                e.printStackTrace();
             }
         } else {
             bzf=new BufferedZipFile2(dest_path, out_path, ZipUtil.DEFAULT_ZIP_FILENAME_ENCODING);
