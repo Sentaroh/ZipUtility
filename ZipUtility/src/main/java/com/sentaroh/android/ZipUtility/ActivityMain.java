@@ -28,6 +28,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -57,6 +58,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -67,12 +69,14 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabWidget;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
@@ -81,6 +85,7 @@ import com.sentaroh.android.Utilities.SafManager;
 import com.sentaroh.android.Utilities.SystemInfo;
 import com.sentaroh.android.Utilities.ThemeUtil;
 import com.sentaroh.android.Utilities.Widget.CustomTabContentView;
+import com.sentaroh.android.Utilities.Widget.CustomTextView;
 import com.sentaroh.android.Utilities.Widget.CustomViewPager;
 import com.sentaroh.android.Utilities.Widget.CustomViewPagerAdapter;
 import com.sentaroh.android.ZipUtility.Log.LogFileListDialogFragment;
@@ -673,7 +678,10 @@ public class ActivityMain extends AppCompatActivity {
 				return true;			
 			case R.id.menu_top_settings:
 				invokeSettingsActivity();
-				return true;			
+				return true;
+            case R.id.menu_top_show_system_information:
+                showSystemInfo();
+                return true;
 			case R.id.menu_top_quit:
 				mGp.settingExitClean=true;
 				confirmExit();
@@ -691,8 +699,157 @@ public class ActivityMain extends AppCompatActivity {
 
 		return false;
 	};
-	
-	private final int REQUEST_PERMISSIONS_WRITE_EXTERNAL_STORAGE=1;
+
+    private void showSystemInfo() {
+        final Dialog dialog = new Dialog(mActivity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.common_dialog);
+
+        final TextView tv_title=(TextView)dialog.findViewById(R.id.common_dialog_title);
+        final TextView tv_msg_old=(TextView)dialog.findViewById(R.id.common_dialog_msg);
+        tv_msg_old.setVisibility(TextView.GONE);
+        final CustomTextView tv_msg=(CustomTextView)dialog.findViewById(R.id.common_dialog_custom_text_view);
+        tv_msg.setVisibility(TextView.VISIBLE);
+        final Button btn_copy=(Button)dialog.findViewById(R.id.common_dialog_btn_ok);
+        final Button btn_close=(Button)dialog.findViewById(R.id.common_dialog_btn_cancel);
+        final Button btn_send=(Button)dialog.findViewById(R.id.common_dialog_extra_button);
+        btn_send.setText(mContext.getString(R.string.msgs_info_storage_send_btn_title));
+        btn_send.setVisibility(Button.VISIBLE);
+
+        tv_title.setText(mContext.getString(R.string.msgs_menu_list_system_info));
+        btn_close.setText(mContext.getString(R.string.msgs_common_dialog_close));
+        btn_copy.setText(mContext.getString(R.string.msgs_info_storage_copy_clipboard));
+
+        ArrayList<String>sil= SystemInfo.listSystemInfo(mContext, mGp.safMgr);
+        String si_text="";
+        for(String si_item:sil) si_text+=si_item+"\n";
+
+        tv_msg.setText(si_text);
+
+        CommonDialog.setDlgBoxSizeLimit(dialog,true);
+
+        btn_copy.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                android.content.ClipboardManager cm=(android.content.ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData cd=cm.getPrimaryClip();
+                cm.setPrimaryClip(ClipData.newPlainText("SMBSync2 storage info", tv_msg.getText().toString()));
+                Toast.makeText(mContext,
+                        mContext.getString(R.string.msgs_info_storage_copy_completed), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        btn_close.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        btn_send.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NotifyEvent ntfy=new NotifyEvent(mContext);
+                ntfy.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context context, Object[] objects) {
+                        String desc=(String)objects[0];
+                        Intent intent=new Intent();
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setAction(Intent.ACTION_SEND);
+                        intent.setType("message/rfc822");
+//                intent.setType("text/plain");
+//                intent.setType("application/zip");
+
+                        intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"gm.developer.fhoshino@gmail.com"});
+//                intent.putExtra(Intent.EXTRA_CC, new String[]{"cc@example.com"});
+//                intent.putExtra(Intent.EXTRA_BCC, new String[]{"bcc@example.com"});
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "SMBSync2 System Info");
+                        intent.putExtra(Intent.EXTRA_TEXT, desc+ "\n\n\n"+tv_msg.getText().toString());
+//                intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(lf));
+                        mContext.startActivity(intent);
+                    }
+                    @Override
+                    public void negativeResponse(Context context, Object[] objects) {
+                    }
+                });
+                getProblemDescription(ntfy);
+            }
+        });
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                btn_close.performClick();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void getProblemDescription(final NotifyEvent p_ntfy) {
+        final Dialog dialog = new Dialog(mActivity);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.single_item_input_dlg);
+
+        final TextView tv_title=(TextView)dialog.findViewById(R.id.single_item_input_title);
+        tv_title.setText(mContext.getString(R.string.msgs_your_problem_title));
+        final TextView tv_msg=(TextView)dialog.findViewById(R.id.single_item_input_msg);
+        tv_msg.setVisibility(TextView.GONE);
+        final TextView tv_desc=(TextView)dialog.findViewById(R.id.single_item_input_name);
+        tv_desc.setText(mContext.getString(R.string.msgs_your_problem_msg));
+        final EditText et_msg=(EditText)dialog.findViewById(R.id.single_item_input_dir);
+        et_msg.setHint(mContext.getString(R.string.msgs_your_problem_hint));
+        et_msg.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        final Button btn_ok=(Button)dialog.findViewById(R.id.single_item_input_ok_btn);
+        final Button btn_cancel=(Button)dialog.findViewById(R.id.single_item_input_cancel_btn);
+
+//        btn_cancel.setText(mContext.getString(R.string.msgs_common_dialog_close));
+
+        CommonDialog.setDlgBoxSizeLimit(dialog,true);
+
+        btn_ok.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NotifyEvent ntfy_desc=new NotifyEvent(mContext);
+                ntfy_desc.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context context, Object[] objects) {
+                        p_ntfy.notifyToListener(true, new Object[]{et_msg.getText().toString()});
+                        dialog.dismiss();
+                    }
+
+                    @Override
+                    public void negativeResponse(Context context, Object[] objects) {
+                    }
+                });
+                if (et_msg.getText().length()==0) {
+                    mCommonDlg.showCommonDialog(true, "W", mContext.getString(R.string.msgs_your_problem_no_desc),"",ntfy_desc);
+                } else {
+                    ntfy_desc.notifyToListener(true, null);
+                }
+            }
+        });
+
+        btn_cancel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                btn_cancel.performClick();
+            }
+        });
+
+        dialog.show();
+    }
+
+
+    private final int REQUEST_PERMISSIONS_WRITE_EXTERNAL_STORAGE=1;
 	@SuppressLint("NewApi")
 	private void checkRequiredPermissions() {
 		if (Build.VERSION.SDK_INT>=23) {
@@ -1016,10 +1173,16 @@ public class ActivityMain extends AppCompatActivity {
             StorageVolume sdcard_sv=null;
             for(StorageVolume item:vol_list) {
                 if (item.getDescription(mContext).startsWith("SD")) {
-                    Intent intent = item.createAccessIntent(null);
-                    startActivityForResult(intent, ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS);
+                    sdcard_sv=item;
                     break;
                 }
+            }
+            if (sdcard_sv!=null) {
+                Intent intent = sdcard_sv.createAccessIntent(null);
+                startActivityForResult(intent, ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS);
+            } else {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+                startActivityForResult(intent, ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS);
             }
         } else {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);

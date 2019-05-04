@@ -238,7 +238,7 @@ External Library:\n
     <string name="msgs_main_external_sdcard_select_retry_select_usb_selected_msg">USB Storage was selected. Do you wants to re select SDCARD?</string>
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api21">SMBSync_SD_CARD_5.0_EN.png</string>
 	<string name="msgs_main_external_sdcard_select_required_select_msg_file_api23">SMBSync_SD_CARD_6.0_EN.png</string>
-	<string name="msgs_main_external_sdcard_select_required_cancel_msg">You can not perform edit until external SD card is selected.</string>
+	<string name="msgs_main_external_sdcard_select_required_cancel_msg">You cannot edit until the external SDCARD is allowed to write.</string>
     <string name="msgs_main_external_sdcard_select_required_can_not_write">Write to SDCARD is not allowed. Please perform "SDCARD write permission" in the menu.</string>
     <string name="msgs_main_external_sdcard_select_required_can_not_selected">You cannot select an external sdcard until the "SDcard Write permission" is made from the menu.</string>
 	
