@@ -102,6 +102,7 @@ import java.util.List;
 
 import static com.sentaroh.android.ZipUtility.Constants.ACTIVITY_REQUEST_CODE_SDCARD_STORAGE_ACCESS;
 import static com.sentaroh.android.ZipUtility.Constants.ACTIVITY_REQUEST_CODE_USB_STORAGE_ACCESS;
+import static com.sentaroh.android.ZipUtility.Constants.APPLICATION_TAG;
 
 @SuppressLint("NewApi")
 public class ActivityMain extends AppCompatActivity {
@@ -764,7 +765,7 @@ public class ActivityMain extends AppCompatActivity {
                         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"gm.developer.fhoshino@gmail.com"});
 //                intent.putExtra(Intent.EXTRA_CC, new String[]{"cc@example.com"});
 //                intent.putExtra(Intent.EXTRA_BCC, new String[]{"bcc@example.com"});
-                        intent.putExtra(Intent.EXTRA_SUBJECT, "SMBSync2 System Info");
+                        intent.putExtra(Intent.EXTRA_SUBJECT, APPLICATION_TAG+" System Info");
                         intent.putExtra(Intent.EXTRA_TEXT, desc+ "\n\n\n"+tv_msg.getText().toString());
 //                intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(lf));
                         mContext.startActivity(intent);
