@@ -32,7 +32,6 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.MediaScannerConnection;
 import android.net.wifi.WifiManager;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;

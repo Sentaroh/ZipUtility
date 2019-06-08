@@ -24,21 +24,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
-import com.sentaroh.android.Utilities.MiscUtil;
-import com.sentaroh.android.Utilities.StringUtil;
 import com.sentaroh.android.ZipUtility.Log.LogUtil;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class ZipReceiver extends BroadcastReceiver {
 

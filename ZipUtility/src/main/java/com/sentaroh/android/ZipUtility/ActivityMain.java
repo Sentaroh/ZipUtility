@@ -954,8 +954,11 @@ public class ActivityMain extends AppCompatActivity {
 			}
 		});
 		mUtil.flushLog();
-		LogFileListDialogFragment lfm=
-				LogFileListDialogFragment.newInstance(false, getString(R.string.msgs_log_management_title));
+        LogFileListDialogFragment lfm =
+                LogFileListDialogFragment.newInstance(false, getString(R.string.msgs_log_management_title),
+                        getString(R.string.msgs_log_management_send_log_file_warning),
+                        getString(R.string.msgs_log_management_enable_log_file_warning),
+                        "ZipUtility log file");
 		lfm.showDialog(getSupportFragmentManager(), lfm, mGp, ntfy);
 	};
 

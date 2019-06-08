@@ -36,7 +36,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
-import android.support.v4.content.ContextCompat;
 import android.widget.Button;
 
 import com.sentaroh.android.Utilities.CommonGlobalParms;
