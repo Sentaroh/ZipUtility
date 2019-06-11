@@ -4,6 +4,8 @@
     android:id="@+id/select_sort_dlg_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="7dp"
+    android:background="@drawable/dialog_box_outline"
     android:orientation="vertical"
     tools:ignore="HardcodedText,RtlHardcoded,RtlSymmetry,LabelFor,UselessParent,InefficientWeight" >
 

@@ -702,7 +702,7 @@ public class ActivityMain extends AppCompatActivity {
 	};
 
     private void showSystemInfo() {
-        final Dialog dialog = new Dialog(mActivity);
+        final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.common_dialog);
 
@@ -789,7 +789,7 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private void getProblemDescription(final NotifyEvent p_ntfy) {
-        final Dialog dialog = new Dialog(mActivity);
+        final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.single_item_input_dlg);
 
@@ -1200,25 +1200,25 @@ public class ActivityMain extends AppCompatActivity {
     };
 
     public void showSelectSdcardMsg(final NotifyEvent ntfy) {
-		final Dialog dialog = new Dialog(mContext);
+		final Dialog dialog = new Dialog(mContext, mGp.applicationTheme);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    dialog.setContentView(R.layout.show_select_sdcard_dlg);
 
 		final LinearLayout title_view = (LinearLayout) dialog.findViewById(R.id.show_select_sdcard_dlg_title_view);
 		final TextView title = (TextView) dialog.findViewById(R.id.show_select_sdcard_dlg_title);
-		title_view.setBackgroundColor(mGp.themeColorList.dialog_title_background_color);
-		title.setTextColor(mGp.themeColorList.text_color_dialog_title);
-		
+		title_view.setBackgroundColor(mGp.themeColorList.title_background_color);
+		title.setTextColor(mGp.themeColorList.title_text_color);
+
 		final TextView dlg_msg=(TextView)dialog.findViewById(R.id.show_select_sdcard_dlg_msg);
 		String msg="";
 		if (Build.VERSION.SDK_INT>=23) msg=mContext.getString(R.string.msgs_main_external_sdcard_select_required_select_msg_api23);
 		else if (Build.VERSION.SDK_INT>=21) msg=mContext.getString(R.string.msgs_main_external_sdcard_select_required_select_msg_api21);
 		else msg=mContext.getString(R.string.msgs_main_external_sdcard_select_required_select_msg_api21);
 		dlg_msg.setText(msg);
-		
+
 		final ImageView func_view=(ImageView)dialog.findViewById(R.id.show_select_sdcard_dlg_image);
-		
-		
+
+
 		try {
 			String fn="";
 			if (Build.VERSION.SDK_INT>=23) fn=mContext.getString(R.string.msgs_main_external_sdcard_select_required_select_msg_file_api23);
@@ -1229,7 +1229,7 @@ public class ActivityMain extends AppCompatActivity {
 		    func_view.setImageBitmap(bm);
 		} catch (IOException e) {
 		}
-		
+
 		final Button btnOk = (Button) dialog.findViewById(R.id.show_select_sdcard_dlg_btn_ok);
 		final Button btnCancel = (Button) dialog.findViewById(R.id.show_select_sdcard_dlg_btn_cancel);
 
@@ -1259,14 +1259,14 @@ public class ActivityMain extends AppCompatActivity {
 	}
 
     public void showSelectUsbMsg(final NotifyEvent ntfy) {
-        final Dialog dialog = new Dialog(mContext);
+        final Dialog dialog = new Dialog(mContext, mGp.applicationTheme);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.show_select_sdcard_dlg);
 
         final LinearLayout title_view = (LinearLayout) dialog.findViewById(R.id.show_select_sdcard_dlg_title_view);
         final TextView title = (TextView) dialog.findViewById(R.id.show_select_sdcard_dlg_title);
-        title_view.setBackgroundColor(mGp.themeColorList.dialog_title_background_color);
-        title.setTextColor(mGp.themeColorList.text_color_dialog_title);
+        title_view.setBackgroundColor(mGp.themeColorList.title_background_color);
+        title.setTextColor(mGp.themeColorList.title_text_color);
 
         final TextView dlg_msg=(TextView)dialog.findViewById(R.id.show_select_sdcard_dlg_msg);
         String msg="";
@@ -1327,7 +1327,6 @@ public class ActivityMain extends AppCompatActivity {
         else setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         
         if (prev_theme!=mGp.applicationTheme) {
-        	mGp.applicationTheme=prev_theme;
         	mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_main_theme_changed_msg), "", null);
         	mGp.settingExitClean=true;
         }
@@ -1408,12 +1407,12 @@ public class ActivityMain extends AppCompatActivity {
 
 		
 		LinearLayout ll_main=(LinearLayout)findViewById(R.id.main_screen_view);
-		ll_main.setBackgroundColor(mGp.themeColorList.window_background_color_content);
+//		ll_main.setBackgroundColor(mGp.themeColorList.window_background_color_content);
 		
         LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mLocalView=(LinearLayout)vi.inflate(R.layout.main_local_file,null);
-		if (mGp.themeIsLight) mLocalView.setBackgroundColor(0xffc0c0c0);
-		else mLocalView.setBackgroundColor(0xff303030);
+//		if (mGp.themeIsLight) mLocalView.setBackgroundColor(0xffc0c0c0);
+//		else mLocalView.setBackgroundColor(0xff303030);
 		
 		LinearLayout dv=(LinearLayout)mLocalView.findViewById(R.id.main_dialog_view);
 		dv.setVisibility(LinearLayout.GONE);
@@ -1423,15 +1422,15 @@ public class ActivityMain extends AppCompatActivity {
 		
 //		mLocalView.setBackgroundColor(mGp.themeColorList.window_background_color_content);
 		mZipView=(LinearLayout)vi.inflate(R.layout.main_zip_file,null);
-		if (mGp.themeIsLight) mZipView.setBackgroundColor(0xffc0c0c0);
-		else mZipView.setBackgroundColor(0xff303030);
+//		if (mGp.themeIsLight) mZipView.setBackgroundColor(0xffc0c0c0);
+//		else mZipView.setBackgroundColor(0xff303030);
 //		mZipView.setBackgroundColor(mGp.themeColorList.window_background_color_content);
 
 		mMainViewPager=(CustomViewPager)findViewById(R.id.main_screen_pager);
 	    mMainViewPagerAdapter=new CustomViewPagerAdapter(this, 
 	    		new View[]{mLocalView, mZipView});
 	    
-	    mMainViewPager.setBackgroundColor(mGp.themeColorList.window_background_color_content);
+//	    mMainViewPager.setBackgroundColor(mGp.themeColorList.window_background_color_content);
 	    mMainViewPager.setAdapter(mMainViewPagerAdapter);
 	    mMainViewPager.setOnPageChangeListener(new MainPageChangeListener());
 		if (mRestartStatus==0) {

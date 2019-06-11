@@ -138,9 +138,9 @@ public class AdapterSearchFileList extends BaseAdapter {
         	holder.comp_method=(TextView)v.findViewById(R.id.search_file_result_list_item_comp_method);
         	holder.file_date=(TextView)v.findViewById(R.id.search_file_result_list_item_last_modified_date);
         	holder.file_time=(TextView)v.findViewById(R.id.search_file_result_list_item_last_modified_time);
-        	if (mThemeColorList.theme_is_light) {
-//    			holder.result_view.setBackgroundColor(mThemeColorList.dialog_msg_background_color);
-        	}
+//        	if (ThemeUtil.isLightThemeUsed(mContext)) {
+////    			holder.result_view.setBackgroundColor(mThemeColorList.dialog_msg_background_color);
+//        	}
 
 //        	if (normal_text_color==-1) normal_text_color=holder.tv_name.getCurrentTextColor();
 //        	Log.v("","n="+String.format("0x%08x",holder.tv_name.getCurrentTextColor()));

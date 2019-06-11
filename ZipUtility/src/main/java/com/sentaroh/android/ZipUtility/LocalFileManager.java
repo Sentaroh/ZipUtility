@@ -42,6 +42,7 @@ import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.NotifyEvent.NotifyEventListener;
 import com.sentaroh.android.Utilities.SafFile;
 import com.sentaroh.android.Utilities.SafManager;
+import com.sentaroh.android.Utilities.ThemeUtil;
 import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.Utilities.Widget.CustomSpinnerAdapter;
 import com.sentaroh.android.Utilities.Widget.CustomTextView;
@@ -300,7 +301,7 @@ public class LocalFileManager {
         else
             mFileListTop.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_16_go_top_light, 0, 0, 0);
         mCurrentDirectory = (CustomTextView) mMainView.findViewById(R.id.local_file_filepath);
-        mCurrentDirectory.setTextColor(mGp.themeColorList.text_color_primary);
+//        mCurrentDirectory.setTextColor(mGp.themeColorList.text_color_primary);
 
         mDialogProgressSpinView = (LinearLayout) mMainView.findViewById(R.id.main_dialog_progress_spin_view);
         mDialogProgressSpinView.setVisibility(LinearLayout.GONE);
@@ -638,20 +639,20 @@ public class LocalFileManager {
     private String mSearchRootDir = "";
 
     public void searchFile() {
-        final Dialog dialog = new Dialog(mActivity);
+        final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().setSoftInputMode(LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         dialog.setContentView(R.layout.search_file_dlg);
         final LinearLayout dlg_view = (LinearLayout) dialog.findViewById(R.id.search_file_dlg_view);
-        dlg_view.setBackgroundResource(R.drawable.dialog_border_dark);
+//        dlg_view.setBackgroundResource(R.drawable.dialog_border_dark);
 
         final LinearLayout title_view = (LinearLayout) dialog.findViewById(R.id.search_file_dlg_title_view);
-        title_view.setBackgroundColor(mGp.themeColorList.dialog_title_background_color);
+        title_view.setBackgroundColor(mGp.themeColorList.title_background_color);
         final TextView dlg_title = (TextView) dialog.findViewById(R.id.search_file_dlg_title);
-        dlg_title.setTextColor(mGp.themeColorList.text_color_dialog_title);
+        dlg_title.setTextColor(mGp.themeColorList.title_text_color);
 
         final ImageButton ib_sort = (ImageButton) dialog.findViewById(R.id.search_file_dlg_sort_btn);
-        ib_sort.setBackgroundColor(mGp.themeColorList.dialog_title_background_color);
+//        ib_sort.setBackgroundColor(mGp.themeColorList.dialog_title_background_color);
 //		final TextView dlg_msg = (TextView) dialog.findViewById(R.id.search_file_dlg_msg);
         final CheckedTextView dlg_hidden = (CheckedTextView) dialog.findViewById(R.id.search_file_dlg_search_hidden_item);
         CommonUtilities.setCheckedTextView(dlg_hidden);
@@ -926,13 +927,13 @@ public class LocalFileManager {
 
     private void createItem(CustomTreeFilelistAdapter tfa, final String c_dir) {
         mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");
-        final Dialog dialog = new Dialog(mActivity);
+        final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.single_item_input_dlg);
         final LinearLayout title_view = (LinearLayout) dialog.findViewById(R.id.single_item_input_title_view);
-        title_view.setBackgroundColor(mGp.themeColorList.dialog_title_background_color);
+        title_view.setBackgroundColor(mGp.themeColorList.title_background_color);
         final TextView dlg_title = (TextView) dialog.findViewById(R.id.single_item_input_title);
-        dlg_title.setTextColor(mGp.themeColorList.text_color_dialog_title);
+        dlg_title.setTextColor(mGp.themeColorList.title_text_color);
         dlg_title.setText(mContext.getString(R.string.msgs_file_select_edit_dlg_create));
         final TextView dlg_msg = (TextView) dialog.findViewById(R.id.single_item_input_msg);
         final TextView dlg_cmp = (TextView) dialog.findViewById(R.id.single_item_input_name);
@@ -946,7 +947,7 @@ public class LocalFileManager {
         create_type.setChecked(false);
         final String t_dir = c_dir.endsWith("/") ? c_dir : c_dir + "/";
         dlg_cmp.setText(mContext.getString(R.string.msgs_file_select_edit_parent_directory) + t_dir);
-        CommonDialog.setDlgBoxSizeCompact(dialog);
+        CommonDialog.setDlgBoxSizeCompactWithInput(dialog);
         etDir.setText("");
         btnOk.setEnabled(false);
         etDir.addTextChangedListener(new TextWatcher() {
@@ -1044,16 +1045,16 @@ public class LocalFileManager {
 
     private void renameItem(CustomTreeFilelistAdapter tfa) {
         mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");
-        final Dialog dialog = new Dialog(mActivity);
+        final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.single_item_input_dlg);
         final LinearLayout dlg_view = (LinearLayout) dialog.findViewById(R.id.single_item_input_dlg_view);
-        dlg_view.setBackgroundResource(R.drawable.dialog_border_dark);
+//        dlg_view.setBackgroundResource(R.drawable.dialog_border_dark);
 
         final LinearLayout title_view = (LinearLayout) dialog.findViewById(R.id.single_item_input_title_view);
-        title_view.setBackgroundColor(mGp.themeColorList.dialog_title_background_color);
+        title_view.setBackgroundColor(mGp.themeColorList.title_background_color);
         final TextView dlg_title = (TextView) dialog.findViewById(R.id.single_item_input_title);
-        dlg_title.setTextColor(mGp.themeColorList.text_color_dialog_title);
+        dlg_title.setTextColor(mGp.themeColorList.title_text_color);
         dlg_title.setText(mContext.getString(R.string.msgs_zip_local_file_rename_title));
         final TextView dlg_msg = (TextView) dialog.findViewById(R.id.single_item_input_msg);
         final TextView dlg_cmp = (TextView) dialog.findViewById(R.id.single_item_input_name);
@@ -1071,7 +1072,7 @@ public class LocalFileManager {
         }
         final TreeFilelistItem tfli = w_tfli;
 
-        CommonDialog.setDlgBoxSizeCompact(dialog);
+        CommonDialog.setDlgBoxSizeCompactWithInput(dialog);
         btnOk.setEnabled(false);
         etDir.addTextChangedListener(new TextWatcher() {
             @Override

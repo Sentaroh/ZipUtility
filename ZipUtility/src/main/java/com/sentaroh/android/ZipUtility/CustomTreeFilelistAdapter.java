@@ -25,6 +25,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -339,6 +340,7 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 	}
 	
 	private Drawable mDefaultBgColor=null;
+	private ColorStateList mDefaultTextColor=null;
 	@SuppressLint("InflateParams")
 	@Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -366,7 +368,9 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
             	
         		holder.ll_select_view=(LinearLayout)v.findViewById(R.id.tree_file_list_select_view);
         		holder.ll_date_time_view=(LinearLayout)v.findViewById(R.id.tree_file_list_date_time_view);
-            	if (mThemeColorList.theme_is_light) {
+                if (mDefaultBgColor==null) mDefaultBgColor=holder.ll_view.getBackground();
+                if (mDefaultTextColor==null) mDefaultTextColor=holder.tv_name.getTextColors();
+            	if (ThemeUtil.isLightThemeUsed(mContext)) {
 
             		if (mSetColor) {
 //                    	holder.tv_spacer.setBackgroundColor(mThemeColorList.dialog_msg_background_color);
@@ -378,11 +382,10 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
 //                    	holder.tv_modtime.setBackgroundColor(mThemeColorList.dialog_msg_background_color);
 //
 //                    	holder.ll_date_time_view.setBackgroundColor(mThemeColorList.dialog_msg_background_color);
-                		holder.ll_view.setBackgroundColor(mThemeColorList.dialog_msg_background_color);
+                		holder.ll_view.setBackgroundDrawable(mDefaultBgColor);
             		}
 
             	}
-            	if (mDefaultBgColor==null) mDefaultBgColor=holder.ll_view.getBackground();
 //            	if (normal_text_color==-1) normal_text_color=holder.tv_name.getCurrentTextColor();
 //            	Log.v("","n="+String.format("0x%08x",holder.tv_name.getCurrentTextColor()));
             	v.setTag(holder); 
@@ -470,10 +473,10 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
         		            	holder.tv_moddate.setTextColor(mThemeColorList.text_color_warning);//normal_text_color);
         		            	holder.tv_modtime.setTextColor(mThemeColorList.text_color_warning);//normal_text_color);
                    			} else {
-                           		holder.tv_name.setTextColor(mThemeColorList.text_color_primary);//normal_text_color);
-        		            	holder.tv_size.setTextColor(mThemeColorList.text_color_primary);//normal_text_color);
-        		            	holder.tv_moddate.setTextColor(mThemeColorList.text_color_primary);//normal_text_color);
-        		            	holder.tv_modtime.setTextColor(mThemeColorList.text_color_primary);//normal_text_color);
+                           		holder.tv_name.setTextColor(mDefaultTextColor);//normal_text_color);
+        		            	holder.tv_size.setTextColor(mDefaultTextColor);//normal_text_color);
+        		            	holder.tv_moddate.setTextColor(mDefaultTextColor);//normal_text_color);
+        		            	holder.tv_modtime.setTextColor(mDefaultTextColor);//normal_text_color);
                    			}
                    		} else {
                        		holder.tv_name.setTextColor(mThemeColorList.text_color_disabled);//Color.GRAY);
@@ -530,10 +533,10 @@ public class CustomTreeFilelistAdapter extends BaseAdapter {
             	}
             	
             	if (o.isChecked()) {
-            		if (mThemeColorList.theme_is_light) holder.ll_view.setBackgroundColor(Color.CYAN);
+            		if (ThemeUtil.isLightThemeUsed(mContext)) holder.ll_view.setBackgroundColor(Color.CYAN);
             		else holder.ll_view.setBackgroundColor(Color.DKGRAY);
             	} else {
-            		holder.ll_view.setBackgroundColor(mThemeColorList.dialog_msg_background_color);
+            		holder.ll_view.setBackgroundDrawable(mDefaultBgColor);
             	}
                	final int p = position;
                	if (mNotifyExpand!=null) {

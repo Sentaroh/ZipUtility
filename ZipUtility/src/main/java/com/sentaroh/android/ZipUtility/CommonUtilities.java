@@ -373,17 +373,17 @@ public final class CommonUtilities {
 	static public void sortFileList(final ActivityMain mActivity, final GlobalParameters mGp,
                                     final CustomTreeFilelistAdapter tfa, final NotifyEvent p_ntfy) {
 		if (tfa==null) return;
-		final Dialog dialog = new Dialog(mActivity);
+		final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.select_sort_dlg);
 		
 		final LinearLayout dlg_view = (LinearLayout) dialog.findViewById(R.id.select_sort_dlg_view);
-		dlg_view.setBackgroundResource(R.drawable.dialog_border_dark);
+//		dlg_view.setBackgroundResource(R.drawable.dialog_border_dark);
 		
 		final LinearLayout title_view = (LinearLayout) dialog.findViewById(R.id.select_sort_dlg_title_view);
-		title_view.setBackgroundColor(mGp.themeColorList.dialog_title_background_color);
+		title_view.setBackgroundColor(mGp.themeColorList.title_background_color);
 		final TextView dlg_title = (TextView) dialog.findViewById(R.id.select_sort_dlg_title);
-		dlg_title.setTextColor(mGp.themeColorList.text_color_dialog_title);
+		dlg_title.setTextColor(mGp.themeColorList.title_text_color);
 
 		final Button btnCancel = (Button) dialog.findViewById(R.id.select_sort_dlg_cancel_btn);
 		final Button btnOk = (Button) dialog.findViewById(R.id.select_sort_dlg_ok_btn);
