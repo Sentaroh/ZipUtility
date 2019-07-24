@@ -178,7 +178,7 @@ public class ActivityMain extends AppCompatActivity {
 
             String file_path=null;
             try {
-                file_path=getFilePath(mContext, cd, intent.getData());
+                file_path=getFilePath(mUtil, mContext, cd, intent.getData());
             } catch(Exception e) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
@@ -307,9 +307,10 @@ public class ActivityMain extends AppCompatActivity {
         dlf.mkdirs();
     };
 
-    public static String getFilePath(Context c, String cache_dir, Uri content_uri) {
+    public static String getFilePath(CommonUtilities cu, Context c, String cache_dir, Uri content_uri) {
         if (content_uri==null) return null;
-        final String[] column={MediaStore.MediaColumns._ID,  MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME};
+        final String[] column={MediaStore.MediaColumns._ID,  MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME,
+                                        MediaStore.MediaColumns.DATE_MODIFIED, MediaStore.MediaColumns.SIZE};
         String cd=cache_dir;
         File tlf=null;
         if (ContentResolver.SCHEME_FILE.equals(content_uri.getScheme())) {
@@ -322,6 +323,9 @@ public class ActivityMain extends AppCompatActivity {
             if (cursor.moveToFirst()) {
                 String path=cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA));
                 tlf=new File(path);
+                long last_modified=cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED));
+                long length=cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE));
+                cu.addDebugMsg(1,"I","path="+path+", size="+length+", modified="+last_modified);
             }
             cursor.close();
         } else if (content_uri.toString().startsWith("content://com.android.providers.downloads.documents")) {
@@ -341,6 +345,9 @@ public class ActivityMain extends AppCompatActivity {
             if (cursor.moveToFirst()) {
                 String path = cursor.getString(columnIndex);
                 tlf=new File(path);
+                long last_modified=cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED));
+                long length=cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE));
+                cu.addDebugMsg(1,"I","path="+path+", size="+length+", modified="+last_modified);
             }
             cursor.close();
         } else if (content_uri.toString().startsWith("content://downloads/all_downloads")) {
@@ -360,6 +367,9 @@ public class ActivityMain extends AppCompatActivity {
             if (cursor.moveToFirst()) {
                 String path = cursor.getString(columnIndex);
                 tlf=new File(path);
+                long last_modified=cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED));
+                long length=cursor.getLong(cursor.getColumnIndex(MediaStore.MediaColumns.SIZE));
+                cu.addDebugMsg(1,"I","path="+path+", size="+length+", modified="+last_modified);
             }
             cursor.close();
         } else if (content_uri.toString().startsWith("content://")) {
