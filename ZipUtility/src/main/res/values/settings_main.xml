@@ -38,8 +38,10 @@
     <string name="settings_use_light_theme_summary_ena">Use light theme</string>
 	<string name="settings_use_light_theme">settings_use_light_theme</string>
 
-				
-	<string name="settings_device_orientation_portrait_title">The orientation of the device</string>
+    <string name="settings_open_as_text_file_type_title">File type to open as text</string>
+    <string name="settings_open_as_text_file_type">settings_open_as_text_file_type</string>
+
+    <string name="settings_device_orientation_portrait_title">The orientation of the device</string>
     <string name="settings_device_orientation_portrait_summary_ena">Fix the orientation of the device to portrait</string>
 	<string name="settings_device_orientation_portrait">settings_device_orientation_portrait</string>
 	

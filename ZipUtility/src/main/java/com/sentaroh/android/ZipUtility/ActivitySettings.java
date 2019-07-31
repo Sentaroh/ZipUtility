@@ -36,6 +36,8 @@ import com.sentaroh.android.Utilities.LocalMountPoint;
 
 import java.util.List;
 
+import static com.sentaroh.android.ZipUtility.GlobalParameters.DEFAULT_OPEN_AS_TEXT_FILE_TYPE;
+
 @SuppressWarnings("unused")
 public class ActivitySettings extends PreferenceActivity{
 	private static Context mContext=null;
@@ -147,6 +149,9 @@ public class ActivitySettings extends PreferenceActivity{
 //			boolean orientation=shared_pref.getBoolean(key_string,false);
 //            if (orientation) mPrefActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 //            else mPrefActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        } else if (key_string.equals(c.getString(R.string.settings_open_as_text_file_type))) {
+            isChecked=true;
+            pref_key.setSummary(shared_pref.getString(key_string, DEFAULT_OPEN_AS_TEXT_FILE_TYPE));
 		}
 
 		return isChecked;
@@ -356,6 +361,7 @@ public class ActivitySettings extends PreferenceActivity{
 
 			checkSettingValue(mUtil, shared_pref,getString(R.string.settings_use_light_theme));
 			checkSettingValue(mUtil, shared_pref,getString(R.string.settings_device_orientation_portrait));
+            checkSettingValue(mUtil, shared_pref,getString(R.string.settings_open_as_text_file_type));
 
 		};
 

@@ -597,7 +597,7 @@ public class LocalFileManager {
                 }
             } else if (fpl.size() == 1) {
                 File lf = new File(fpl.get(0));
-                String mt=getMimeTypeFromFileExtention(lf.getName());
+                String mt=getMimeTypeFromFileExtention(mGp, lf.getName());
                 Intent intent = new Intent(android.content.Intent.ACTION_SEND);
                 Uri uri = null;
 //                if (Build.VERSION.SDK_INT >= 26) uri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", lf);
@@ -622,13 +622,23 @@ public class LocalFileManager {
         }
     }
 
-    private String getMimeTypeFromFileExtention(String fn) {
+    static public String getMimeTypeFromFileExtention(GlobalParameters gp, String fn) {
         String fid="", mt=null;
         if (fn.lastIndexOf(".") > 0) {
             fid = fn.substring(fn.lastIndexOf(".") + 1, fn.length());
             fid=fid.toLowerCase();
         }
-        mt= MimeTypeMap.getSingleton().getMimeTypeFromExtension(fid);
+        if (!gp.settingOpenAsTextFileType.equals("")) {
+            String[] ft_array=gp.settingOpenAsTextFileType.split(";");
+            for(String ft_item:ft_array) {
+                String ft=ft_item.trim();
+                if (fid.equals(ft)) {
+                    mt=MIME_TYPE_TEXT;
+                    break;
+                }
+            }
+        }
+        if (mt==null) mt= MimeTypeMap.getSingleton().getMimeTypeFromExtension(fid);
         return mt;
     }
 
@@ -3931,10 +3941,10 @@ public class LocalFileManager {
 		String fid=CommonUtilities.getFileExtention(f_name);
 		String mt="";
 		if (!mime_type.equals("")) mt=mime_type;
-		else if (fid.equals("log")) mt=MIME_TYPE_TEXT;
 		else if (fid.equals("gz")) mt=MIME_TYPE_ZIP;
 		else if (fid.equals("zip")) mt=MIME_TYPE_ZIP;
-		else mt=MimeTypeMap.getSingleton().getMimeTypeFromExtension(fid);
+        else mt=getMimeTypeFromFileExtention(mGp, f_name);
+//		else mt=MimeTypeMap.getSingleton().getMimeTypeFromExtension(fid);
 			
 		if (mt != null) {
 		    if (mt.equals(MIME_TYPE_ZIP)) mActivity.showZipFile(p_dir+"/"+f_name);

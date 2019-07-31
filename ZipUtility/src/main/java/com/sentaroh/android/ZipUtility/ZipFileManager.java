@@ -3600,8 +3600,8 @@ public class ZipFileManager {
 	private void invokeBrowser(boolean encrypted, final TreeFilelistItem tfli,
 			final String p_dir, final String f_name, String mime_type) {
 		final String work_dir=mGp.internalRootDirectory+"/"+mGp.appSpecificDirectory+"/"+WORK_DIRECTORY;
-		String fid=CommonUtilities.getFileExtention(f_name);
-		String w_mt=MimeTypeMap.getSingleton().getMimeTypeFromExtension(fid);
+//		String fid=CommonUtilities.getFileExtention(f_name);
+		String w_mt=LocalFileManager.getMimeTypeFromFileExtention(mGp, f_name);
 		final String mt=mime_type.equals("")?w_mt:mime_type;
 		if (mt != null) {
 			try {

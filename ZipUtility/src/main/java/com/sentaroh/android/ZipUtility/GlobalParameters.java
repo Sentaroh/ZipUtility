@@ -104,9 +104,13 @@ public class GlobalParameters extends CommonGlobalParms {
 	public String  settingZipDefaultEncoding="UTF-8";
 	public String  settingNoCompressFileType=DEFAULT_NOCOMPRESS_FILE_TYPE;
 	static final public String DEFAULT_NOCOMPRESS_FILE_TYPE=
-			"aac;avi;gif;ico;gz;jpe;jpeg;jpg;m3u;m4a;m4u;mov;movie;mp2;mp3;mpe;mpeg;mpg;mpga;ogg;png;qt;ra;ram;svg;tgz;wmv;"; 
-	
-	public Handler uiHandler=null;
+			"aac;avi;gif;ico;gz;jpe;jpeg;jpg;m3u;m4a;m4u;mov;movie;mp2;mp3;mpe;mpeg;mpg;mpga;ogg;png;qt;ra;ram;svg;tgz;wmv;";
+
+    public String  settingOpenAsTextFileType=DEFAULT_OPEN_AS_TEXT_FILE_TYPE;
+    static final public String DEFAULT_OPEN_AS_TEXT_FILE_TYPE=
+            "log;";
+
+    public Handler uiHandler=null;
 
 
 	public GlobalParameters() {
@@ -255,6 +259,11 @@ public class GlobalParameters extends CommonGlobalParms {
 			prefs.edit().putString(c.getString(R.string.settings_zip_default_encoding), enc).commit();
 		}
 
+        if (!prefs.contains(c.getString(R.string.settings_open_as_text_file_type))) {
+            prefs.edit().putString(c.getString(R.string.settings_open_as_text_file_type), DEFAULT_OPEN_AS_TEXT_FILE_TYPE).commit();
+        }
+
+
 	};
 
 	public void setSettingOptionLogEnabled(Context c, boolean enabled) {
@@ -283,7 +292,9 @@ public class GlobalParameters extends CommonGlobalParms {
 		settingLogOption=prefs.getBoolean(c.getString(R.string.settings_log_option), false); 
 		settingPutLogcatOption=prefs.getBoolean(c.getString(R.string.settings_put_logcat_option), false);
 
-		settingNoCompressFileType=prefs.getString(c.getString(R.string.settings_no_compress_file_type),DEFAULT_NOCOMPRESS_FILE_TYPE);
+		settingNoCompressFileType=prefs.getString(c.getString(R.string.settings_no_compress_file_type), DEFAULT_NOCOMPRESS_FILE_TYPE);
+
+        settingOpenAsTextFileType=prefs.getString(c.getString(R.string.settings_open_as_text_file_type), DEFAULT_OPEN_AS_TEXT_FILE_TYPE);
 
 		themeIsLight=settingUseLightTheme=prefs.getBoolean(c.getString(R.string.settings_use_light_theme), false);
 		if (settingUseLightTheme) {
