@@ -44,6 +44,7 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -59,6 +60,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -597,8 +600,8 @@ public class ActivityMain extends AppCompatActivity {
 		inflater.inflate(R.menu.menu_top, menu);
 		return true;
 	};
-	
-	@Override
+
+    @Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		mUtil.addDebugMsg(2, "I", "onPrepareOptionsMenu Entered");
         super.onPrepareOptionsMenu(menu);
@@ -619,21 +622,21 @@ public class ActivityMain extends AppCompatActivity {
         	}
         }
         if (isUiEnabled()) {
-        	menu.findItem(R.id.menu_top_find).setEnabled(true);
-        	menu.findItem(R.id.menu_top_refresh).setEnabled(true);
-        	menu.findItem(R.id.menu_top_sort).setEnabled(true);
-        	menu.findItem(R.id.menu_top_browse_log).setEnabled(true);
-        	menu.findItem(R.id.menu_top_log_management).setEnabled(true);
-        	menu.findItem(R.id.menu_top_about).setEnabled(true);
-        	menu.findItem(R.id.menu_top_settings).setEnabled(true);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_find), true);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_refresh),true);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_sort), true);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_browse_log), true);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_log_management), true);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_about), true);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_settings), true);
         } else {
-        	menu.findItem(R.id.menu_top_find).setEnabled(false);
-        	menu.findItem(R.id.menu_top_refresh).setEnabled(false);
-        	menu.findItem(R.id.menu_top_sort).setEnabled(false);
-        	menu.findItem(R.id.menu_top_browse_log).setEnabled(false);
-        	menu.findItem(R.id.menu_top_log_management).setEnabled(false);
-        	menu.findItem(R.id.menu_top_about).setEnabled(false);
-        	menu.findItem(R.id.menu_top_settings).setEnabled(false);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_find), false);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_refresh), false);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_sort), false);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_browse_log), false);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_log_management), false);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_about), false);
+            CommonDialog.setMenuItemEnabled(mActivity, menu, menu.findItem(R.id.menu_top_settings), false);
         }
 
         if (mGp.safMgr.getSdcardRootPath().equals(SafManager.UNKNOWN_SDCARD_DIRECTORY)) menu.findItem(R.id.menu_top_show_sdcard_selector).setVisible(true);

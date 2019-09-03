@@ -24,6 +24,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 */
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -46,6 +47,7 @@ import com.sentaroh.android.Utilities.Dialog.CommonDialog;
 import com.sentaroh.android.Utilities.NotifyEvent;
 import com.sentaroh.android.Utilities.SafFile;
 import com.sentaroh.android.Utilities.SystemInfo;
+import com.sentaroh.android.Utilities.ThemeUtil;
 import com.sentaroh.android.Utilities.ThreadCtrl;
 import com.sentaroh.android.ZipUtility.Log.LogUtil;
 
@@ -338,7 +340,7 @@ public final class CommonUtilities {
 		return ret;
 	};
 
-	static public void setCheckedTextView(final CheckedTextView ctv) {
+    static public void setCheckedTextView(final CheckedTextView ctv) {
 		ctv.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {

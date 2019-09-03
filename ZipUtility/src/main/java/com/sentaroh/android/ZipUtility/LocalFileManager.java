@@ -743,8 +743,8 @@ public class LocalFileManager {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.length() > 0) btnOk.setEnabled(true);
-                else btnOk.setEnabled(false);
+                if (s.length() > 0) CommonDialog.setButtonEnabled(mActivity, btnOk, true);
+                else CommonDialog.setButtonEnabled(mActivity, btnOk, false);
             }
         });
 
@@ -959,7 +959,7 @@ public class LocalFileManager {
         dlg_cmp.setText(mContext.getString(R.string.msgs_file_select_edit_parent_directory) + t_dir);
         CommonDialog.setDlgBoxSizeCompactWithInput(dialog);
         etDir.setText("");
-        btnOk.setEnabled(false);
+        CommonDialog.setButtonEnabled(mActivity, btnOk, false);
         etDir.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -975,10 +975,10 @@ public class LocalFileManager {
                     File lf = new File(t_dir + s.toString());
 //					Log.v("","fp="+lf.getPath());
                     if (lf.exists()) {
-                        btnOk.setEnabled(false);
+                        CommonDialog.setButtonEnabled(mActivity, btnOk, false);
                         dlg_msg.setText(mContext.getString(R.string.msgs_single_item_input_dlg_duplicate_dir));
                     } else {
-                        btnOk.setEnabled(true);
+                        CommonDialog.setButtonEnabled(mActivity, btnOk, true);
                         dlg_msg.setText("");
                     }
                 }
@@ -1083,7 +1083,7 @@ public class LocalFileManager {
         final TreeFilelistItem tfli = w_tfli;
 
         CommonDialog.setDlgBoxSizeCompactWithInput(dialog);
-        btnOk.setEnabled(false);
+        CommonDialog.setButtonEnabled(mActivity, btnOk, false);
         etDir.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -1099,10 +1099,10 @@ public class LocalFileManager {
                     File lf = new File(tfli.getPath() + "/" + s.toString());
 //					Log.v("","fp="+lf.getPath());
                     if (lf.exists()) {
-                        btnOk.setEnabled(false);
+                        CommonDialog.setButtonEnabled(mActivity, btnOk, false);
                         dlg_msg.setText(mContext.getString(R.string.msgs_single_item_input_dlg_duplicate_dir));
                     } else {
-                        btnOk.setEnabled(true);
+                        CommonDialog.setButtonEnabled(mActivity, btnOk, true);
                         dlg_msg.setText("");
                     }
                 }
@@ -1302,8 +1302,6 @@ public class LocalFileManager {
         mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
     }
 
-    ;
-
     private boolean isCopyCutDestValid(String fp) {
         boolean enabled = true;
         if (mGp.copyCutList.size() > 0) {
@@ -1355,8 +1353,6 @@ public class LocalFileManager {
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " exit, enabled=" + enabled);
         return enabled;
     }
-
-    ;
 
     private void confirmCancel(final ThreadCtrl tc, final Button cancel) {
         NotifyEvent ntfy = new NotifyEvent(mContext);
@@ -1651,8 +1647,6 @@ public class LocalFileManager {
         return result;
     }
 
-    ;
-
     private boolean moveFileExternalToInternal(ThreadCtrl tc, File from_file, String to_path) {
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " from=" + from_file.getPath() + ", to=" + to_path);
         boolean result = false;
@@ -1766,8 +1760,6 @@ public class LocalFileManager {
         }
         return result;
     }
-
-    ;
 
     private boolean moveFileExternalToExternal(ThreadCtrl tc, File from_file, String to_path) {
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " from=" + from_file.getPath() + ", to=" + to_path);
@@ -1972,8 +1964,6 @@ public class LocalFileManager {
         th.start();
     }
 
-    ;
-
     private boolean isExtractEnded(final ThreadCtrl tc, final String dest_path, final ZipFile zf,
                                    final ArrayList<FileHeader> selected_fh_list, final ArrayList<FileHeader> extracted_fh_list,
                                    final String conf_list, final boolean move_mode) {
@@ -2031,8 +2021,6 @@ public class LocalFileManager {
         }
         return false;
     }
-
-    ;
 
     private String mMainPassword = "";
 
@@ -2260,8 +2248,6 @@ public class LocalFileManager {
         return result;
     }
 
-    ;
-
     private boolean extractSpecificFileByExternal(ThreadCtrl tc, ZipFile zf, String zip_file_name,
                                                   String dest_path, String dest_file_name) {
         boolean result = false;
@@ -2322,8 +2308,6 @@ public class LocalFileManager {
                 "extractSpecificFile result=" + result + ", zip file name=" + zip_file_name + ", dest=" + dest_path + ", dest file name=" + dest_file_name);
         return result;
     }
-
-    ;
 
     private void confirmCopyFromLocal() {
         mUtil.addDebugMsg(1,"I",CommonUtilities.getExecutedMethodName()+" entered");

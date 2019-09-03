@@ -767,8 +767,8 @@ public class ZipFileManager {
 			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			@Override
 			public void afterTextChanged(Editable s) {
-				if (s.length()>0) btnOk.setEnabled(true);
-				else btnOk.setEnabled(false);
+				if (s.length()>0) CommonDialog.setButtonEnabled(mActivity, btnOk, true);
+				else CommonDialog.setButtonEnabled(mActivity, btnOk, false);
 			}
 		});
 
