@@ -93,6 +93,10 @@ import com.sentaroh.android.Utilities.Widget.CustomViewPager;
 import com.sentaroh.android.Utilities.Widget.CustomViewPagerAdapter;
 import com.sentaroh.android.ZipUtility.Log.LogFileListDialogFragment;
 
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -433,7 +437,31 @@ public class ActivityMain extends AppCompatActivity {
 //        startService(intmsg);
 
         checkRequiredPermissions();
-	};
+
+
+//        try {
+//            ZipParameters zp=new ZipParameters();
+//            File lf=new File("/sdcard/enc_test_sjis.zip");
+//            lf.delete();
+//            ZipFile zf=new ZipFile(lf);
+//            zf.setFileNameCharset("SHIFT_JIS");
+//            zf.addFolder("/sdcard/ZIP_エンコーディング_テスト", zp);
+//        } catch (ZipException e) {
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            ZipParameters zp=new ZipParameters();
+//            File lf=new File("/sdcard/enc_test_utf8.zip");
+//            lf.delete();
+//            ZipFile zf=new ZipFile(lf);
+//            zf.setFileNameCharset("UTF-8");
+//            zf.addFolder("/sdcard/ZIP_エンコーディング_テスト", zp);
+//        } catch (ZipException e) {
+//            e.printStackTrace();
+//        }
+
+    };
 
 	private void putSystemInfo() {
         ArrayList<String> sil=SystemInfo.listSystemInfo(mContext, mGp.safMgr);

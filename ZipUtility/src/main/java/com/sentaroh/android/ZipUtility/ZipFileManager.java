@@ -34,6 +34,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -3637,16 +3638,13 @@ public class ZipFileManager {
 									File ef=new File(work_dir+"/"+f_name);
 									boolean extract_required=true;
 									if (ef.exists()) {
-//										Log.v("","file lm="+ef.lastModified()+", l="+ef.length());
-//										Log.v("","zip  lm="+tfli.getLastModified()+", l="+tfli.getLength());
 										if (ef.lastModified()==tfli.getLastModified() &&
 												ef.length()==tfli.getLength()) {
 											extract_required=false;	
 										}
 									}
 									boolean extract_rc=true;
-//									Log.v("","extract="+extract_required);
-									if (extract_required) 
+									if (extract_required)
 										extract_rc=extractSpecificFile(tc, zf, e_name, work_dir, f_name, false);
 									final boolean rc=extract_rc;
                                     mUiHandler.post(new Runnable(){
@@ -3655,14 +3653,17 @@ public class ZipFileManager {
 											setUiEnabled();
 											if (rc) {
 												try {
+												    String fp=(work_dir+"/"+f_name).replaceAll("//","/");
                                                     Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
-                                                    if (Build.VERSION.SDK_INT>=26) {
-                                                        intent.setDataAndType(Uri.parse("file://"+work_dir+"/"+f_name), mt);
-//                                                        Uri uri= FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", new File(work_dir+"/"+f_name));
-//                                                        intent.setDataAndType(uri, mt);
-//                                                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                                                            Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED |
+                                                            Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                                    if (Build.VERSION.SDK_INT>=24) {
+                                                        Uri uri= FileProvider.getUriForFile(
+                                                                mContext, BuildConfig.APPLICATION_ID + ".provider", new File(fp));
+                                                        intent.setDataAndType(uri, mt);
                                                     } else {
-                                                        intent.setDataAndType(Uri.parse("file://"+work_dir+"/"+f_name), mt);
+                                                        intent.setDataAndType(Uri.fromFile(new File(fp)), mt);
                                                     }
                                                     mActivity.startActivity(intent);
 
