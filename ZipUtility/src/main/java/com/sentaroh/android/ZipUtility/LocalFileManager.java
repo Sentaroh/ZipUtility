@@ -3749,17 +3749,16 @@ public class LocalFileManager {
 									}
 									
 								});
-								if (out_fl.getPath().startsWith(mGp.externalRootDirectory)) {
-									SafFile out_sf=mUtil.createSafFile(out_fl.getPath(), true);
-									if (out_sf!=null && out_sf.exists()) out_sf.delete();
-									else {
-									    return;
-                                    }
-								} else {
-									if (out_fl.isFile()) out_fl.delete();
-								}
-								ZipFileManager.getZipParmDlg(mUtil, mActivity, mGp, ENCODING_NAME_UTF8, "", 
-										out_fl.getPath(), ntfy_zip);
+//								if (out_fl.getPath().startsWith(mGp.externalRootDirectory)) {
+//									SafFile out_sf=mUtil.createSafFile(out_fl.getPath(), true);
+//									if (out_sf!=null && out_sf.exists()) out_sf.delete();
+//									else {
+//									    return;
+//                                    }
+//								} else {
+//									if (out_fl.isFile()) out_fl.delete();
+//								}
+								ZipFileManager.getZipParmDlg(mUtil, mActivity, mGp, ENCODING_NAME_UTF8, "", out_fl.getPath(), ntfy_zip);
 							}
 							@Override
 							public void negativeResponse(Context c,Object[] o) {
@@ -3869,8 +3868,18 @@ public class LocalFileManager {
                         if (tc.isEnabled()) {
                             putProgressMessage(mContext.getString(R.string.msgs_zip_zip_file_being_updated));
                             disableCancelButton();
-
                             bzf.close();
+
+                            if (out_fl.getPath().startsWith(mGp.externalRootDirectory)) {
+                                SafFile out_sf=mUtil.createSafFile(out_fl.getPath(), true);
+                                if (out_sf!=null && out_sf.exists()) out_sf.delete();
+                                else {
+                                    return;
+                                }
+                            } else {
+                                if (out_fl.isFile()) out_fl.delete();
+                            }
+
                             ZipFileManager.renameBufferedZipFile(mGp, mUtil, dest_path, out_path, zip_file_name);
 //                        ZipFileManager.renameWorkFileToDestFile(mGp, tc, dest_file_path, out_zf_path);
                             mUtil.addDebugMsg(1, "I", "zipSelectedItem elapsed time="+(System.currentTimeMillis()-b_time));

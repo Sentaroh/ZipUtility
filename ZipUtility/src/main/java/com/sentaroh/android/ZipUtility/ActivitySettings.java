@@ -134,6 +134,8 @@ public class ActivitySettings extends PreferenceActivity{
 		} else if (key_string.equals(c.getString(R.string.settings_zip_default_encoding))) {
 			isChecked=true;
 			pref_key.setSummary(shared_pref.getString(key_string, ""));
+        } else if (key_string.equals(c.getString(R.string.settings_use_set_gpf_bit3_on))) {
+            isChecked=true;
 		}
 		return isChecked;
 	};
@@ -320,6 +322,7 @@ public class ActivitySettings extends PreferenceActivity{
 
 			checkSettingValue(mUtil, shared_pref,getString(R.string.settings_no_compress_file_type));
 			checkSettingValue(mUtil, shared_pref,getString(R.string.settings_zip_default_encoding));
+            checkSettingValue(mUtil, shared_pref,getString(R.string.settings_use_set_gpf_bit3_on));
 
 		};
 

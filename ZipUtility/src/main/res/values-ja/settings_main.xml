@@ -5,7 +5,11 @@
     <string name="settings_compress_title">圧縮</string>
 	
 	<string name="settings_no_compress_file_type_title">圧縮しないファイルタイプ</string>
-	
+
+    <string name="settings_use_set_gpf_bit3_on_title">ファイル名の文字化け</string>
+    <string name="settings_use_set_gpf_bit3_on_summary_ena">UTF8での文字化けを回避する</string>
+    <string name="settings_use_set_gpf_bit3_on">settings_use_set_gpf_bit3_on</string>
+
     <string name="settings_zip_default_encoding_title">自動判別失敗時のエンコーディング</string>
 	<string name="settings_zip_default_encoding_dialog_title">エンコーディングの選択</string>
 		

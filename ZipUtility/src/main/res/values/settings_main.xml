@@ -8,6 +8,10 @@
 	<string name="settings_no_compress_file_type_title">File type for no compress</string>
 	<string name="settings_no_compress_file_type">settings_no_compress_file_type</string>
 
+    <string name="settings_use_set_gpf_bit3_on_title">File name Garbled</string>
+    <string name="settings_use_set_gpf_bit3_on_summary_ena">Avoid garbled characters in UTF8</string>
+    <string name="settings_use_set_gpf_bit3_on">settings_use_set_gpf_bit3_on</string>
+
     <string name="settings_zip_default_encoding_title">Encoding when auto detect failed</string>
 	<string name="settings_zip_default_encoding_dialog_title">Select encoding</string>
 	<string name="settings_zip_default_encoding">settings_zip_default_encoding</string>

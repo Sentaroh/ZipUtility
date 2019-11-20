@@ -100,7 +100,9 @@ public class GlobalParameters extends CommonGlobalParms {
 	public boolean settingPutLogcatOption=false;
 	
 	public boolean settingFixDeviceOrientationToPortrait=false;
-	
+
+	public boolean settingSetGpfBit3On=false;
+
 	public String  settingZipDefaultEncoding="UTF-8";
 	public String  settingNoCompressFileType=DEFAULT_NOCOMPRESS_FILE_TYPE;
 	static final public String DEFAULT_NOCOMPRESS_FILE_TYPE=
@@ -308,7 +310,7 @@ public class GlobalParameters extends CommonGlobalParms {
 		settingFixDeviceOrientationToPortrait=prefs.getBoolean(c.getString(R.string.settings_device_orientation_portrait),false);
 		
 		settingZipDefaultEncoding=prefs.getString(c.getString(R.string.settings_zip_default_encoding), "UTF-8");
-
+        settingSetGpfBit3On=prefs.getBoolean(c.getString(R.string.settings_use_set_gpf_bit3_on), false);
 		if (settingDebugLevel==1) {
             slf4jLog.setLogOption(true,true,true,false,true);
         } else if (settingDebugLevel==2) {
