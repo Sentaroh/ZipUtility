@@ -111,12 +111,12 @@ public class LocalFileManager {
         initViewWidget();
         mTreeFilelistAdapter = new CustomTreeFilelistAdapter(mActivity, false, true);
 
-        mLocalStorage.setEnabled(false);
+        CommonDialog.setViewEnabled(mActivity, mLocalStorage, false);
         createFileList(mMainFilePath, null);
         mUiHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mLocalStorage.setEnabled(true);
+                CommonDialog.setViewEnabled(mActivity, mLocalStorage, true);
             }
         },200);
 
@@ -288,6 +288,7 @@ public class LocalFileManager {
 
         mLocalStorage = (Spinner) mMainView.findViewById(R.id.local_file_storage_spinner);
         CommonUtilities.setSpinnerBackground(mActivity, mLocalStorage, mGp.themeIsLight);
+        CommonDialog.setViewEnabled(mActivity, mLocalStorage, true);
         setLocalMpSpinner(false);
 
         mFileListUp = (Button) mMainView.findViewById(R.id.local_file_up_btn);
@@ -359,11 +360,11 @@ public class LocalFileManager {
             btn.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    btn.setEnabled(true);
+                    CommonDialog.setViewEnabled(mActivity, btn, true);
                 }
             }, 1000);
         } else {
-            btn.setEnabled(false);
+            CommonDialog.setViewEnabled(mActivity, btn, false);
         }
     }
 
@@ -1126,7 +1127,7 @@ public class LocalFileManager {
                         setUiDisabled();
                         showDialogProgress();
                         final ThreadCtrl tc = new ThreadCtrl();
-                        mDialogProgressSpinCancel.setEnabled(true);
+                        CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
                         mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
                         mDialogProgressSpinCancel.setOnClickListener(new OnClickListener() {
                             @Override
@@ -1360,7 +1361,7 @@ public class LocalFileManager {
             @Override
             public void positiveResponse(Context c, Object[] o) {
                 tc.setDisabled();
-                cancel.setEnabled(false);
+                CommonDialog.setViewEnabled(mActivity, cancel, false);
             }
 
             @Override
@@ -1410,7 +1411,7 @@ public class LocalFileManager {
                 setUiDisabled();
                 showDialogProgress();
                 final ThreadCtrl tc = new ThreadCtrl();
-                mDialogProgressSpinCancel.setEnabled(true);
+                CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
                 mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
                 mDialogProgressSpinCancel.setOnClickListener(new OnClickListener() {
                     @Override
@@ -1918,7 +1919,7 @@ public class LocalFileManager {
         showDialogProgress();
         final ThreadCtrl tc = new ThreadCtrl();
         mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
-        mDialogProgressSpinCancel.setEnabled(true);
+        CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
         mDialogProgressSpinCancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -2319,7 +2320,7 @@ public class LocalFileManager {
                 setUiDisabled();
                 showDialogProgress();
                 final ThreadCtrl tc = new ThreadCtrl();
-                mDialogProgressSpinCancel.setEnabled(true);
+                CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
                 mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
                 mDialogProgressSpinCancel.setOnClickListener(new OnClickListener() {
                     @Override
@@ -2725,7 +2726,7 @@ public class LocalFileManager {
 				setUiDisabled();
 				showDialogProgress();
 				final ThreadCtrl tc=new ThreadCtrl();
-				mDialogProgressSpinCancel.setEnabled(true);
+                CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
 				mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
 				mDialogProgressSpinCancel.setOnClickListener(new OnClickListener(){
 					@Override
@@ -2792,7 +2793,7 @@ public class LocalFileManager {
 				setUiDisabled();
 				showDialogProgress();
 				final ThreadCtrl tc=new ThreadCtrl();
-				mDialogProgressSpinCancel.setEnabled(true);
+                CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
 				mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
 				mDialogProgressSpinCancel.setOnClickListener(new OnClickListener(){
 					@Override
@@ -2927,6 +2928,7 @@ public class LocalFileManager {
 
 	private void setUiEnabled() {
 		mActivity.setUiEnabled();
+        CommonDialog.setViewEnabled(mActivity, mLocalStorage, true);
 		mTreeFilelistAdapter.setCheckBoxEnabled(isUiEnabled());
 		mTreeFilelistAdapter.notifyDataSetChanged();
 		hideDialog();
@@ -2936,6 +2938,7 @@ public class LocalFileManager {
 	
 	private void setUiDisabled() {
 		mActivity.setUiDisabled();
+		CommonDialog.setViewEnabled(mActivity, mLocalStorage, false);
 		mTreeFilelistAdapter.setCheckBoxEnabled(false);
 		mTreeFilelistAdapter.notifyDataSetChanged();
 		refreshOptionMenu();
@@ -3440,15 +3443,8 @@ public class LocalFileManager {
 	}
 
 	private void setTopUpButtonEnabled(boolean p) {
-		mFileListUp.setEnabled(p);
-		mFileListTop.setEnabled(p);
-		if (p) {
-			mFileListUp.setAlpha(1);
-			mFileListTop.setAlpha(1);
-		} else {
-			mFileListUp.setAlpha(0.4f);
-			mFileListTop.setAlpha(0.4f);
-		}
+        CommonDialog.setViewEnabled(mActivity, mFileListUp, p);
+        CommonDialog.setViewEnabled(mActivity, mFileListTop, p);
 	}
 	
 	private int mInfoDirectoryCount=0;
@@ -3812,7 +3808,7 @@ public class LocalFileManager {
 		showDialogProgress();
 		final ThreadCtrl tc=new ThreadCtrl();
 		mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
-		mDialogProgressSpinCancel.setEnabled(true);
+        CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
 		mDialogProgressSpinCancel.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -3923,7 +3919,7 @@ public class LocalFileManager {
         mUiHandler.post(new Runnable(){
             @Override
             public void run() {
-                mDialogProgressSpinCancel.setEnabled(false);
+                CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, false);
             }
         });
     }

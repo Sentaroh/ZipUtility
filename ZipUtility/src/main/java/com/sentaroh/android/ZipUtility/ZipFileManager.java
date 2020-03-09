@@ -1056,7 +1056,7 @@ public class ZipFileManager {
 			setUiDisabled();
 			showDialogProgress();
 			final ThreadCtrl tc=new ThreadCtrl();
-			mDialogProgressSpinCancel.setEnabled(true);
+            CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
 			mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
 			mDialogProgressSpinCancel.setOnClickListener(new OnClickListener(){
 				@Override
@@ -1138,7 +1138,7 @@ public class ZipFileManager {
 			mFileEmpty.setText(R.string.msgs_zip_folder_not_specified);
 			mCurrentDirectory.setVisibility(TextView.GONE);
 			mFileListUp.setVisibility(Button.GONE);
-			mFileListUp.setEnabled(false);
+            CommonDialog.setViewEnabled(mActivity, mFileListUp, false);
 			mFileListTop.setVisibility(Button.GONE);
 			mEncodingSpinner.setVisibility(Spinner.INVISIBLE);
 			mZipFileSpinner.setVisibility(TextView.INVISIBLE);
@@ -1239,11 +1239,11 @@ public class ZipFileManager {
         	btn.postDelayed(new Runnable(){
     			@Override
     			public void run() {
-    				btn.setEnabled(true);
-    			}
+                    CommonDialog.setViewEnabled(mActivity, btn, true);
+                }
         	}, 1000);
     	} else {
-    		btn.setEnabled(false);
+            CommonDialog.setViewEnabled(mActivity, btn, false);
     	}
     };
 
@@ -1686,7 +1686,7 @@ public class ZipFileManager {
 			@Override
 			public void positiveResponse(Context c, Object[] o) {
 				tc.setDisabled();
-				cancel.setEnabled(false);
+                CommonDialog.setViewEnabled(mActivity, cancel, false);
 			}
 			@Override
 			public void negativeResponse(Context c, Object[] o) {}
@@ -1872,7 +1872,7 @@ public class ZipFileManager {
         mUiHandler.post(new Runnable(){
             @Override
             public void run() {
-                mDialogProgressSpinCancel.setEnabled(false);
+                CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, false);
             }
         });
     }
@@ -1883,7 +1883,7 @@ public class ZipFileManager {
 		showDialogProgress();
 		final ThreadCtrl tc=new ThreadCtrl();
 		mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
-		mDialogProgressSpinCancel.setEnabled(true);
+        CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
 		mDialogProgressSpinCancel.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -1985,7 +1985,7 @@ public class ZipFileManager {
 		th.start();
 	};
 
-	static public void getZipParmDlg(CommonUtilities mUtil, Activity mActivity, final GlobalParameters mGp,
+	static public void getZipParmDlg(final CommonUtilities mUtil, final Activity mActivity, final GlobalParameters mGp,
 			final String selected_encoding, final String pswd, final String fp, final NotifyEvent p_ntfy) {
 		@SuppressWarnings("unused")
 		boolean w_zip_empty=false;
@@ -2043,18 +2043,18 @@ public class ZipFileManager {
 		    		dlg_pswd.setVisibility(EditText.VISIBLE);
 		    		dlg_conf.setVisibility(EditText.VISIBLE);
 				}
-				checkZipParmValidation(mGp, dialog, fp, zf);
+				checkZipParmValidation(mActivity, mGp, dialog, fp, zf);
 			}
     	});
 
-		dlg_rb_none.setEnabled(true);
+        CommonDialog.setViewEnabled(mActivity, dlg_rb_none, true);
 		dlg_rb_none.setChecked(true);
 		dlg_pswd.setVisibility(EditText.GONE);
 		dlg_conf.setVisibility(EditText.GONE);
 
     	dlg_pswd.setText(pswd);
 
-    	checkZipParmValidation(mGp, dialog, fp, zf);
+    	checkZipParmValidation(mActivity, mGp, dialog, fp, zf);
     	dlg_pswd.addTextChangedListener(new TextWatcher(){
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -2064,7 +2064,7 @@ public class ZipFileManager {
 			}
 			@Override
 			public void afterTextChanged(Editable s) {
-				checkZipParmValidation(mGp, dialog, fp, zf);
+				checkZipParmValidation(mActivity, mGp, dialog, fp, zf);
 			}
     	});
     	dlg_conf.addTextChangedListener(new TextWatcher(){
@@ -2076,7 +2076,7 @@ public class ZipFileManager {
 			}
 			@Override
 			public void afterTextChanged(Editable s) {
-				checkZipParmValidation(mGp, dialog, fp, zf);
+				checkZipParmValidation(mActivity, mGp, dialog, fp, zf);
 			}
     	});
 
@@ -2134,7 +2134,7 @@ public class ZipFileManager {
     	dialog.show();
 	};
 
-	private static void checkZipParmValidation(GlobalParameters mGp, Dialog dialog, String fp,
+	private static void checkZipParmValidation(Activity a, GlobalParameters mGp, Dialog dialog, String fp,
 			ZipFile zf) {
     	final EditText dlg_pswd=(EditText)dialog.findViewById(R.id.zip_parm_dlg_enc_password);
     	final EditText dlg_conf=(EditText)dialog.findViewById(R.id.zip_parm_dlg_enc_confirm);
@@ -2150,21 +2150,21 @@ public class ZipFileManager {
 
     	if (dlg_rb_none.isChecked()) {
 			dlg_msg.setText("");
-			dlg_ok.setEnabled(true);;
+            CommonDialog.setViewEnabled(a, dlg_ok, true);
     	} else {
 			if (dlg_pswd.getText().length()>0) {
 				if (dlg_pswd.getText().toString().equals(dlg_conf.getText().toString())) {
 					dlg_msg.setText("");
-					dlg_ok.setEnabled(true);;
+                    CommonDialog.setViewEnabled(a, dlg_ok, true);
 				} else {
 					dlg_msg.setText(mGp.appContext.getString(R.string.msgs_zip_parm_confirm_pswd_unmatched));
-					dlg_ok.setEnabled(false);;
+                    CommonDialog.setViewEnabled(a, dlg_ok, false);
 				}
-				dlg_conf.setEnabled(true);
+                CommonDialog.setViewEnabled(a, dlg_conf, true);
 			} else {
-				dlg_ok.setEnabled(false);;
-				dlg_msg.setText(mGp.appContext.getString(R.string.msgs_zip_parm_pswd_not_specified));
-				dlg_conf.setEnabled(false);
+                CommonDialog.setViewEnabled(a, dlg_ok, false);
+                CommonDialog.setViewEnabled(a, dlg_conf, false);
+                dlg_msg.setText(mGp.appContext.getString(R.string.msgs_zip_parm_pswd_not_specified));
 			}
     	}
 	};
@@ -2252,7 +2252,7 @@ public class ZipFileManager {
 		showDialogProgress();
 		final ThreadCtrl tc=new ThreadCtrl();
 		mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
-		mDialogProgressSpinCancel.setEnabled(true);
+        CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
 		mDialogProgressSpinCancel.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
@@ -2601,7 +2601,7 @@ public class ZipFileManager {
 		return result;
 	};
 
-	static public void getZipPasswordDlg(Activity mActivity, GlobalParameters mGp, String mMainPassword,
+	static public void getZipPasswordDlg(final Activity mActivity, GlobalParameters mGp, String mMainPassword,
 			final ZipFile zf, final FileHeader fh, final NotifyEvent p_ntfy,
 			final boolean thread_resp) {
 		final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
@@ -2638,7 +2638,7 @@ public class ZipFileManager {
     	CommonDialog.setDlgBoxSizeLimit(dialog, true);
     	
     	dlg_pswd.setText(mMainPassword);
-        dlg_pswd.setEnabled(true);
+        CommonDialog.setViewEnabled(mActivity, dlg_pswd, true);
 //    	verifyZipPassword(zf, fh, mMainPassword, dlg_ok, dlg_msg);
     	dlg_pswd.addTextChangedListener(new TextWatcher(){
 			@Override
@@ -2650,7 +2650,10 @@ public class ZipFileManager {
 			@Override
 			public void afterTextChanged(Editable s) {
 			    if (s.toString().length()>0) {
-			        verifyZipPassword(zf, fh, s.toString(), dlg_ok, dlg_msg);
+			        CommonDialog.setViewEnabled(mActivity, dlg_ok,true);
+//			        verifyZipPassword(zf, fh, s.toString(), dlg_ok, dlg_msg);
+                } else {
+                    CommonDialog.setViewEnabled(mActivity, dlg_ok,false);
                 }
 			}
     	});
@@ -2693,17 +2696,17 @@ public class ZipFileManager {
     	dialog.show();
 	};
 
-	private static void verifyZipPassword(final ZipFile zf, final FileHeader fh, String pswd, Button dlg_ok, TextView dlg_msg) {
+	private static void verifyZipPassword(final Activity a, final ZipFile zf, final FileHeader fh, String pswd, Button dlg_ok, TextView dlg_msg) {
 		if (pswd.length()>0) {
 			if (isCorrectZipFilePassword(zf, fh, pswd)) {
-				dlg_ok.setEnabled(true);
+                CommonDialog.setViewEnabled(a, dlg_ok, true);
 				dlg_msg.setText("");
 			} else {
-				dlg_ok.setEnabled(false);
-				dlg_msg.setText(R.string.msgs_zip_extract_zip_password_wrong);
+                CommonDialog.setViewEnabled(a, dlg_ok, false);
+                dlg_msg.setText(R.string.msgs_zip_extract_zip_password_wrong);
 			}
 		} else {
-			dlg_ok.setEnabled(false);
+            CommonDialog.setViewEnabled(a, dlg_ok, false);
 			dlg_msg.setText(R.string.msgs_zip_extract_zip_password_not_specified);
 		}
 	}
@@ -2811,7 +2814,7 @@ public class ZipFileManager {
 		setUiDisabled();
 		showDialogProgress();
 		final ThreadCtrl tc=new ThreadCtrl();
-		mDialogProgressSpinCancel.setEnabled(true);
+        CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
 		mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
 		mDialogProgressSpinCancel.setOnClickListener(new OnClickListener(){
 			@Override
@@ -3028,15 +3031,15 @@ public class ZipFileManager {
 	private void setUiEnabled() {
 		mActivity.setUiEnabled();
 		hideDialog();
-		mZipFileSpinner.setEnabled(true);
-		mEncodingSpinner.setEnabled(true);
+        CommonDialog.setViewEnabled(mActivity, mZipFileSpinner, true);
+        CommonDialog.setViewEnabled(mActivity, mEncodingSpinner, true);
 		refreshOptionMenu();
 	};
 	
 	private void setUiDisabled() {
 		mActivity.setUiDisabled();
-		mZipFileSpinner.setEnabled(false);
-		mEncodingSpinner.setEnabled(false);
+        CommonDialog.setViewEnabled(mActivity, mZipFileSpinner, false);
+        CommonDialog.setViewEnabled(mActivity, mEncodingSpinner, false);
 		refreshOptionMenu();
 	};
 	
@@ -3265,15 +3268,15 @@ public class ZipFileManager {
 	};
 
 	private void setTopUpButtonEnabled(boolean p) {
-		mFileListUp.setEnabled(p);
-		mFileListTop.setEnabled(p);
-		if (p) {
-			mFileListUp.setAlpha(1);
-			mFileListTop.setAlpha(1);
-		} else {
-			mFileListUp.setAlpha(0.4f);
-			mFileListTop.setAlpha(0.4f);
-		}
+        CommonDialog.setViewEnabled(mActivity, mFileListUp, p);
+        CommonDialog.setViewEnabled(mActivity, mFileListTop, p);
+//		if (p) {
+//			mFileListUp.setAlpha(1);
+//			mFileListTop.setAlpha(1);
+//		} else {
+//			mFileListUp.setAlpha(0.4f);
+//			mFileListTop.setAlpha(0.4f);
+//		}
 	};
 
 	private ZipFileListItem getZipFileListItem(String zfp) {
@@ -3623,7 +3626,7 @@ public class ZipFileManager {
 								mMainPassword=pswd;
 							}
 							final ThreadCtrl tc=new ThreadCtrl();
-							mDialogProgressSpinCancel.setEnabled(true);
+                            CommonDialog.setViewEnabled(mActivity, mDialogProgressSpinCancel, true);
 							mDialogProgressSpinCancel.setOnClickListener(new OnClickListener(){
 								@Override
 								public void onClick(View v) {
