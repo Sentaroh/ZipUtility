@@ -2639,7 +2639,7 @@ public class ZipFileManager {
     	
     	dlg_pswd.setText(mMainPassword);
         CommonDialog.setViewEnabled(mActivity, dlg_pswd, true);
-//    	verifyZipPassword(zf, fh, mMainPassword, dlg_ok, dlg_msg);
+    	verifyZipPassword(mActivity, zf, fh, mMainPassword, dlg_ok, dlg_msg);
     	dlg_pswd.addTextChangedListener(new TextWatcher(){
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -2650,8 +2650,9 @@ public class ZipFileManager {
 			@Override
 			public void afterTextChanged(Editable s) {
 			    if (s.toString().length()>0) {
-			        CommonDialog.setViewEnabled(mActivity, dlg_ok,true);
-//			        verifyZipPassword(zf, fh, s.toString(), dlg_ok, dlg_msg);
+//                    verifyZipPassword(mActivity, zf, fh, s.toString(), dlg_ok, dlg_msg);
+                    CommonDialog.setViewEnabled(mActivity, dlg_ok,true);
+                    dlg_msg.setText("");
                 } else {
                     CommonDialog.setViewEnabled(mActivity, dlg_ok,false);
                 }
@@ -2661,18 +2662,22 @@ public class ZipFileManager {
 		dlg_ok.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				dialog.dismiss();
-				if (thread_resp) {
-					Thread th=new Thread(){
-						@Override
-						public void run() {
-							p_ntfy.notifyToListener(true, new Object[]{dlg_pswd.getText().toString()});
-						}
-					};
-					th.start();
-				} else {
-					p_ntfy.notifyToListener(true, new Object[]{dlg_pswd.getText().toString()});
-				}
+			    if (isCorrectZipFilePassword(zf, fh, dlg_pswd.getText().toString())) {
+                    dialog.dismiss();
+                    if (thread_resp) {
+                        Thread th=new Thread(){
+                            @Override
+                            public void run() {
+                                p_ntfy.notifyToListener(true, new Object[]{dlg_pswd.getText().toString()});
+                            }
+                        };
+                        th.start();
+                    } else {
+                        p_ntfy.notifyToListener(true, new Object[]{dlg_pswd.getText().toString()});
+                    }
+                } else {
+                    dlg_msg.setText(R.string.msgs_zip_extract_zip_password_wrong);
+                }
 			}
 		});
 		
