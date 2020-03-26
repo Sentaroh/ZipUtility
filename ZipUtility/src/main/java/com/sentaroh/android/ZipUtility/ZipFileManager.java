@@ -2918,21 +2918,21 @@ public class ZipFileManager {
                     bzf=new BufferedZipFile2(dest_path, gp.appContext.getContentResolver().openOutputStream(out.getUri()),
                             ZipUtil.DEFAULT_ZIP_FILENAME_ENCODING, gp.safMgr.getSdcardRootPath() + gp.appSpecificDirectory);
                     bzf.setGpfBit3On(gp.settingSetGpfBit3On);
-                } catch (FileNotFoundException e) {
+                } catch (Exception e) {
                     util.addLogMsg("E","createBufferedZipFile failed. msg="+e.getMessage());
                     util.addLogMsg("E","dest="+dest_path+", out="+out_path);
                     try {if (out!=null && out.exists()) out.delete();} catch(Exception e2){};
                 }
             }
-            try {
-                bzf=new BufferedZipFile2(dest_path, gp.appContext.getContentResolver().openOutputStream(out.getUri()),
-                        ZipUtil.DEFAULT_ZIP_FILENAME_ENCODING, gp.safMgr.getSdcardRootPath() + gp.appSpecificDirectory);
-                bzf.setGpfBit3On(gp.settingSetGpfBit3On);
-            } catch (FileNotFoundException e) {
-                util.addLogMsg("E","createBufferedZipFile failed. msg="+e.getMessage());
-                util.addLogMsg("E","dest="+dest_path+", out="+out_path);
-                try {if (out!=null && out.exists()) out.delete();} catch(Exception e2){};
-            }
+//            try {
+//                bzf=new BufferedZipFile2(dest_path, gp.appContext.getContentResolver().openOutputStream(out.getUri()),
+//                        ZipUtil.DEFAULT_ZIP_FILENAME_ENCODING, gp.safMgr.getSdcardRootPath() + gp.appSpecificDirectory);
+//                bzf.setGpfBit3On(gp.settingSetGpfBit3On);
+//            } catch (Exception e) {
+//                util.addLogMsg("E","createBufferedZipFile failed. msg="+e.getMessage());
+//                util.addLogMsg("E","dest="+dest_path+", out="+out_path);
+//                try {if (out!=null && out.exists()) out.delete();} catch(Exception e2){};
+//            }
         } else {
             bzf=new BufferedZipFile2(dest_path, out_path, ZipUtil.DEFAULT_ZIP_FILENAME_ENCODING);
             bzf.setGpfBit3On(gp.settingSetGpfBit3On);
