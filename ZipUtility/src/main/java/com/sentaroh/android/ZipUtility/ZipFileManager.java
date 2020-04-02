@@ -2961,7 +2961,7 @@ public class ZipFileManager {
     static public void deleteBufferedZipWork(GlobalParameters gp, CommonUtilities util, String dest_path, String out_path) {
         if (dest_path.startsWith(gp.externalRootDirectory)) {
             SafFile of=gp.safMgr.findSdcardItem(out_path);
-            of.deleteIfExists();
+            if (of!=null) of.deleteIfExists();
         } else {
             File of=new File(out_path);
             if (of.exists()) of.delete();
