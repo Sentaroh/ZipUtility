@@ -587,11 +587,19 @@ public class ActivityMain extends AppCompatActivity {
 			case KeyEvent.KEYCODE_BACK:
 				if (isUiEnabled()) {
 					if (mMainTabHost.getCurrentTab()==0) {//Local tab
+                        if (mLocalFileMgr.isFileListSelected()) {
+                            mLocalFileMgr.setFileListAllItemUnselected();
+                            return true;
+                        }
 						if (mLocalFileMgr.isUpButtonEnabled()) {
 							mLocalFileMgr.performClickUpButton();
 							return true;
 						}
 					} else {//Zip folder
+                        if (mZipFileMgr.isFileListSelected()) {
+                            mZipFileMgr.setFileListAllItemUnselected();
+                            return true;
+                        }
 						if (mZipFileMgr.isUpButtonEnabled()) {
 							mZipFileMgr.performClickUpButton();
 							return true;

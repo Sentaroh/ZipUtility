@@ -230,6 +230,15 @@ public class ZipFileManager {
         mTreeFilelistAdapter.notifyDataSetChanged();
     }
 
+    public boolean isFileListSelected() {
+        return mTreeFilelistAdapter.isItemSelected();
+    }
+
+    public void setFileListAllItemUnselected() {
+        mTreeFilelistAdapter.setAllItemUnchecked();
+        mTreeFilelistAdapter.notifyDataSetChanged();
+    }
+
     public boolean isFileListSortAscendant() {
 		if (mTreeFilelistAdapter!=null) return mTreeFilelistAdapter.isSortAscendant();
 		else return true;

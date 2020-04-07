@@ -137,6 +137,15 @@ public class LocalFileManager {
         mTreeFilelistAdapter.notifyDataSetChanged();
     }
 
+    public boolean isFileListSelected() {
+        return mTreeFilelistAdapter.isItemSelected();
+    }
+
+    public void setFileListAllItemUnselected() {
+        mTreeFilelistAdapter.setAllItemUnchecked();
+        mTreeFilelistAdapter.notifyDataSetChanged();
+    }
+
     public boolean isFileListSortAscendant() {
         if (mTreeFilelistAdapter != null) return mTreeFilelistAdapter.isSortAscendant();
         else return true;
@@ -3180,7 +3189,7 @@ public class LocalFileManager {
 			@Override
 			public void positiveResponse(Context c, Object[] o) {
 				setContextButtonShareVisibility();
-				mContextButtonCreateView.setVisibility(ImageButton.INVISIBLE);
+                setCreateContextButtonViewVisibility(mContextButtonCreateView);
 				if (mTreeFilelistAdapter.getSelectedItemCount()==1) setContextButtonViewVisibility(mContextButtonRenameView);
 				else mContextButtonRenameView.setVisibility(ImageButton.INVISIBLE);
                 setContextButtonViewVisibility(mContextButtonDeleteView);
@@ -3193,7 +3202,7 @@ public class LocalFileManager {
 			@Override
 			public void negativeResponse(Context c, Object[] o) {
 				if (mTreeFilelistAdapter.isItemSelected()) {
-                    setContextButtonViewVisibility(mContextButtonCreateView);
+                    setCreateContextButtonViewVisibility(mContextButtonCreateView);
 					setContextButtonShareVisibility();
 					if (mTreeFilelistAdapter.getSelectedItemCount()==1) {
                         setContextButtonViewVisibility(mContextButtonRenameView);
@@ -3212,7 +3221,7 @@ public class LocalFileManager {
 					} else {
 						mContextButtonPasteView.setVisibility(ImageButton.INVISIBLE);
 					}
-                    setContextButtonViewVisibility(mContextButtonCreateView);
+                    setCreateContextButtonViewVisibility(mContextButtonCreateView);
 					setContextButtonShareVisibility();
 					mContextButtonRenameView.setVisibility(ImageButton.INVISIBLE);
 					mContextButtonDeleteView.setVisibility(ImageButton.INVISIBLE);
@@ -3435,6 +3444,25 @@ public class LocalFileManager {
             else cbv.setVisibility(LinearLayout.INVISIBLE);
         }
     }
+
+    private void setCreateContextButtonViewVisibility(LinearLayout cbv) {
+        if (mMainFilePath.startsWith(mGp.internalRootDirectory)) {
+            if (mTreeFilelistAdapter.isItemSelected()) setCreateContextButtonViewVisibility(LinearLayout.INVISIBLE);
+            else setCreateContextButtonViewVisibility(LinearLayout.VISIBLE);
+        } else {
+            if (mGp.safMgr.isSdcardMounted()) {
+                if (mTreeFilelistAdapter.isItemSelected()) setCreateContextButtonViewVisibility(LinearLayout.INVISIBLE);
+                else setCreateContextButtonViewVisibility(LinearLayout.VISIBLE);
+            } else {
+                setCreateContextButtonViewVisibility(LinearLayout.INVISIBLE);
+            }
+        }
+    }
+
+    private void setCreateContextButtonViewVisibility(int visibility) {
+        mContextButtonCreate.setVisibility(visibility);
+    }
+
 
     public void performClickUpButton() {
 		mFileListUp.setSoundEffectsEnabled(false);
