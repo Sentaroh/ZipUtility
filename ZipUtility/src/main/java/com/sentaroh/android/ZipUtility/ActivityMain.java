@@ -399,8 +399,8 @@ public class ActivityMain extends AppCompatActivity {
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
 
-        mContext=this;
-        mActivity=this;
+        mContext=ActivityMain.this.getApplicationContext();
+        mActivity=ActivityMain.this;
         mUiHandler=new Handler();
         mFragmentManager=getSupportFragmentManager();
         mRestartStatus=0;
@@ -429,7 +429,7 @@ public class ActivityMain extends AppCompatActivity {
         mGp.copyCutList=new ArrayList<TreeFilelistItem>();
     	mGp.copyCutModeIsCut=false;
 
-        mLocalFileMgr=new LocalFileManager(mGp, this, mFragmentManager, mLocalView);
+        mLocalFileMgr=new LocalFileManager(mGp, mActivity, mFragmentManager, mLocalView);
         mLocalFileMgr.showLocalFileView(false);
         mZipFileMgr=new ZipFileManager(mGp, mActivity, mFragmentManager, mZipView);
 
@@ -985,7 +985,7 @@ public class ActivityMain extends AppCompatActivity {
 	private void invokeSettingsActivity() {
 		mUtil.addDebugMsg(1,"I","Invoke Settings.");
 		Intent intent=null;
-		intent = new Intent(this, ActivitySettings.class);
+		intent = new Intent(mContext, ActivitySettings.class);
 		startActivityForResult(intent,0);
 	};
 
@@ -1443,13 +1443,13 @@ public class ActivityMain extends AppCompatActivity {
 	    mMainTabWidget.setStripEnabled(false);  
 	    mMainTabWidget.setShowDividers(LinearLayout.SHOW_DIVIDER_NONE);  
 	    
-		CustomTabContentView tabLocal = new CustomTabContentView(this,
+		CustomTabContentView tabLocal = new CustomTabContentView(mContext,
 				mContext.getString(R.string.msgs_main_tab_name_local));
 		mMainTabHost.addTab(mMainTabHost.newTabSpec(
 				mContext.getString(R.string.msgs_main_tab_name_local)).setIndicator(tabLocal).
 				setContent(android.R.id.tabcontent));
 		
-		CustomTabContentView tabZip = new CustomTabContentView(this,
+		CustomTabContentView tabZip = new CustomTabContentView(mContext,
 				mContext.getString(R.string.msgs_main_tab_name_zip));
 		mMainTabHost.addTab(mMainTabHost.newTabSpec(mContext.getString(R.string.msgs_main_tab_name_zip)).
 				setIndicator(tabZip).setContent(android.R.id.tabcontent));
@@ -1476,7 +1476,7 @@ public class ActivityMain extends AppCompatActivity {
 //		mZipView.setBackgroundColor(mGp.themeColorList.window_background_color_content);
 
 		mMainViewPager=(CustomViewPager)findViewById(R.id.main_screen_pager);
-	    mMainViewPagerAdapter=new CustomViewPagerAdapter(this, 
+	    mMainViewPagerAdapter=new CustomViewPagerAdapter(mActivity,
 	    		new View[]{mLocalView, mZipView});
 	    
 //	    mMainViewPager.setBackgroundColor(mGp.themeColorList.window_background_color_content);
