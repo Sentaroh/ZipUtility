@@ -1249,7 +1249,7 @@ public class ActivityMain extends AppCompatActivity {
     };
 
     public void showSelectSdcardMsg(final NotifyEvent ntfy) {
-		final Dialog dialog = new Dialog(mContext, mGp.applicationTheme);
+		final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
 		dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    dialog.setContentView(R.layout.show_select_sdcard_dlg);
 
@@ -1308,7 +1308,7 @@ public class ActivityMain extends AppCompatActivity {
 	}
 
     public void showSelectUsbMsg(final NotifyEvent ntfy) {
-        final Dialog dialog = new Dialog(mContext, mGp.applicationTheme);
+        final Dialog dialog = new Dialog(mActivity, mGp.applicationTheme);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.show_select_sdcard_dlg);
 
