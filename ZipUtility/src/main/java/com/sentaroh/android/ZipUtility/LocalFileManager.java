@@ -3334,7 +3334,7 @@ public class LocalFileManager {
                         } else {
                             mFileEmpty.setVisibility(TextView.GONE);
                             mTreeFilelistView.setVisibility(ListView.VISIBLE);
-                            mTreeFilelistView.setSelectionFromTop(p_dli.pos_x, p_dli.pos_y);
+                            if (p_dli!=null) mTreeFilelistView.setSelectionFromTop(p_dli.pos_x, p_dli.pos_y);
                         }
                         if (isCopyCutDestValid(mMainFilePath)) {
                             setContextButtonViewVisibility(mContextButtonPasteView);
