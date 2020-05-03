@@ -237,10 +237,10 @@ public class ActivityMain extends AppCompatActivity {
                             mCommonDlg.showCommonDialog(false,"E","showZipFileByIntent()Input stream open error", ", Uri="+intent.getData(),null);
                             mUtil.addLogMsg("E","showZipFileByIntent()Input stream open error"+ ", Uri="+intent.getData());
                         }
-                    } catch (FileNotFoundException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
-                        mCommonDlg.showCommonDialog(false,"E","showZipFileByIntent() File not found exception occured", ", Uri="+intent.getData(),null);
-                        mUtil.addLogMsg("E","showZipFileByIntent() File not found exception occured"+", Uri="+intent.getData());
+                        mCommonDlg.showCommonDialog(false,"E","showZipFileByIntent() Exception occured", "Error="+e.getMessage()+"\n"+"Uri="+intent.getData(),null);
+                        mUtil.addLogMsg("E","showZipFileByIntent() Exception occured"+", Error="+e.getMessage()+", Uri="+intent.getData());
                         final StringWriter sw = new StringWriter();
                         final PrintWriter pw = new PrintWriter(sw);
                         e.printStackTrace(pw);
