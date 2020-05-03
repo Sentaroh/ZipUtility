@@ -44,7 +44,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,14 +53,13 @@ import android.os.RemoteException;
 import android.os.StrictMode;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -93,12 +91,7 @@ import com.sentaroh.android.Utilities.Widget.CustomViewPager;
 import com.sentaroh.android.Utilities.Widget.CustomViewPagerAdapter;
 import com.sentaroh.android.ZipUtility.Log.LogFileListDialogFragment;
 
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import net.lingala.zip4j.model.ZipParameters;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -197,57 +190,39 @@ public class ActivityMain extends AppCompatActivity {
             }
             if (file_path!=null){// && file_path.endsWith(".zip")) {
                 if (file_path.startsWith("content://")) {
-                    InputStream is=null;
-                    try {
-                        is=mContext.getContentResolver().openInputStream(intent.getData());
-                        if (is!=null) {
-                            final Dialog pd=CommonDialog.showProgressSpinIndicator(mActivity);
-                            pd.show();
-                            Thread th=new Thread() {
-                                public void run() {
-                                    final String[] column={MediaStore.MediaColumns._ID,  MediaStore.MediaColumns.DATA, MediaStore.MediaColumns.DISPLAY_NAME};
-                                    Cursor cursor = mContext.getContentResolver().query(intent.getData(), column, null, null, null);
-                                    if (cursor!=null) {
-                                        if (cursor.moveToFirst()) {
-                                            String t_file_name = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME));
-                                            clearCacheFile(cd);
-                                            String file_name=t_file_name==null?"attachedFile":t_file_name;
-                                            final File tlf=new File(cd+file_name);
-                                            try {
-                                                InputStream is=mContext.getContentResolver().openInputStream(intent.getData());
-                                                copyFileFromUri(is, tlf);
-                                                mUiHandler.post(new Runnable(){
-                                                    @Override
-                                                    public void run() {
-                                                        invokeZipFileManager(tlf.getPath());
-                                                    }
-                                                });
-
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                        cursor.close();
+                    final Dialog pd=CommonDialog.showProgressSpinIndicator(mActivity);
+                    pd.show();
+                    Thread th=new Thread() {
+                        public void run() {
+                            String t_file_name = CommonUtilities.queryNameFromUri(mContext, intent.getData(), DocumentsContract.Document.COLUMN_DISPLAY_NAME, null);
+                            clearCacheFile(cd);
+                            String file_name=t_file_name==null?"attachedFile":t_file_name;
+                            String fp=cd+file_name;
+                            final File tlf=new File(fp);
+                            try {
+                                InputStream is=mContext.getContentResolver().openInputStream(intent.getData());
+                                copyFileFromUri(is, tlf);
+                                mUiHandler.post(new Runnable(){
+                                    @Override
+                                    public void run() {
+                                        invokeZipFileManager(tlf.getPath());
                                     }
-                                    pd.dismiss();
-                                }
-                            };
-                            th.start();
-                        } else {
-                            mCommonDlg.showCommonDialog(false,"E","showZipFileByIntent()Input stream open error", ", Uri="+intent.getData(),null);
-                            mUtil.addLogMsg("E","showZipFileByIntent()Input stream open error"+ ", Uri="+intent.getData());
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                mCommonDlg.showCommonDialog(false,"E","showZipFileByIntent() Exception occured", "Error="+e.getMessage()+"\n"+"Uri="+intent.getData(),null);
+                                mUtil.addLogMsg("E","showZipFileByIntent() Exception occured"+", Error="+e.getMessage()+", Uri="+intent.getData());
+                                final StringWriter sw = new StringWriter();
+                                final PrintWriter pw = new PrintWriter(sw);
+                                e.printStackTrace(pw);
+                                pw.flush();
+                                pw.close();
+                                mUtil.addLogMsg("E","showZipFileByIntent() ","\n",sw.toString());
+                            }
+                            pd.dismiss();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        mCommonDlg.showCommonDialog(false,"E","showZipFileByIntent() Exception occured", "Error="+e.getMessage()+"\n"+"Uri="+intent.getData(),null);
-                        mUtil.addLogMsg("E","showZipFileByIntent() Exception occured"+", Error="+e.getMessage()+", Uri="+intent.getData());
-                        final StringWriter sw = new StringWriter();
-                        final PrintWriter pw = new PrintWriter(sw);
-                        e.printStackTrace(pw);
-                        pw.flush();
-                        pw.close();
-                        mUtil.addLogMsg("E","showZipFileByIntent() ","\n",sw.toString());
-                    }
+                    };
+                    th.start();
                 } else {
                     invokeZipFileManager(file_path);
                 }
@@ -265,7 +240,7 @@ public class ActivityMain extends AppCompatActivity {
         }
 	}
 
-	private void invokeZipFileManager(String file_path) {
+    private void invokeZipFileManager(String file_path) {
         mLocalFileMgr.showLocalFileView(false);
         Handler hndl=new Handler();
         showZipFile(file_path);

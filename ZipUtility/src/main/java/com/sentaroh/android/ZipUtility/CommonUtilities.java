@@ -26,12 +26,15 @@ OTHER DEALINGS IN THE SOFTWARE.
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.database.Cursor;
 import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -87,6 +90,30 @@ public final class CommonUtilities {
 		File w_lf=new File(work_dir);
 		deleteLocalFile(w_lf);
 	};
+
+    public static String queryNameFromUri(Context context, Uri uri, String column, String defaultValue) {
+        final ContentResolver resolver = context.getContentResolver();
+
+        Cursor c = null;
+        try {
+            c = resolver.query(uri, new String[] { column }, null, null, null);
+            if (c.moveToFirst() && !c.isNull(0)) {
+                return c.getString(0);
+            } else {
+                return defaultValue;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return defaultValue;
+        } finally {
+            try {
+                if (c!=null) c.close();
+            } catch (RuntimeException rethrown) {
+                throw rethrown;
+            } catch (Exception ignored) {
+            }
+        }
+    }
 
     public SafFile createSafFile(String fp, boolean directory) {
         SafFile sf=null;
