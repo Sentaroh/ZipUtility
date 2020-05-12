@@ -2146,10 +2146,10 @@ public class LocalFileManager {
                     result = false;
 //					mCommonDlg.showCommonDialog(false, "W",
 //							mContext.getString(R.string.msgs_zip_extract_file_was_cancelled), "", null);
-                    refreshFileList();
                     mUiHandler.post(new Runnable() {
                         @Override
                         public void run() {
+                            refreshFileList();
                             setUiEnabled();
                             hideDialog();
                         }
@@ -2159,10 +2159,10 @@ public class LocalFileManager {
                 result = false;
                 mCommonDlg.showCommonDialog(false, "E",
                         mContext.getString(R.string.msgs_zip_extract_file_was_failed), tc.getThreadMessage(), null);
-                refreshFileList();
                 mUiHandler.post(new Runnable() {
                     @Override
                     public void run() {
+                        refreshFileList();
                         setUiEnabled();
                         hideDialog();
                     }
