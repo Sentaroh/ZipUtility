@@ -32,6 +32,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.sentaroh.android.Utilities.BufferedZipFile2;
+import com.sentaroh.android.Utilities.CallBackListener;
 import com.sentaroh.android.Utilities.ContextButton.ContextButtonUtil;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenu;
 import com.sentaroh.android.Utilities.ContextMenu.CustomContextMenuItem.CustomContextMenuOnClickListener;
@@ -2258,13 +2259,16 @@ public class LocalFileManager {
         return result;
     }
 
-    private boolean extractSpecificFileByExternal(ThreadCtrl tc, ZipFile zf, String zip_file_name,
+    private boolean extractSpecificFileByExternal(ThreadCtrl tc, ZipFile zf, final String zip_file_name,
                                                   String dest_path, String dest_file_name) {
         boolean result = false;
+        OutputStream os=null;
+        InputStream is=null;
+        File work_os_file=null;
         try {
             if (tc.isEnabled()) {
                 FileHeader fh = zf.getFileHeader(zip_file_name);
-                InputStream is = zf.getInputStream(fh);
+                is = zf.getInputStream(fh);
 
                 String w_path = dest_path.endsWith("/") ? dest_path + dest_file_name : dest_path + "/" + dest_file_name;
                 SafFile out_dir_sf = mGp.safMgr.createSdcardItem(dest_path, true);
@@ -2283,36 +2287,49 @@ public class LocalFileManager {
                     mCommonDlg.showCommonDialog(false, "E", "SafFile creation :fp=" + out_file_sf, e_msg, null);
                     return false;
                 }
-                OutputStream os = mContext.getContentResolver().openOutputStream(out_file_sf.getUri());
 
-                long fsz = fh.getUncompressedSize();
-                long frc = 0;
-                byte[] buff = new byte[IO_AREA_SIZE];
-                int rc = is.read(buff);
-                while (rc > 0) {
-                    if (!tc.isEnabled()) break;
-                    os.write(buff, 0, rc);
-                    frc += rc;
-                    long progress = (frc * 100) / (fsz);
-                    putProgressMessage(String.format(mContext.getString(R.string.msgs_zip_extract_file_extracting),
-                            zip_file_name, progress));
-                    rc = is.read(buff);
+                long fsz=fh.getUncompressedSize();
+                final String msg_text=mContext.getString(R.string.msgs_zip_extract_file_extracting);
+
+                CallBackListener cbl=new CallBackListener() {
+                    @Override
+                    public boolean onCallBack(Context context, Object o, Object[] objects) {
+                        putProgressMessage(String.format(msg_text, zip_file_name, (int)o));
+                        return true;
+                    }
+                };
+
+                work_os_file=new File(mGp.safMgr.getSdcardRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/cache/"+System.currentTimeMillis());
+                File work_os_dir=new File(mGp.safMgr.getSdcardRootPath()+"/"+APP_SPECIFIC_DIRECTORY+"/cache");
+                if (!work_os_dir.exists()) work_os_dir.mkdirs();
+
+                os=new FileOutputStream(work_os_file);
+
+                ZipFileManager.copyFile(tc, fsz, is, os, cbl);
+                if (!tc.isEnabled()) work_os_file.delete();
+                else {
+                    work_os_file.setLastModified(ZipUtil.dosToJavaTme(fh.getLastModFileTime()));
+                    SafFile work_sf=mUtil.createSafFile(work_os_file.getPath(), false);
+                    work_sf.moveTo(out_file_sf);
+                    CommonUtilities.scanMediaFile(mGp, mUtil, w_path);
+
                 }
-                os.flush();
-                os.close();
-                is.close();
-                if (!tc.isEnabled()) out_file_sf.delete();
-                else CommonUtilities.scanMediaFile(mGp, mUtil, w_path);
             }
             result = true;
         } catch (ZipException e) {
             mUtil.addLogMsg("I", e.getMessage());
             CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
             tc.setThreadMessage(e.getMessage());
+            try {if (is!=null) is.close();} catch (Exception ex){};
+            try {if (os!=null) os.close();} catch (Exception ex){};
+            if (work_os_file!=null) work_os_file.delete();
         } catch (IOException e) {
             mUtil.addLogMsg("I", e.getMessage());
             CommonUtilities.printStackTraceElement(mUtil, e.getStackTrace());
             tc.setThreadMessage(e.getMessage());
+            try {if (is!=null) is.close();} catch (Exception ex){};
+            try {if (os!=null) os.close();} catch (Exception ex){};
+            if (work_os_file!=null) work_os_file.delete();
         }
         mUtil.addDebugMsg(1, "I",
                 "extractSpecificFile result=" + result + ", zip file name=" + zip_file_name + ", dest=" + dest_path + ", dest file name=" + dest_file_name);
