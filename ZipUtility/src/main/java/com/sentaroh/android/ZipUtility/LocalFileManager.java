@@ -767,14 +767,6 @@ public class LocalFileManager {
                 mSearchListPositionX = lv_search_result.getFirstVisiblePosition();
                 mSearchListPositionY = lv_search_result.getChildAt(0) == null ? 0 : lv_search_result.getChildAt(0).getTop();
                 btnCancel.performClick();
-
-//				String fid=CommonUtilities.getFileExtention(tfi.getName());
-//				String mt=MimeTypeMap.getSingleton().getMimeTypeFromExtension(fid);
-//				invokeBrowser(tfi.getPath(), tfi.getName(), "");
-//
-//				if (mt!=null && mt.startsWith("application/zip")) {
-//					btnCancel.performClick();
-//				}
             }
         });
 
@@ -920,7 +912,6 @@ public class LocalFileManager {
         } else {
             ignore = false;
         }
-//		Log.v("","path="+s_file.getPath()+", ignore="+ignore);
         if (!ignore) {
             if (s_file.isDirectory()) {
                 psd.updateMsgText(s_file.getPath());
@@ -934,8 +925,6 @@ public class LocalFileManager {
                 if (!tc.isEnabled()) return;
             } else {
                 if (!tc.isEnabled()) return;
-//				Log.v("","s_key="+s_key.toString()+", fn="+s_file.getName().toLowerCase()+
-//						", result="+s_key.matcher(s_file.getName().toLowerCase()).matches());
                 if (s_key.matcher(s_file.getName()).matches()) {
                     TreeFilelistItem tfli = createNewFileListItem(s_file);
                     s_tfl.add(tfli);
@@ -984,7 +973,6 @@ public class LocalFileManager {
             public void afterTextChanged(Editable s) {
                 if (s.length() > 0) {
                     File lf = new File(t_dir + s.toString());
-//					Log.v("","fp="+lf.getPath());
                     if (lf.exists()) {
                         CommonDialog.setButtonEnabled(mActivity, btnOk, false);
                         dlg_msg.setText(mContext.getString(R.string.msgs_single_item_input_dlg_duplicate_dir));
@@ -999,10 +987,8 @@ public class LocalFileManager {
         //OK button
         btnOk.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//				NotifyEvent
                 final String creat_dir = etDir.getText().toString();
                 final String n_path = t_dir + creat_dir;
-//				Log.v("","create_dir="+creat_dir+", n_path="+n_path);
                 NotifyEvent ntfy = new NotifyEvent(mContext);
                 ntfy.setListener(new NotifyEventListener() {
                     @Override
@@ -1108,7 +1094,6 @@ public class LocalFileManager {
             public void afterTextChanged(Editable s) {
                 if (s.length() > 0) {
                     File lf = new File(tfli.getPath() + "/" + s.toString());
-//					Log.v("","fp="+lf.getPath());
                     if (lf.exists()) {
                         CommonDialog.setButtonEnabled(mActivity, btnOk, false);
                         dlg_msg.setText(mContext.getString(R.string.msgs_single_item_input_dlg_duplicate_dir));
@@ -1127,8 +1112,6 @@ public class LocalFileManager {
             public void onClick(View v) {
                 final String new_name = tfli.getPath() + "/" + etDir.getText().toString();
                 final String current_name = tfli.getPath() + "/" + tfli.getName();
-//				NotifyEvent
-//				Log.v("","new name="+new_name+", current name="+current_name);
                 NotifyEvent ntfy = new NotifyEvent(mContext);
                 ntfy.setListener(new NotifyEventListener() {
                     @Override
@@ -1330,10 +1313,8 @@ public class LocalFileManager {
                     String sel_path = s_item.getPath();
                     String pref = sel_path.startsWith(mGp.internalRootDirectory) ? mGp.internalRootDirectory : mGp.externalRootDirectory;
                     String w_s_item = sel_path.replace(pref, "").equals("") ? "/" : sel_path.replace(pref, "");
-//					Log.v("","w_s_item="+w_s_item);
                     String[] item_array = w_s_item.equals("") ? new String[]{"/"} : w_s_item.substring(1).split("/");
                     String[] cdir_array = curr_dir.equals("/") ? new String[]{""} : curr_dir.split("/");
-//					Log.v("","item num="+item_array.length+", cdir num="+cdir_array.length);
                     if (item_array.length > 1) {
                         if (cdir_array.length != 0) {
                             if (w_s_item.equals(curr_dir)) enabled = false;
@@ -1343,7 +1324,6 @@ public class LocalFileManager {
                             }
                         }
                     } else {
-//						Log.v("","s_path="+(w_s_item+s_item.getName()));
                         if (s_item.isDirectory()) {
                             if (w_s_item.equals(curr_dir)) enabled = false;
                             else {
@@ -1354,8 +1334,6 @@ public class LocalFileManager {
                             if (w_s_item.equals(curr_dir)) enabled = false;
                         }
                     }
-//					if (enabled) Log.v("","enabled  name="+w_s_item+", c="+curr_dir);
-//					else Log.v("","disabled name="+w_s_item+", c="+curr_dir);
                 }
             }
         } else {
@@ -1436,13 +1414,6 @@ public class LocalFileManager {
                         String moved_item = "", moved_sep = "";
                         boolean process_aborted = false;
                         for (TreeFilelistItem tfl : mGp.copyCutList) {
-//							if (!tc.isEnabled()) {
-//								String msg=mContext.getString(R.string.msgs_zip_local_file_move_cancelled);
-//								mUtil.addLogMsg("I", msg);
-//								mCommonDlg.showCommonDialog(false, "W", msg, "", null);
-//								process_aborted=true;
-//								break;
-//							}
                             File from_file = new File(tfl.getPath() + "/" + tfl.getName());
 //							File to_file=new File(to_dir+"/"+tfl.getName());
                             boolean rc = moveFile(tc, from_file, (to_dir + "/" + tfl.getName()).replace("//", "/"));
@@ -1512,7 +1483,6 @@ public class LocalFileManager {
         boolean result = false;
 
         if (from_file.isDirectory()) {
-//			Log.v("","mkdirs="+to_path);
             File[] fl = from_file.listFiles();
             if (fl != null && fl.length > 0) {
                 for (File item : fl) {
@@ -1564,7 +1534,6 @@ public class LocalFileManager {
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " from=" + from_file.getPath() + ", to=" + to_path);
         boolean result = false;
         if (from_file.isDirectory()) {
-//			Log.v("","mkdirs="+to_path);
             if (!tc.isEnabled()) {
                 String msg = String.format(mContext.getString(R.string.msgs_zip_local_file_move_cancelled), to_path);
                 mUtil.addLogMsg("I", msg);
@@ -1662,7 +1631,6 @@ public class LocalFileManager {
         mUtil.addDebugMsg(1, "I", CommonUtilities.getExecutedMethodName() + " from=" + from_file.getPath() + ", to=" + to_path);
         boolean result = false;
         if (from_file.isDirectory()) {
-//			Log.v("","mkdirs="+to_path);
             if (!tc.isEnabled()) {
                 String msg = String.format(mContext.getString(R.string.msgs_zip_local_file_move_cancelled), to_path);
                 mUtil.addLogMsg("I", msg);
@@ -1702,7 +1670,6 @@ public class LocalFileManager {
                     File out_file = new File(to_path);
                     File d_lf = new File(out_file.getParent());
                     d_lf.mkdirs();
-//					Log.v("","dir="+d_lf.getPath()+", file="+lf.getPath());
                     FileOutputStream fos = new FileOutputStream(out_file);
 //					BufferedOutputStream bos=new BufferedOutputStream(fos, 1024*1024*8);
                     byte[] buff = new byte[IO_AREA_SIZE];
@@ -1782,7 +1749,6 @@ public class LocalFileManager {
                 mCommonDlg.showCommonDialog(false, "W", msg, "", null);
                 return false;
             }
-//			Log.v("","mkdirs="+to_path);
             File[] fl = from_file.listFiles();
             if (fl != null && fl.length > 0) {
                 for (File item : fl) {
@@ -2133,7 +2099,6 @@ public class LocalFileManager {
             dir = "/"+fh_item.getFileName().substring(0, fh_item.getFileName().lastIndexOf("/")).replace(mGp.copyCutCurrentDirectory, "");
             fn = fh_item.getFileName().substring(fh_item.getFileName().lastIndexOf("/") + 1);
         }
-//		Log.v("","dir="+dir+", fn="+fn+", cd="+mGp.copyCutCurrentFilePath);
         if (confirmReplace(tc, (dest_path + dir + "/" + fn).replaceAll("//","/").replaceAll("//","/"))) {
             if (extractSpecificFile(tc, zf, fh_item.getFileName(), dest_path + dir, fn)) {
                 if (tc.isEnabled()) {
@@ -2145,8 +2110,6 @@ public class LocalFileManager {
                         extractMultipleItem(tc, dest_path, zf, selected_fh_list, extracted_fh_list, conf_list, move_mode);
                 } else {
                     result = false;
-//					mCommonDlg.showCommonDialog(false, "W",
-//							mContext.getString(R.string.msgs_zip_extract_file_was_cancelled), "", null);
                     mUiHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -2386,8 +2349,6 @@ public class LocalFileManager {
                             }
                         }
                         if (!process_aborted) {
-//							putDialogMessage(false, "I",
-//								mContext.getString(R.string.msgs_zip_local_file_copy_completed), copied_item, null);
                             mCommonDlg.showCommonDialog(false, "I",
                                     mContext.getString(R.string.msgs_zip_local_file_copy_completed), copied_item, null);
                         }
@@ -2428,7 +2389,6 @@ public class LocalFileManager {
 
     private boolean confirmReplace(final ThreadCtrl tc, final String dest_path) {
         File lf = new File(dest_path);
-//		Log.v("","name="+lf.getPath()+", exists="+lf.exists());
         if (lf.exists()) {
             if (mConfirmResponse != CONFIRM_RESPONSE_YESALL && mConfirmResponse != CONFIRM_RESPONSE_NOALL) {
                 mUiHandler.post(new Runnable() {
@@ -2541,7 +2501,6 @@ public class LocalFileManager {
         if (from_file.isDirectory()) {
             File to_file = new File(to_path);
             to_file.mkdirs();
-//			Log.v("","mkdirs="+to_path);
             File[] fl = from_file.listFiles();
             if (fl != null && fl.length > 0) {
                 for (File item : fl) {
@@ -2891,8 +2850,7 @@ public class LocalFileManager {
 		});
 	}
 
-	@SuppressWarnings("unused")
-	private void putDialogMessage(final boolean negative, final String msg_type, final String msg_title, 
+	private void putDialogMessage(final boolean negative, final String msg_type, final String msg_title,
 			final String msg_body, final NotifyEvent ntfy) {
 		mUiHandler.post(new Runnable(){
 			@Override
@@ -3376,7 +3334,6 @@ public class LocalFileManager {
 			public void onClick(View v) {
 				if (!isUiEnabled()) return;
 				String dir=mLocalStorage.getSelectedItem().toString()+mCurrentDirectory.getText().toString();
-//				Log.v("","dir="+dir+", idx="+dir.lastIndexOf("/"));
 				if (!dir.equals("")) {
 					if (dir.lastIndexOf("/")>0) {
 						FileManagerDirectoryListItem dli=CommonUtilities.getDirectoryItem(mDirectoryList, dir);

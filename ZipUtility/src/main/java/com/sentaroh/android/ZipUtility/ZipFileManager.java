@@ -809,13 +809,6 @@ public class ZipFileManager {
 				mSearchListPositionX=lv_search_result.getFirstVisiblePosition();
 				mSearchListPositionY=lv_search_result.getChildAt(0)==null?0:lv_search_result.getChildAt(0).getTop();
 				btnCancel.performClick();
-//				String fid=CommonUtilities.getFileExtention(tfi.getName());
-//				String mt=MimeTypeMap.getSingleton().getMimeTypeFromExtension(fid);
-//				invokeBrowser(tfi.getPath(), tfi.getName(), "");
-////				Log.v("","mt="+mt);
-//				if (mt!=null && mt.startsWith("application/zip")) {
-//					btnCancel.performClick();
-//				}
 			}
 		});
 
@@ -855,8 +848,6 @@ public class ZipFileManager {
 							mCommonDlg.showCommonDialog(false, "W",
 									mContext.getString(R.string.msgs_search_file_dlg_search_cancelled), "", null);
 						} else {
-//							mCommonDlg.showCommonDialog(false, "W",
-//									String.format(mContext.getString(R.string.msgs_search_file_dlg_search_found), s_tfl.size()), "", null);
 							mAdapterSearchFileList.setDataList(s_tfl);
 							mSearchRootDir=mCurrentFilePath;
 							mUiHandler.post(new Runnable(){
@@ -886,41 +877,6 @@ public class ZipFileManager {
 
 		dialog.show();
 	};
-
-//	private void saveSearchResultList(ArrayList<TreeFilelistItem>fl) {
-//		try {
-//			FileOutputStream fos=new FileOutputStream(mGp.applicationCacheDirectory+"/ZipSearchList");
-//			BufferedOutputStream bos=new BufferedOutputStream(fos,1024*1024*4);
-//			ObjectOutputStream oos=new ObjectOutputStream(bos);
-//			oos.writeObject(fl);
-//			oos.flush();
-//			oos.close();
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	};
-//
-//	@SuppressWarnings("unchecked")
-//	private ArrayList<TreeFilelistItem> loadSearchResultList() {
-//		ArrayList<TreeFilelistItem>fl=null;
-//		try {
-//			FileInputStream fis=new FileInputStream(mGp.applicationCacheDirectory+"/ZipSearchList");
-//			BufferedInputStream bis=new BufferedInputStream(fis,1024*1024*4);
-//			ObjectInputStream ois=new ObjectInputStream(bis);
-//			fl=(ArrayList<TreeFilelistItem>) ois.readObject();
-//			ois.close();
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		} catch (ClassNotFoundException e) {
-//			e.printStackTrace();
-//		}
-//		return fl;
-//	};
-
 
 	private void buildFileListBySearchKey(final ThreadCtrl tc, ProgressSpinDialogFragment psd,
 			ArrayList<TreeFilelistItem>s_tfl, Pattern s_key) {
@@ -990,8 +946,6 @@ public class ZipFileManager {
 
 	private boolean isZipFileChanged() {
 		File lf=new File(mCurrentFilePath);
-//		mUtil.addDebugMsg(2, "I", "File exists="+lf.exists()+", savedLastMod="+mCurrentFileLastModified+", savedLength="+mCurrentFileLength+
-//				", lastMod="+lf.lastModified()+", length="+lf.length());
 		if (mCurrentFileLastModified!=lf.lastModified() || mCurrentFileLength!=lf.length()) return true;
 		else return false;
 	};
@@ -1193,24 +1147,6 @@ public class ZipFileManager {
 		}
 	};
 
-
-
-//	private void saveZipFileList(ArrayList<ZipFileListItem>fl, String fp) {
-//		File lf=new File(mGp.applicationCacheDirectory+"/ZipSearchList");
-//		try {
-//			FileOutputStream fos=new FileOutputStream(lf);
-//			BufferedOutputStream bos=new BufferedOutputStream(fos,1024*1024*4);
-//			ObjectOutputStream oos=new ObjectOutputStream(bos);
-//			oos.writeObject(fl);
-//			oos.flush();
-//			oos.close();
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	};
-
 	private ArrayList<TreeFilelistItem> createTreeFileList(ArrayList<ZipFileListItem>zip_file_list, String target_dir) {
 		ArrayList<TreeFilelistItem> tfl=new ArrayList<TreeFilelistItem>();
 		for (ZipFileListItem zfli:mZipFileList) {
@@ -1265,8 +1201,6 @@ public class ZipFileManager {
 			tfi.setZipFileCompressionMethod(zfli.getCompressionMethod());
 			tfi.setZipFileCompressedSize(zfli.getCompressedFileLength());
             tfi.setZipFileItem(true);
-//            tfi.dump("zfli");
-//			Log.v("","ft="+ft+", mt="+mt);
 		}
 		return tfi;
 	};
@@ -1361,16 +1295,6 @@ public class ZipFileManager {
 			}
         });
         ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonNew,mContext.getString(R.string.msgs_zip_cont_label_new));
-
-//        mContextButtonAdd.setOnClickListener(new OnClickListener(){
-//			@Override
-//			public void onClick(View v) {
-//				if (isUiEnabled()) {
-//					addItemDlg();
-//				}
-//			}
-//        });
-//        ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonAdd,mContext.getString(R.string.msgs_zip_cont_label_add));
 
         mContextButtonDelete.setOnClickListener(new OnClickListener(){
 			@Override
@@ -1470,20 +1394,10 @@ public class ZipFileManager {
 		boolean enabled=true;
 		if (mGp.copyCutList.size()>0) {
 			if (mGp.copyCutType.equals(GlobalParameters.COPY_CUT_FROM_LOCAL)) {
-//				for(TreeFilelistItem tfli:mGp.copyCutList) {
-//					if (!tfli.isDirectory()) {
-//						String zfp=tfli.getPath()+"/"+tfli.getName();
-//						if (zfp.equals(zip_file_path)) {
-//							enabled=false;
-//							break;
-//						}
-//					}
-//				}
 			} else if (mGp.copyCutType.equals(GlobalParameters.COPY_CUT_FROM_ZIP)) {
 				if (!mGp.copyCutFilePath.equals(zip_file_path)) enabled=true;
 				else {
 					String curr_dir=fp.equals("")?"":fp;
-//					Log.v("","size="+mGp.copyCutList.size());
 					for(TreeFilelistItem s_item:mGp.copyCutList) {
 						String sel_path="";
 						if (s_item.isDirectory()){
@@ -1493,7 +1407,6 @@ public class ZipFileManager {
 						}
 						String[] item_array=sel_path.equals("")?new String[]{"/"}:sel_path.substring(1).split("/");
 						String[] cdir_array=curr_dir.equals("/")?new String[]{""}:curr_dir.split("/");
-//						Log.v("","item length="+item_array.length+", cdir length="+cdir_array.length);
 						if (item_array.length>1) {
 							if (cdir_array.length!=0){
 								if (sel_path.equals(curr_dir)) enabled=false;
@@ -1516,8 +1429,6 @@ public class ZipFileManager {
 								if (curr_dir.equals(sel_path)) enabled=false;
 							}
 						}
-//						if (enabled) Log.v("","enabled  name="+sel_path+", c="+curr_dir);
-//						else Log.v("","disabled name="+sel_path+", c="+curr_dir);
 						if (!enabled) break;
 					}
 				}
@@ -1571,7 +1482,6 @@ public class ZipFileManager {
 				confirmAddItemFromLocal(add_item, mContext.getString(R.string.msgs_zip_add_file_confirm), true, null);
 			}
 		} else {
-//			mCommonDlg.showCommonDialog(false, "W", mContext.getString(R.string.msgs_zip_copy_cut_not_supported), "", null);
 			if (mGp.copyCutModeIsCut) {
 				NotifyEvent ntfy_move=new NotifyEvent(mContext);
 				ntfy_move.setListener(new NotifyEventListener(){
@@ -3263,9 +3173,6 @@ public class ZipFileManager {
 					String n_dir=dir.lastIndexOf("/")>0?dir.substring(1,dir.lastIndexOf("/")):"";
 					FileManagerDirectoryListItem p_dli=
 							CommonUtilities.getDirectoryItem(mDirectoryList, mZipFileSpinner.getSelectedItem().toString()+"/"+n_dir);
-//					Log.v("","loaded="+zipFileSpinner.getSelectedItem().toString()+"/"+n_dir);
-//					Log.v("","x="+p_dli.pos_x+", y="+p_dli.pos_y);
-//					Log.v("","dir="+dir+", idx="+dir.lastIndexOf("/"));
 					ArrayList<TreeFilelistItem> tfl=createTreeFileList(mZipFileList, n_dir);
 					mTreeFilelistAdapter.setDataList(tfl);
 					mCurrentDirectory.setText("/"+n_dir);
@@ -3311,13 +3218,6 @@ public class ZipFileManager {
 	private void setTopUpButtonEnabled(boolean p) {
         CommonDialog.setViewEnabled(mActivity, mFileListUp, p);
         CommonDialog.setViewEnabled(mActivity, mFileListTop, p);
-//		if (p) {
-//			mFileListUp.setAlpha(1);
-//			mFileListTop.setAlpha(1);
-//		} else {
-//			mFileListUp.setAlpha(0.4f);
-//			mFileListTop.setAlpha(0.4f);
-//		}
 	};
 
 	private ZipFileListItem getZipFileListItem(String zfp) {
@@ -3387,13 +3287,6 @@ public class ZipFileManager {
 		  		.setOnClickListener(new CustomContextMenuOnClickListener() {
 				@Override
 				public void onClick(CharSequence menuTitle) {
-//					ZipFile zf=createZipFile(mCurrentFilePath,mZipFileNameEncodingSelected);
-//					try {
-//					} catch (ZipException e) {
-//						e.printStackTrace();
-//						mCommonDlg.showCommonDialog(false, "E", n_tfl.get(0).getName(), 
-//								"ZipException\n"+e.getMessage(), null);
-//					}
 					if (tfi.isDirectory()) {
 						long item_cnt=-1, item_comp_size=0, item_uncomp_size=0;
 						for(ZipFileListItem zfli:mZipFileList) {
@@ -3415,10 +3308,6 @@ public class ZipFileManager {
 							else if (zfli.getCompressionMethod()==Zip4jConstants.COMP_AES_ENC) comp_method="AES";
 							else comp_method+=zfli.getCompressionMethod();
 							long comp_size=zfli.getCompressedFileLength();
-//							long last_mod=fh.getLastModFileTime();
-//							Log.v("","enc="+fh.getEncryptionMethod());
-//							if (fh.getAesExtraDataRecord()!=null)
-//								Log.v("","aes="+fh.getAesExtraDataRecord().getAesStrength());
 							long uncomp_size=zfli.getFileLength();
 							long last_mod=zfli.getLastModifiedTime();
 							String enc_yes_no=zfli.isEncrypted()?
@@ -3502,17 +3391,6 @@ public class ZipFileManager {
 				cutItem(tfa);
 			}
 	  	});
-//		if (mGp.copyCutList.size()>0 && 
-//				isCopyCutDestValid(mZipFileSpinner.getSelectedItem().toString(),mZipFileCurrentDirectory.getText().toString().substring(1))) {
-//			mCcMenu.addMenuItem(mContext.getString(R.string.msgs_main_local_file_ccmenu_paste),R.drawable.context_button_paste)
-//		  		.setOnClickListener(new CustomContextMenuOnClickListener() {
-//				@Override
-//				public void onClick(CharSequence menuTitle) {
-//					if (mGp.copyCutModeIsCut) confirmMove();
-//					else confirmCopy();
-//				}
-//		  	});
-//		}
 
 		if (sel_count==1) {
 			if (!tfi.isDirectory()) {
