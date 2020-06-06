@@ -626,7 +626,10 @@ public class ActivityMain extends AppCompatActivity {
         	}
         } else {
         	if (mZipFileMgr!=null) {
-        		if (mZipFileMgr.isFileListSortAscendant()) menu.findItem(R.id.menu_top_sort).setIcon(R.drawable.ic_128_sort_asc_gray);
+                if (mZipFileMgr.isZipFileLoaded()) menu.findItem(R.id.menu_top_save_zip_file).setVisible(true);
+                else menu.findItem(R.id.menu_top_save_zip_file).setVisible(false);
+
+                if (mZipFileMgr.isFileListSortAscendant()) menu.findItem(R.id.menu_top_sort).setIcon(R.drawable.ic_128_sort_asc_gray);
         		else menu.findItem(R.id.menu_top_sort).setIcon(R.drawable.ic_128_sort_dsc_gray);
         	} else {
         		menu.findItem(R.id.menu_top_sort).setIcon(R.drawable.ic_128_sort_asc_gray);
@@ -700,7 +703,10 @@ public class ActivityMain extends AppCompatActivity {
 //				};
 //				th.start();
 				aboutApplicaion();
-				return true;			
+				return true;
+            case R.id.menu_top_save_zip_file:
+                mZipFileMgr.saveZipFile();
+                return true;
 			case R.id.menu_top_settings:
 				invokeSettingsActivity();
 				return true;

@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:appv7="http://schemas.android.com/apk/res-auto">
-    
+
     <item android:id="@+id/menu_top_find"
           android:title="@string/msgs_menu_find" 
           android:icon="@drawable/search"
@@ -10,7 +10,11 @@
           android:title="@string/msgs_menu_refresh" 
           android:icon="@drawable/ic_32_refresh"
           appv7:showAsAction="always"/>
-    
+
+    <item android:id="@+id/menu_top_save_zip_file"
+        android:title="@string/msgs_menu_save_zip_file"
+        />
+
     <item android:id="@+id/menu_top_quit"
           android:title="@string/msgs_menu_quit"
           android:icon="@drawable/ic_32_close_gray"
@@ -54,5 +58,4 @@
     <item android:id="@+id/menu_top_kill"
           android:title="@string/msgs_menu_kill"
           />
-    
 </menu>

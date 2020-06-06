@@ -273,5 +273,8 @@ External Library:\n
     <string name="msgs_main_saf_file_creation_error">SafFile creation error, File path=%s</string>
 
     <string name="msgs_main_local_mount_point_unmounted">The local folder is displaying internal storage because the SDcard has been removed.</string>
-		
+
+    <string name="msgs_zip_write_zip_file_canelled">Zip file writing has been canceled.</string>
+    <string name="msgs_zip_write_zip_file_writing">Witing ZIP file.</string>
+    <string name="msgs_zip_write_zip_file_confirm_override">File already exists, do you want to overwrite it?</string>
 </resources>

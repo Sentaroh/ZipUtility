@@ -93,6 +93,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Externalizable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -412,8 +413,113 @@ public class ZipFileManager {
         mFragmentManager=null;
         mUtil=null;
 	};
-	
-	public void showZipFile(String fp) {
+
+    public void saveZipFile() {
+        NotifyEvent ntfy_select_dest=new NotifyEvent(mContext);
+        ntfy_select_dest.setListener(new NotifyEventListener() {
+            @Override
+            public void positiveResponse(Context context, Object[] objects) {
+                final String fpath = (String) objects[0]+objects[1]+"/"+(String)objects[2];
+                NotifyEvent ntfy_confirm=new NotifyEvent(mContext);
+                ntfy_confirm.setListener(new NotifyEventListener() {
+                    @Override
+                    public void positiveResponse(Context context, Object[] objects) {
+                        setUiDisabled();
+                        showDialogProgress();
+                        putProgressMessage(mContext.getString(R.string.msgs_zip_write_zip_file_writing));
+                        final ThreadCtrl tc=new ThreadCtrl();
+                        mDialogProgressSpinCancel.setEnabled(true);
+                        mDialogProgressSpinMsg1.setVisibility(TextView.GONE);
+                        mDialogProgressSpinCancel.setOnClickListener(new OnClickListener(){
+                            @Override
+                            public void onClick(View v) {
+                                confirmCancel(tc,mDialogProgressSpinCancel);
+                            }
+                        });
+                        Thread th=new Thread() {
+                            @Override
+                            public void run() {
+                                mUtil.addDebugMsg(2, "I", CommonUtilities.getExecutedMethodName()+" entered");
+                                SafFile sf_out=null;
+                                File os_out=null;
+                                File in_file=new File(mCurrentFilePath);
+                                InputStream is=null;
+                                OutputStream os=null;
+
+                                try {
+                                    is=new FileInputStream(in_file);
+                                    if (fpath.startsWith(mGp.internalRootDirectory)) {
+                                        os_out=new File(fpath);
+                                        os=new FileOutputStream(os_out);
+                                    } else {
+                                        sf_out=mGp.safMgr.createSdcardFile(fpath);
+                                        if (sf_out==null) {
+                                            return;
+                                        }
+                                        os=mContext.getContentResolver().openOutputStream(sf_out.getUri());
+                                    }
+                                    copyFile(tc, in_file.length(), is, os, new CallBackListener() {
+                                        @Override
+                                        public boolean onCallBack(Context context, Object o, Object[] objects) {
+                                            putProgressMessage(mContext.getString(R.string.msgs_zip_write_zip_file_writing)+" "+(int)o+"%");
+                                            return false;
+                                        }
+                                    });
+                                    if (!tc.isEnabled()) {
+                                        if (fpath.startsWith(mGp.internalRootDirectory)) {
+                                            if (os!=null) os.close();
+                                            os_out.delete();
+                                        } else {
+                                            if (os!=null) os.close();
+                                            sf_out.deleteIfExists();
+                                        }
+                                        mCommonDlg.showCommonDialog(false, "W",
+                                                mContext.getString(R.string.msgs_zip_write_zip_file_canelled), fpath, null);
+                                    }
+                                    mUiHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            setUiEnabled();
+                                            hideDialog();
+                                        }
+                                    });
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    if (is!=null) try {is.close();} catch(Exception ex) {};
+                                    if (os!=null) try {os.close();} catch(Exception ex) {};
+                                    if (sf_out!=null) sf_out.delete();
+                                    if (os_out!=null) os_out.delete();
+                                }
+                            }
+                        };
+                        th.start();
+                    }
+                    @Override
+                    public void negativeResponse(Context context, Object[] objects) {}
+                });
+                File lf=new File(fpath);
+                if (lf.exists()) {
+                    mCommonDlg.showCommonDialog(true, "W",
+                            mContext.getString(R.string.msgs_zip_write_zip_file_confirm_override), fpath, ntfy_confirm);
+                } else {
+                    ntfy_confirm.notifyToListener(true, null);
+                }
+            }
+
+            @Override
+            public void negativeResponse(Context context, Object[] objects) {
+
+            }
+        });
+        String fn=mCurrentFilePath.substring(mCurrentFilePath.lastIndexOf("/")+1);
+        CommonFileSelector fsdf=
+                CommonFileSelector.newInstance(false, true, false, CommonFileSelector.DIALOG_SELECT_CATEGORY_FILE,
+                        true, false, "", "", fn, "Select destination file");
+        fsdf.showDialog(mActivity.getSupportFragmentManager(), fsdf, ntfy_select_dest);
+
+    }
+
+    public void showZipFile(String fp) {
 		if (!isUiEnabled()) return;
 		Bundle bd=new Bundle();
 		if (!fp.equals("")) {
@@ -436,6 +542,7 @@ public class ZipFileManager {
                         if (!fp.startsWith(mGp.internalRootDirectory)) {
                             if (mGp.safMgr.getSdcardRootPath().equals(SafManager.UNKNOWN_SDCARD_DIRECTORY)) mCurrentFileReadOnly=true;
                         }
+                        if (fp.startsWith("/storage/emulated/0/Android/data")) mCurrentFileReadOnly=true;
                         mCurrentFilePath=fp;
 						mCurrentDirectory.setText("/");
 						refreshFileList(true);
