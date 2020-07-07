@@ -1336,7 +1336,7 @@ public class ZipFileManager {
 				}
 			}
         });
-        ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonExtract,mContext.getString(R.string.msgs_zip_cont_label_extract));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextButtonExtract,mContext.getString(R.string.msgs_zip_cont_label_extract));
 
         mContextButtonCopy.setOnClickListener(new OnClickListener(){
 			@Override
@@ -1348,7 +1348,7 @@ public class ZipFileManager {
 				}
 			}
         });
-        ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonCopy, mContext.getString(R.string.msgs_zip_cont_label_copy));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextButtonCopy, mContext.getString(R.string.msgs_zip_cont_label_copy));
 
         mContextButtonCut.setOnClickListener(new OnClickListener(){
 			@Override
@@ -1360,7 +1360,7 @@ public class ZipFileManager {
 				}
 			}
         });
-        ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonCut, mContext.getString(R.string.msgs_zip_cont_label_cut));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextButtonCut, mContext.getString(R.string.msgs_zip_cont_label_cut));
 
         mContextButtonPaste.setOnClickListener(new OnClickListener(){
 			@Override
@@ -1372,7 +1372,7 @@ public class ZipFileManager {
 				}
 			}
         });
-        ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonPaste, mContext.getString(R.string.msgs_zip_cont_label_paste));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextButtonPaste, mContext.getString(R.string.msgs_zip_cont_label_paste));
 
         mContextButtonOpen.setOnClickListener(new OnClickListener(){
 			@Override
@@ -1384,7 +1384,7 @@ public class ZipFileManager {
 				}
 			}
         });
-        ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonOpen,mContext.getString(R.string.msgs_zip_cont_label_open));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextButtonOpen,mContext.getString(R.string.msgs_zip_cont_label_open));
 
         mContextButtonNew.setOnClickListener(new OnClickListener(){
 			@Override
@@ -1401,7 +1401,7 @@ public class ZipFileManager {
 				}
 			}
         });
-        ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonNew,mContext.getString(R.string.msgs_zip_cont_label_new));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextButtonNew,mContext.getString(R.string.msgs_zip_cont_label_new));
 
         mContextButtonDelete.setOnClickListener(new OnClickListener(){
 			@Override
@@ -1413,7 +1413,7 @@ public class ZipFileManager {
 				}
 			}
         });
-        ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonDelete,mContext.getString(R.string.msgs_zip_cont_label_delete));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextButtonDelete,mContext.getString(R.string.msgs_zip_cont_label_delete));
 
         mContextButtonSelectAll.setOnClickListener(new OnClickListener(){
 			@Override
@@ -1429,7 +1429,7 @@ public class ZipFileManager {
 				}
 			}
         });
-        ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonSelectAll,mContext.getString(R.string.msgs_zip_cont_label_select_all));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextButtonSelectAll,mContext.getString(R.string.msgs_zip_cont_label_select_all));
 
         mContextButtonUnselectAll.setOnClickListener(new OnClickListener(){
 			@Override
@@ -1442,7 +1442,7 @@ public class ZipFileManager {
 				}
 			}
         });
-        ContextButtonUtil.setButtonLabelListener(mContext, mContextButtonUnselectAll,mContext.getString(R.string.msgs_zip_cont_label_unselect_all));
+        ContextButtonUtil.setButtonLabelListener(mActivity, mContextButtonUnselectAll,mContext.getString(R.string.msgs_zip_cont_label_unselect_all));
 	};
 
 	private void copyItem(CustomTreeFilelistAdapter tfa) {
