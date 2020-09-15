@@ -167,6 +167,7 @@ public class ActivityMain extends AppCompatActivity {
 	protected void onNewIntent(Intent in) {
 		super.onNewIntent(in);
 		mUtil.addDebugMsg(1, "I", "onNewIntent entered, restartStatus="+mRestartStatus);
+		if (Build.VERSION.SDK_INT>=30) return;
 		if (mRestartStatus==2) return;
 		if (in!=null && in.getData()!=null) showZipFileByIntent(in);
 	};
@@ -411,7 +412,7 @@ public class ActivityMain extends AppCompatActivity {
 //        Intent intmsg = new Intent(mContext, ZipService.class);
 //        startService(intmsg);
 
-        checkRequiredPermissions();
+        if (Build.VERSION.SDK_INT<=29) checkRequiredPermissions();
 
 
 //        try {
@@ -459,50 +460,65 @@ public class ActivityMain extends AppCompatActivity {
 	public void onResume() {
 		super.onResume();
 		mUtil.addDebugMsg(1, "I", "onResume entered, restartStatus="+mRestartStatus);
-		if (mRestartStatus==1) {
-			if (isUiEnabled()) {
-				mZipFileMgr.refreshFileList();
-				mLocalFileMgr.refreshFileList();
-			}
-	        try {
-				mSvcClient.aidlSetActivityInForeground();
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
+		if (Build.VERSION.SDK_INT<=29) {
+            if (mRestartStatus==1) {
+                if (isUiEnabled()) {
+                    mZipFileMgr.refreshFileList();
+                    mLocalFileMgr.refreshFileList();
+                }
+                try {
+                    mSvcClient.aidlSetActivityInForeground();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
 
-		} else {
-			CommonUtilities.cleanupWorkFile(mGp);
-			NotifyEvent ntfy=new NotifyEvent(mContext);
-			ntfy.setListener(new NotifyEventListener(){
-				@Override
-				public void positiveResponse(Context c, Object[] o) {
-			        try {
-						mSvcClient.aidlSetActivityInForeground();
-					} catch (RemoteException e) {
-						e.printStackTrace();
-					}
-					if (mRestartStatus==0) {
-				    	Intent in=getIntent();
-						if (in!=null && in.getData()!=null) showZipFileByIntent(in);
-						else mLocalFileMgr.showLocalFileView(true);
-					} else if (mRestartStatus==2) {
-						if (mGp.activityIsDestroyed) {
-							mCommonDlg.showCommonDialog(false, "W",
-							getString(R.string.msgs_main_restart_by_destroyed),"",null);
-						} else {
-							mCommonDlg.showCommonDialog(false, "W",
-							getString(R.string.msgs_main_restart_by_killed),"",null);
-						}
-					}
-					mRestartStatus=1;
-					mGp.activityIsDestroyed=false;
-				}
-				@Override
-				public void negativeResponse(Context c, Object[] o) {
-				}
-				
-			});
-			openService(ntfy);
+            } else {
+                CommonUtilities.cleanupWorkFile(mGp);
+                NotifyEvent ntfy=new NotifyEvent(mContext);
+                ntfy.setListener(new NotifyEventListener(){
+                    @Override
+                    public void positiveResponse(Context c, Object[] o) {
+                        try {
+                            mSvcClient.aidlSetActivityInForeground();
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                        if (mRestartStatus==0) {
+                            Intent in=getIntent();
+                            if (in!=null && in.getData()!=null) showZipFileByIntent(in);
+                            else mLocalFileMgr.showLocalFileView(true);
+                        } else if (mRestartStatus==2) {
+                            if (mGp.activityIsDestroyed) {
+                                mCommonDlg.showCommonDialog(false, "W",
+                                        getString(R.string.msgs_main_restart_by_destroyed),"",null);
+                            } else {
+                                mCommonDlg.showCommonDialog(false, "W",
+                                        getString(R.string.msgs_main_restart_by_killed),"",null);
+                            }
+                        }
+                        mRestartStatus=1;
+                        mGp.activityIsDestroyed=false;
+                    }
+                    @Override
+                    public void negativeResponse(Context c, Object[] o) {
+                    }
+
+                });
+                openService(ntfy);
+            }
+        } else {
+		    NotifyEvent ntfy_unsuport_version=new NotifyEvent(mContext);
+		    ntfy_unsuport_version.setListener(new NotifyEventListener() {
+                @Override
+                public void positiveResponse(Context context, Object[] objects) {
+                    finish();
+                }
+
+                @Override
+                public void negativeResponse(Context context, Object[] objects) {}
+            });
+		    mCommonDlg.showCommonDialog(false, "E", mContext.getString(R.string.msgs_zip_unsupported_android_version_title),
+                    mContext.getString(R.string.msgs_zip_unsupported_android_version_message), ntfy_unsuport_version);
         }
 	}
 

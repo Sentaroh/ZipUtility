@@ -277,4 +277,8 @@ External Library:\n
     <string name="msgs_zip_write_zip_file_canelled">Zip file writing has been canceled.</string>
     <string name="msgs_zip_write_zip_file_writing">Witing ZIP file.</string>
     <string name="msgs_zip_write_zip_file_confirm_override">File already exists, do you want to overwrite it?</string>
+
+    <string name="msgs_zip_unsupported_android_version_title">Unsupported Android Version</string>
+    <string name="msgs_zip_unsupported_android_version_message">This application cannot be used in Android 11 or later, please use ZipUtility3.</string>
+
 </resources>

@@ -274,4 +274,7 @@ ZIPファイルの作成・編集・抽出のためのアプリケーション�
     <string name="msgs_zip_write_zip_file_canelled">ZIPファイル保存がキャンセルされました。</string>
     <string name="msgs_zip_write_zip_file_writing">ZIPファイルを保存中。</string>
     <string name="msgs_zip_write_zip_file_confirm_override">ファイルが既に存在します、上書きしますか？</string>
+
+    <string name="msgs_zip_unsupported_android_version_title">Androidバージョンエラー</string>
+    <string name="msgs_zip_unsupported_android_version_message">Android11以降ではこのアプリケーションは使用できません、ZipUtility3を御使用ください。</string>
 </resources>
